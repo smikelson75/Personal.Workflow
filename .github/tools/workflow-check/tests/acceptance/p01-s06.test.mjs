@@ -66,6 +66,7 @@ test('[R2-07] requirement without Accept is a requirement-format error at that l
 test('[R2-08] only the malformed requirement is flagged; retired forms are accepted', () => {
   const bad = '- R3 - Users can export.';
   const session = validSession({
+    header: ['- Builds on: `context-2026-11-19-0900.md`'],
     sections: {
       Requirements: [
         '- R1 - Users can run it. Accept: it runs.',
@@ -75,7 +76,14 @@ test('[R2-08] only the malformed requirement is flagged; retired forms are accep
       ].join('\n'),
     },
   });
-  const result = runCheck({ files: folder(session) });
+  const files = folder(session);
+  files['.workflow/sessions/context-2026-11-19-0900.md'] = validSession({
+    title: '# Context - 2026-11-19 09:00',
+    sections: {
+      Requirements: '- R4 - Users can sort. Accept: it sorts.\n- R5 - Users can page. Accept: it pages.',
+    },
+  });
+  const result = runCheck({ files });
   assertSingleFinding(result, 'structure/requirement-format', lineOf(session, bad));
 });
 

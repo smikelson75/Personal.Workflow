@@ -71,7 +71,7 @@ test('[R2-04] Relationship value replace reports structure/session-status at lin
 });
 
 test('[R7-02] findings sort by path, line, rule-id then summary', () => {
-  const bad = withoutLine(validSession({ title: '# Notes' }), '- Status:');
+  const bad = withoutLine(validSession({ title: '# Notes', sections: { Requirements: '- R50 - Users can run it. Accept: it runs.' } }), '- Status:');
   const noSize = withoutLine(validSession(), '- Size:');
   const r = runCheck({ files: folderWith({ 'notes.md': bad, [SESSION_NAME]: noSize }) });
   assertFindings(r.stdout, [
