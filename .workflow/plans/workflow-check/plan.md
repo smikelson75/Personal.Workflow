@@ -2,7 +2,7 @@
 
 - Spec: [workflow-check-spec.md](../../specs/workflow-check-spec.md)
 - Lane: standard
-- Next: gate P03
+- Next: review P03
 - Tests locked: `da265b0`
 - Oracle: `.github/tools/workflow-check/tests`
 - Phase base: `5b4fd01`
@@ -41,3 +41,5 @@
 | S05 | Size Rules | completed |
 | S06 | Out-of-stage Rule | completed |
 | S07 | Repair R2-12 fixture for the missing-term Rule (test-fix, fixture) | completed |
+
+- Review pending: S01, S02
