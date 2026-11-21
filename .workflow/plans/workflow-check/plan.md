@@ -2,7 +2,7 @@
 
 - Spec: [workflow-check-spec.md](../../specs/workflow-check-spec.md)
 - Lane: standard
-- Next: gate P02
+- Next: review P02
 - Review pending: S09
 - Tests locked: `af0bcb2`
 - Oracle: `.github/tools/workflow-check/tests`
