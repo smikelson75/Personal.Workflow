@@ -2,7 +2,7 @@
 
 - Spec: [workflow-check-spec.md](../../specs/workflow-check-spec.md)
 - Lane: standard
-- Next: gate P04
+- Next: done
 - Tests locked: `84f6f06`
 - Oracle: `.github/tools/workflow-check/tests`
 - Phase base: `84f6f06`
@@ -28,7 +28,7 @@
 | P01 | Run, report, Session structure | completed | R1 (folder-level), R2 (Session rules), R6, R7, R9, R10 (CRLF/BOM), Q-message-length | [phase-01](phase-01.md) |
 | P02 | Glossary structure, Chain, file argument | completed | R1 (no-final, superseded Sessions), R2 (Glossary rules), R3, R6 (warnings, mixed), R8 | [phase-02](phase-02.md) |
 | P03 | Vocabulary and Excess | completed | R4, R5 | [phase-03](phase-03.md) |
-| P04 | Skill integration and qualities | gating | R10 (no stdin/network), R11, R12, Q-speed, Q-determinism | [phase-04](phase-04.md) |
+| P04 | Skill integration and qualities | completed | R10 (no stdin/network), R11, R12, Q-speed, Q-determinism | [phase-04](phase-04.md) |
 
 ## P04 slices
 
