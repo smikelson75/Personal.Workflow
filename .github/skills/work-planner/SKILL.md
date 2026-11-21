@@ -61,6 +61,7 @@ Stop and redirect to `behavior-spec` when the spec is missing, has a blocking `O
 - End every mode by committing what it wrote, per pull-work's Commits table. Approval is the permission; never ask again before committing.
 - Never contradict an `Accepted` ADR silently: either follow it, or raise a superseding ADR candidate.
 - Write current truth only; no history, no proposals.
+- Checkpoints (setup-card approval, Phase Review, an ADR candidate from Revise with no Phase Review after it) are each one bundled question, run by the `## Checkpoint` rules in `.github/user-interaction.md`.
 
 ## Modes
 

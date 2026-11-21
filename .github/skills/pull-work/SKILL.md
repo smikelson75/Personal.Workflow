@@ -145,6 +145,8 @@ Bring the user in only for:
 
 Everything else proceeds without the user and appears in the brief. Spec gaps and new requirements redirect to `behavior-spec` or `brain-storm`. When you ask, follow the rules in `.github/user-interaction.md`: say where the plan stands, why the answer matters, and the options with a recommendation.
 
+Setup-card approval, Phase Review, and an ADR candidate from Revise are Checkpoints: one bundled question, run by the `## Checkpoint` rules in `.github/user-interaction.md`.
+
 ## Brief
 
 At every stop, report: slices completed with their commits, fixture repairs, review findings and what became of them, blocked slices with reasons, and the `Next` line. Define any workflow term the user hasn't seen in this session.
