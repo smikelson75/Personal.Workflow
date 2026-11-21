@@ -113,11 +113,11 @@ If the user ends early, still write the session file with `Status: draft` and th
 
 ### Check
 
-After writing the Session and Glossary, run `node .github/tools/workflow-check/bin/workflow-check.mjs .workflow/sessions/<new session file>` from the repo root.
+After writing the Session and Glossary, run `node .github/tools/workflow-check/bin/workflow-check.mjs` from the repo root, so the whole Workflow Folder is checked.
 
-- Fix every `error` Finding and rerun until the summary reads `0 errors`.
-- Weigh each `warning`: fix it, or leave it deliberately and name it in the brief.
-- Never edit a prior Session to clear a Finding. When an `error` Finding is anchored at a prior Session, stop and report it to the user instead of finishing.
+- Fix every `error` Finding anchored at the new Session or the Glossary, and rerun until none remain there.
+- Weigh each `warning` anchored at the new Session or the Glossary: fix it, or leave it deliberately and name it in the brief. Ignore warnings anchored at prior Sessions.
+- Never edit a prior Session to clear a Finding. When an `error` Finding is anchored at a prior Session, once your own errors are cleared, show each such Finding line to the Developer instead of finishing.
 
 ### Commit
 

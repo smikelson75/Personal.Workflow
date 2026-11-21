@@ -2,7 +2,7 @@
 
 - Spec: [workflow-check-spec.md](../../specs/workflow-check-spec.md)
 - Lane: standard
-- Next: P05 S03, S04, S06
+- Next: P05 S03
 - Tests locked: `c83391b`
 - Oracle: `.github/tools/workflow-check/tests`
 - Phase base: `c83391b`
@@ -39,6 +39,6 @@
 | S01 | Required sections follow Size | completed |
 | S02 | Repair the R2-05 expectation | completed |
 | S03 | CONTEXT-FORMAT states required sections by Size | ready |
-| S04 | The suite checks skills only by command | ready |
+| S04 | The suite checks skills only by command | completed |
 | S05 | Skill tests drop wording checks | completed |
-| S06 | brain-storm checks the whole folder | ready |
+| S06 | brain-storm checks the whole folder | completed |
