@@ -14,7 +14,8 @@ A card is the brief. The main session sends a `delegate` card's section verbatim
   - tag: how a test carries its scenario ID
   - count: how to read the number of tests that ran from the output
   - assert: a regex matching any line that states an expectation or a test title (for example `^\s*(assert|expect)|\btest\(`)
-- **Known failures** (optional): pre-existing failing tests, each with its owning later phase
+- **Known failures** (optional): pre-existing failing tests, each written as a sub-bullet `<test title>` - owner PNN, where `<test title>` is the title as the harness reports it and `PNN` is a later phase. Excluded only from the gates of phases before `PNN`.
+  - `<test title>` - owner PNN
 - **Gate:**
   - suite: `<full test command>`, excluding `Known failures`
   - traceability: `<command or procedure>` listing scenario IDs with a test that ran and passed

@@ -60,7 +60,7 @@
 - **Goal:** the Phase Format and the pull-work Gate tell planners and the Gate how Known Failures are written and excluded.
 - **Depends on:** S01
 - **Tier:** delegate - adds lines to two markdown files
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:**
   - R14-09: Given `.github/skills/work-planner/references/PHASE-FORMAT.md`, when the line starting `- **Known failures` is read, then it contains `owner PNN` and `<test title>`
   - R14-10: Given `.github/skills/pull-work/SKILL.md`, when the line starting `2. traceability` is read, then it contains `Known failures`
