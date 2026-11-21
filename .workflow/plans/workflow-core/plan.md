@@ -2,10 +2,11 @@
 
 - Spec: [workflow-core-spec.md](../../specs/workflow-core-spec.md)
 - Lane: standard
-- Next: gate P02
+- Next: review P02
 - Tests locked: `56122ec`
 - Oracle: `.github/tools/workflow-core/tests`
 - Phase base: `56122ec`
+- Review pending: S01, S02, S03, S04, S05, S06
 - Reconciled: `d6d5e19`
 
 ## Current state
