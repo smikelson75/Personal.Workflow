@@ -29,7 +29,7 @@
 - **Goal:** `trace.mjs` accepts a phase file and a captured TAP file, and fails only on unlisted failing tests and owned IDs without a passing test.
 - **Depends on:** none
 - **Tier:** delegate - extends an existing script; every behavior is pinned
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:**
   - R14-01: Given phase file `phase-02.md` (title `# P02 - x`) listing `` `legacy import keeps BOM` - owner P04 `` and TAP with `ok 1 - [R3-01] a` and `not ok 2 - legacy import keeps BOM`, when `trace.mjs --tap t.tap --phase-file phase-02.md R3-01` runs, then exit 0
   - R14-02: Given the same files plus TAP line `not ok 3 - [R3-02] duplicate ID errors`, when run, then exit 1 and stderr contains `[R3-02] duplicate ID errors` (failure)
@@ -82,7 +82,7 @@
 - **Goal:** `plan-check.mjs` verifies that a completed phase left `plan.md` showing current truth.
 - **Depends on:** none
 - **Tier:** delegate - one new script; format and messages are pinned
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:**
   - R15-01: Given a spec with `### R1 - a`, `### R2 - b`, `### R3 - c` and a Quality Thresholds bullet `- Latency -> x`, and a plan whose table has P01 `completed` covering `R1, R2` and P02 `planned` covering `R3, Q-latency`, gap line `R3, Q-latency`, `Next: plan P02`, state lines `harness`, `suite baseline`, `in place`, when `plan-check.mjs demo P01` runs, then exit 0
   - R15-02: Given the same plan plus a heading `## P01 slices`, when run, then exit 1 and stderr contains `slice table P01 present` (failure)
@@ -134,7 +134,7 @@
 - **Goal:** `mutation-addon.mjs` reports whether an installed skill supplies a mutation command for a stack.
 - **Depends on:** none
 - **Tier:** delegate - one new script; format and messages are pinned
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:**
   - R17-01: Given a repository whose `.github/skills/` holds a skill with no mutation lines, when `mutation-addon.mjs node` runs there, then stdout is `mutation: unsupported for node - no mutation Language Add-on installed` and exit 0
   - R17-02: Given `.github/skills/stryker-x/SKILL.md` with lines `- **Mutation stack:** node` and `- **Mutation command:** npx stryker run`, when run with `node`, then stdout is `mutation: npx stryker run` and exit 0

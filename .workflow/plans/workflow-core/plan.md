@@ -2,7 +2,7 @@
 
 - Spec: [workflow-core-spec.md](../../specs/workflow-core-spec.md)
 - Lane: standard
-- Next: P02 S01, S03, S05
+- Next: P02 S02
 - Tests locked: `56122ec`
 - Oracle: `.github/tools/workflow-core/tests`
 - Phase base: `56122ec`
@@ -35,9 +35,9 @@
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Trace honors Known Failures | ready |
+| S01 | Trace honors Known Failures | completed |
 | S02 | Gate text names Known Failures | ready |
-| S03 | Plan check script | ready |
+| S03 | Plan check script | completed |
 | S04 | Phase completion runs the plan check | ready |
-| S05 | Mutation add-on detection script | ready |
+| S05 | Mutation add-on detection script | completed |
 | S06 | Plan mode and Gate use mutation detection | ready |
