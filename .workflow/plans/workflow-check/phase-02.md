@@ -201,3 +201,18 @@
   - R2-08: add `context-2026-11-19-0900.md` as a spec-valid final Session (relationship `new`, no `Builds on` or `Supersedes`) whose Requirements are `- R4 - Users can sort. Accept: it sorts.` and `- R5 - Users can page. Accept: it pages.`; add the header line ``- Builds on: `context-2026-11-19-0900.md` `` to the Session under test and change nothing else in it.
   - Every assertion and test title stays byte-identical to `Tests locked`.
 - **Do not:** edit assertions, test titles, `R/tests/support/**`, or any product file.
+## S09 - Restore the chain/no-final message
+
+- **Kind:** fix
+- **Goal:** `chain/no-final` prints the message pinned by S02's Decisions.
+- **Depends on:** none
+- **Tier:** delegate - one string literal in an existing Rule
+- **Review:** none
+- **Restores:** review - `chain/no-final` prints `no Session has Status: final` instead of S02's pinned message `no final Session exists`
+- **Files:** edit `R/src/rules/chain-status.mjs`
+- **Patterns:** `R/src/rules/chain-status.mjs:9 - the chain/no-final Finding`
+- **Decisions:**
+  - The `chain/no-final` Finding message is exactly `no final Session exists`. Path, line, severity, and the condition stay unchanged.
+- **Do not:** edit `R/tests/**`; add dependencies; change any other Rule or message.
+- **Done when:** `node --test --test-reporter=tap ".github/tools/workflow-check/tests/acceptance/*.test.mjs"` exits 0; the full suite runs
+- **Stop and report if:** a file outside Files must change; a locked test looks wrong; same failure after 3 attempts.
