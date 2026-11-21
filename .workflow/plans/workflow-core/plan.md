@@ -2,10 +2,10 @@
 
 - Spec: [workflow-core-spec.md](../../specs/workflow-core-spec.md)
 - Lane: standard
-- Next: phase review P03
-- Tests locked: `2c54851`
+- Next: P03 S01, S03, S05
+- Tests locked: `37ff2d5`
 - Oracle: `.github/tools/workflow-core/tests`
-- Phase base: `56122ec`
+- Phase base: `37ff2d5`
 - Reconciled: `d6d5e19`
 
 ## Current state
@@ -29,17 +29,17 @@
 |---|-------|--------|--------|--------|
 | P01 | Interaction rules and stage commits | completed | R22, R23 (rules file and references), R13, R19 | [phase-01](phase-01.md) |
 | P02 | Gate and plan scripts | completed | R14, R15, R17 | [phase-02](phase-02.md) |
-| P03 | Reconcile, defects, pair coverage | planned | R20, R21, R16, Q-clean-handoff, Q-checkpoint-cost | [phase-03](phase-03.md) |
+| P03 | Reconcile, defects, pair coverage | in progress | R20, R21, R16, Q-clean-handoff, Q-checkpoint-cost | [phase-03](phase-03.md) |
 
 ## P03 slices
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Spec change detection script | planned |
-| S02 | Reconcile text | planned |
-| S03 | Argument parser script | planned |
-| S04 | Defect report text | planned |
-| S05 | Pair gate in plan-check | planned |
-| S06 | Pair coverage text | planned |
-| S07 | Clean handoff and Checkpoint cost text | planned |
+| S01 | Spec change detection script | ready |
+| S02 | Reconcile text | ready |
+| S03 | Argument parser script | ready |
+| S04 | Defect report text | ready |
+| S05 | Pair gate in plan-check | ready |
+| S06 | Pair coverage text | ready |
+| S07 | Clean handoff and Checkpoint cost text | ready |
 
