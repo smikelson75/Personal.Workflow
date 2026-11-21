@@ -114,7 +114,7 @@ Reviews only critical code, once per phase, after the gate passes. Critical card
 | code is right but the spec is wrong or silent | redirect to `behavior-spec` |
 | style, naming, or preference | drop it |
 
-After classifying, replace `Review pending` with only the review-driven `fix` cards, so the next pass after the gate reviews just those. With no actionable finding, remove the `Review pending` line, set the phase `completed`, set `Next: plan PNN+1` (or `Next: done` once every requirement and quality threshold in the spec has a passing scenario), and commit.
+After classifying, replace `Review pending` with only the review-driven `fix` cards, so the next pass after the gate reviews just those. With no actionable finding, remove the `Review pending` line, set the phase `completed`, set `Next: plan PNN+1` (or `Next: done` once every requirement and quality threshold in the spec has a passing scenario), and commit. Before the completion commit, run `node .github/skills/pull-work/scripts/plan-check.mjs <slug> PNN` and fix every line it prints; it checks that `plan.md` shows PNN completed, has no PNN slice table or `Review pending` line, and lists exactly the uncovered IDs in its gap (`none` when `Next: done`).
 
 ## Triage (`Next: triage PNN`)
 

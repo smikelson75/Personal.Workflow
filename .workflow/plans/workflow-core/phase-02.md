@@ -114,7 +114,7 @@
 - **Goal:** pull-work's Review step runs the plan check before the completion commit, and the plan format shows the gap in the checked shape.
 - **Depends on:** S02, S03
 - **Tier:** delegate - adds lines to two markdown files
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:**
   - R15-10: Given `.github/skills/pull-work/SKILL.md`, when its lines are read, then one line contains `node .github/skills/pull-work/scripts/plan-check.mjs <slug> PNN`
   - R15-11: Given `.github/skills/work-planner/references/PLAN-FORMAT.md`, when the line starting `- gap to spec:` is read, then it contains `R2 partial` and not `absent`

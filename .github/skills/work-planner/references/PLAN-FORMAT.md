@@ -67,6 +67,7 @@ The gate fails if `git diff --exit-code <lock> -- <oracle>` shows any change. Be
 - never restate card content; the slice table holds only ID, name, and status
 - the slice table covers the active phase only; when a phase completes, drop its slice table and keep its phase row
 - future phases need enough intent to plan from later, nothing more
+- the gap line lists IDs separated by `, `, adds ` partial` to a partly covered ID, and reads `none` when `Next: done`
 
 ## Skeleton
 
@@ -86,7 +87,7 @@ The gate fails if `git diff --exit-code <lock> -- <oracle>` shows any change. Be
 - suite baseline: green | failing: <tests>
 - mutation: <tool> | unsupported for <stack>
 - in place: ...
-- gap to spec: R4, R6 absent; R2 partial (no failure handling)
+- gap to spec: R4, R6, R2 partial
 
 ## Phases
 
