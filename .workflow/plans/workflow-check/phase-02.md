@@ -184,3 +184,20 @@
   - Every assertion and test title stays byte-identical to `Tests locked`.
 - **Do not:** edit assertions, test titles, `R/tests/support/**`, or any product file.
 - **Fixture repair report:** test-reviewer failed the first repair: besides adding the two Sessions, it set the Session under test's relationship to `extend`, which the Decisions do not allow; assertions were unchanged and the suite passed.
+
+## S08 - Repair P01 fixtures for Requirement ID Rules
+
+- **Kind:** test-fix
+- **Scope:** fixture
+- **Goal:** the locked R7-02 and R2-08 tests pass unchanged against `chain/duplicate-id` and `chain/unknown-retirement` because each fixture again breaks only its own scenario's rules.
+- **Depends on:** none
+- **Tier:** main - edits locked oracle files through Fixture Repair
+- **Review:** none
+- **Restores:** R7-02, R2-08 (owned by P01 cards); dispatch finding on S04: in R7-02 both `notes.md` and the Session under test define R1, so `chain/duplicate-id` is added; in R2-08 the Session retires R4 and R5, which no Session in its ancestry defines, so two `chain/unknown-retirement` Findings are added
+- **Acceptance tests:** `.github/tools/workflow-check/tests/acceptance/p01-s05.test.mjs`, `.github/tools/workflow-check/tests/acceptance/p01-s06.test.mjs`
+- **Decisions:**
+  - Start from the files at `Tests locked`.
+  - R7-02: build `notes.md` with `validSession` `sections: { Requirements: '- R50 - Users can run it. Accept: it runs.' }` in addition to its existing options; change nothing else in either Session.
+  - R2-08: add `context-2026-11-19-0900.md` as a spec-valid final Session (relationship `new`, no `Builds on` or `Supersedes`) whose Requirements are `- R4 - Users can sort. Accept: it sorts.` and `- R5 - Users can page. Accept: it pages.`; add the header line ``- Builds on: `context-2026-11-19-0900.md` `` to the Session under test and change nothing else in it.
+  - Every assertion and test title stays byte-identical to `Tests locked`.
+- **Do not:** edit assertions, test titles, `R/tests/support/**`, or any product file.
