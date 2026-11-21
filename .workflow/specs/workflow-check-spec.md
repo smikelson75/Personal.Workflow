@@ -1,11 +1,12 @@
 # Behavior Spec - workflow-check
 
 ## Sources
-- Sessions: `context-2026-11-20-1124.md`
+- Sessions: `context-2026-11-20-1124.md`, `context-2026-11-21-1442.md` (R2, R11, R18)
 - Language: `.workflow/language.md`
+- Companion spec: [workflow-core-spec.md](workflow-core-spec.md) holds the Workflow Core requirements from `context-2026-11-21-1442.md`.
 
 ## Target Outcome
-- once v1 is done, `workflow-check` reports every Rule break in a repo's Sessions and Glossary as a one-line Finding, fails only on errors, never touches a file, and is wired into brain-storm and behavior-spec.
+- once v1 is done, `workflow-check` reports every Rule break in a repo's Sessions and Glossary as a one-line Finding, fails only on errors, never touches a file, requires Session sections by Size in step with the Session format, and is wired into brain-storm and behavior-spec through checks that survive rewording.
 
 ## Requirements
 
@@ -35,17 +36,30 @@
 | `structure/session-name` | error | Session file name is not `context-YYYY-MM-DD-HHmm.md` |
 | `structure/session-title` | error | first line is not `# Context - YYYY-MM-DD HH:mm` matching the file name |
 | `structure/session-status` | error | `Status`, `Relationship`, or `Size` line missing or has a value outside `final\|draft`, `new\|extend\|amend`, `small\|medium\|large` |
-| `structure/session-section` | error | a required section is missing: Problem, Users, Workflow, Requirements, Scope Guardrails, Constraints, Success, Decisions, Language; also Existing Solution when Relationship is `extend` or `amend` |
+| `structure/session-section` | error | a section the Session's Size requires is missing (Required sections table below) |
 | `structure/requirement-format` | error | a line under Requirements is not `- R<n> - <behavior>. Accept: <signal>.` or `- R<n> - retired, superseded by R<m>.` or `- R<n> - retired.` |
 | `structure/link-format` | error | `Builds on` or `Supersedes` is not one or more backticked `context-....md` names |
 | `structure/final-open` | error | a `Status: final` Session has an `open:` Decision |
 | `structure/glossary-section` | error | Glossary lacks `## Terms` or `## Retired` |
 | `structure/glossary-term-format` | error | a line under Terms is not `` - `Term` - meaning `` (optional `Avoid:`, `States:`, `Code:` parts), or a line under Retired is not `` - `Old` -> `New` - reason `` |
 
-- Failure: each break is reported at the offending line (the section heading line for a missing section, line 1 for a missing field).
+- Required sections by Size:
+
+| Section | small | medium | large |
+|---|---|---|---|
+| Problem, Requirements | required | required | required |
+| Existing Solution | required when Relationship is `extend` or `amend` | same | same |
+| Users, Workflow, Scope Guardrails, Constraints, Success, Decisions | optional | required | required |
+| Language | optional | optional | optional |
+
+- The Session format (`brain-storm/references/CONTEXT-FORMAT.md`) states the same required set per Size: a Session holding exactly the sections the format marks required for its Size gets no `structure/session-section` Finding.
+- Failure: each break is reported at the offending line (line 1 for a missing section or field).
 - Examples:
   - Given a Session with no `- Status:` line, when run, then `structure/session-status` error at that Session, line 1.
   - Given `- R4 - Users can export.` with no `Accept:`, when run, then `structure/requirement-format` error at that line (failure).
+  - Given a `small` `extend` Session with Existing Solution, Problem, and Requirements only, when run, then no `structure/session-section` Finding.
+  - Given a `large` Session missing `## Constraints`, when run, then `structure/session-section` error at that Session, line 1 (failure).
+  - Given a `medium` Session with no `## Language`, when run, then no `structure/session-section` Finding.
 
 ### R3 - Chain Rules
 - Rules (all `chain` Category, all error unless stated):
@@ -117,10 +131,16 @@
   - Given the same Workflow Folder checked out with CRLF on Windows and LF on Linux, when run on each, then stdout is identical.
 
 ### R11 - brain-storm integration
-- Rules: after writing its Session and Glossary, brain-storm runs `workflow-check` on the new Session file, fixes every error Finding and reruns until none remain, and weighs each warning (fixing it or leaving it deliberately) before finishing. It never edits a prior Session to clear a Finding.
-- Failure: if an error Finding is anchored at a prior Session, brain-storm stops and reports it to the user instead of finishing silently or editing it.
+- Rules:
+  - After writing its Session and Glossary, brain-storm runs `node .github/tools/workflow-check/bin/workflow-check.mjs` with no file argument, so the whole Workflow Folder is checked.
+  - It fixes every error Finding anchored at its new Session or the Glossary and reruns until none remain there.
+  - It weighs each warning anchored at its new Session or the Glossary: fixes it, or leaves it deliberately and names it in the brief. Warnings anchored at prior Sessions are ignored.
+  - It never edits a prior Session to clear a Finding.
+- Failure: an error Finding anchored at a prior Session -> once its own errors are cleared, brain-storm stops and shows each such Finding line to the Developer instead of finishing; the prior Session stays unchanged. Committing its own output on this stop is workflow-core R19.
 - Examples:
-  - Given its new Session has a `structure/session-section` error, when brain-storm finishes, then the error is fixed and the final run reports `0 errors`.
+  - Given its new Session has a `structure/session-section` error, when brain-storm finishes, then the error is fixed and no error Finding is anchored at the new Session.
+  - Given a prior Session carries a `chain/duplicate-id` error, when brain-storm runs the check, then it shows that Finding line to the Developer and stops (failure).
+  - Given only a warning anchored at a prior Session, when brain-storm runs the check, then it finishes normally.
 
 ### R12 - behavior-spec integration
 - Rules: while validating inputs, behavior-spec runs `workflow-check` on the whole Workflow Folder. Any error Finding, or exit code 2, makes it stop and redirect to brain-storm, showing the error Findings. Warnings do not stop it.
@@ -128,13 +148,23 @@
   - Given a `chain/duplicate-id` error, when behavior-spec starts, then it stops and redirects to brain-storm.
   - Given only warnings, when behavior-spec starts, then it proceeds.
 
+### R18 - Skill rewording keeps the acceptance suite passing
+- Rules:
+  - The workflow-check acceptance suite's checks of brain-storm and behavior-spec depend only on each `SKILL.md` containing the backticked command `node .github/tools/workflow-check/bin/workflow-check.mjs` with no file argument; never on headings, section order, sentence wording, or other text.
+  - The conduct R11 and R12 describe (fix, weigh, stop, redirect) is not checked by text matching.
+- Failure: removing the command, or adding a file argument to it, fails the suite.
+- Examples:
+  - Given brain-storm's instructions reworded and its sections renamed while keeping the command, when the suite runs, then it passes.
+  - Given the command removed from behavior-spec's `SKILL.md`, when the suite runs, then it fails (failure).
+  - Given brain-storm's command followed by `.workflow/sessions/<new session file>`, when the suite runs, then it fails (failure).
+
 ## Quality Thresholds
 - Speed -> a run on a Workflow Folder of up to 10 Sessions and one Glossary finishes within 2 seconds on a normal dev machine or CI runner.
 - Agent-readable output -> each Finding line is at most 160 message characters; no output beyond Findings and one summary line.
 - Determinism -> two runs on unchanged files produce byte-identical stdout.
 
 ## External Constraints
-- Session format - owner: brain-storm skill (`brain-storm/references/CONTEXT-FORMAT.md`).
+- Session format - owner: brain-storm skill (`brain-storm/references/CONTEXT-FORMAT.md`); its per-Size required sections must match R2.
 - Glossary format - owner: brain-storm skill (`brain-storm/references/LANGUAGE-FORMAT.md`).
 - Runs on Windows and Linux; no macOS - session constraint.
 - Travels inside the workflow folder with the skills; one runtime common to dev machines and CI; no separate install step - session constraint.
@@ -151,13 +181,17 @@
 - Parsing approach and internal structure of Rules.
 - Wording of Finding messages (within the 160-character limit).
 - Where the skills' text invokes the command.
+- How CONTEXT-FORMAT marks each section's required Sizes.
 
 ## Assumptions
 - R1: Workflow Folder is found by walking up from the working directory - the session says it runs from within a copied folder, with no path argument.
 - R1: missing Workflow Folder is exit 2, not a Finding - there is no file to anchor it to.
 - R1: findings with no specific line use line 1 - keeps the line field always present.
 - R1: unreadable files yield a Finding and the run continues - one bad file should not hide others.
-- R2: required sections, field values, and formats derive from CONTEXT-FORMAT and LANGUAGE-FORMAT; `final` Sessions may not carry `open:` - format says `open (draft only)`.
+- R18: the suite checks only the command, so R11 and R12 conduct (fix, weigh, stop, redirect) has no automated test and is approved at Phase Review as not expressible (workflow-core R16) - R18's Accept passes any rewording that keeps the command, and running the skills in a test would spend tokens.
+- R2: core sections for every Size are Problem and Requirements (plus Existing Solution for `extend`/`amend`); medium and large also require Users, Workflow, Scope Guardrails, Constraints, Success, and Decisions; Language is never required - R2's Accept needs a small Session to pass without non-core sections and a large one to fail without Constraints; a small change rarely reshapes users or scope; Language only exists when terms change.
+- R2: a missing section is anchored at line 1 - a missing section has no heading line; matches the plan's pinned and built behavior.
+- R2: field values and formats derive from CONTEXT-FORMAT and LANGUAGE-FORMAT; `final` Sessions may not carry `open:` - format says `open (draft only)`.
 - R3: a later Session may restate an ID only as an `amend` building on the earlier one - format says amend sessions restate changed requirements, while R3's Accept demands duplicates otherwise error.
 - R3: a draft Session is an error only when newest; older drafts warn - behavior-spec redirects on a newest draft but older drafts do not block.
 - R3: a superseded newest draft gets no `chain/draft-newest` - R1 already limits a superseded Session to `structure` and `chain/broken-link` Findings, and the same exemption already applies to `chain/stale-draft`, `chain/duplicate-id`, and `chain/unknown-retirement`.
@@ -172,4 +206,5 @@
 - R7: Finding message limit 160 characters, sorted output, always-printed summary - makes output cheap and deterministic for agents and CI.
 - R8: Findings anchored only at the later Session in two-file conflicts - needed for R8's "run on B reports only B's Finding".
 - R11: brain-storm stops rather than edits when an error is anchored at a prior Session - the session rejects editing prior Sessions.
+- R11: brain-storm fixes errors and weighs warnings at the Glossary as well as its new Session, and ignores prior-Session warnings - it writes the Glossary; prior Sessions are never edited, so their warnings cannot be acted on.
 - R12: exit code 2 also triggers redirect - the run could not verify the inputs.
