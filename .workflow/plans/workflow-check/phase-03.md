@@ -164,3 +164,18 @@
 - **Do not:** edit `R/tests/**`; add dependencies; edit `scan.mjs`.
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" ".github/tools/workflow-check/tests/acceptance/*.test.mjs"` exits 0; targets R5-07 to R5-11; each target test reports `ok`
 - **Stop and report if:** a file outside Files must change; a locked test looks wrong; same failure after 3 attempts.
+
+## S07 - Repair R2-12 fixture for the missing-term Rule
+
+- **Kind:** test-fix
+- **Scope:** fixture
+- **Goal:** the R2-12 fixture keeps `Finding` as a valid Glossary Term, so its only Finding stays `structure/glossary-term-format` once `vocabulary/missing-term` exists.
+- **Depends on:** none
+- **Tier:** main - Fixture Repair is applied by `test-author` and checked by `test-reviewer`
+- **Review:** none
+- **Restores:** R2-12 (its fixture's Session `## Language` bullet `Finding` has no Glossary Term, so `vocabulary/missing-term` adds a second Finding)
+- **Acceptance tests:** `.github/tools/workflow-check/tests/acceptance/p02-s01.test.mjs`
+- **Files:** edit `.github/tools/workflow-check/tests/acceptance/p02-s01.test.mjs`
+- **Decisions:** only the R2-12 fixture changes: its Glossary gains one valid Term line `` - `Finding` - a reported break. `` after the malformed line, so the malformed line stays on line 4. No expectation changes.
+- **Done when:** the R2-12 test passes together with the full suite, excluding scenarios owned by cards that are not `completed`.
+
