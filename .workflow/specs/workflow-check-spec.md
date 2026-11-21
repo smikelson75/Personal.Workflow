@@ -55,7 +55,9 @@
   - `chain/no-final`: see R1.
   - `chain/draft-newest`: the newest Session (by file name) is a draft.
   - `chain/stale-draft` (warning): a draft Session that is not the newest.
+  - A superseded Session (R1) never carries `chain/duplicate-id`, `chain/unknown-retirement`, `chain/draft-newest`, or `chain/stale-draft`; only `chain/broken-link` applies to it among `chain` Rules.
 - Examples:
+  - Given `context-A` (final, `Supersedes` `context-B`) and a newer draft `context-B`, when run, then no `chain/draft-newest` Finding and exit code 0.
   - Given `context-A` and a later `context-B` (relationship `extend`) both defining R3, when run, then `chain/duplicate-id` error at `context-B`'s R3 line, none at A.
   - Given `context-B` (`amend`, Builds on `context-A`) restating R3, when run, then no `chain/duplicate-id`.
   - Given `R9 - retired.` where no earlier Session defines R9, when run, then `chain/unknown-retirement` error (failure).
@@ -158,6 +160,7 @@
 - R2: required sections, field values, and formats derive from CONTEXT-FORMAT and LANGUAGE-FORMAT; `final` Sessions may not carry `open:` - format says `open (draft only)`.
 - R3: a later Session may restate an ID only as an `amend` building on the earlier one - format says amend sessions restate changed requirements, while R3's Accept demands duplicates otherwise error.
 - R3: a draft Session is an error only when newest; older drafts warn - behavior-spec redirects on a newest draft but older drafts do not block.
+- R3: a superseded newest draft gets no `chain/draft-newest` - R1 already limits a superseded Session to `structure` and `chain/broken-link` Findings, and the same exemption already applies to `chain/stale-draft`, `chain/duplicate-id`, and `chain/unknown-retirement`.
 - R4: word matches are warnings and missing/conflicting Glossary terms are errors - English words can be legitimate; Glossary gaps are objective. Applied to every vocabulary Rule.
 - R4: parenthetical Avoid entries are not matched - cannot be matched by rule (e.g. `check (as a noun)`).
 - R4: headings, backticks, and the Language section are not scanned - the current Session's `## Problem` heading would otherwise hit the Avoid word `problem`.
