@@ -1,6 +1,7 @@
 import { chainIdRules } from './chain-ids.mjs';
 import { chainLinkRules } from './chain-links.mjs';
 import { chainStatusRules } from './chain-status.mjs';
+import { excessSizeRules } from './excess-size.mjs';
 import { folderRules } from './folder.mjs';
 import { glossaryRules } from './glossary.mjs';
 import { sessionBodyRules } from './session-body.mjs';
@@ -22,4 +23,5 @@ export const RULES = [
   ...vocabularyAvoidRules,
   ...vocabularyRetiredRules,
   ...vocabularyMissingRules,
+  ...excessSizeRules,
 ];

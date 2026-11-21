@@ -2,7 +2,7 @@
 
 - Spec: [workflow-check-spec.md](../../specs/workflow-check-spec.md)
 - Lane: standard
-- Next: P03 S05, S06
+- Next: P03 S06
 - Tests locked: `da265b0`
 - Oracle: `.github/tools/workflow-check/tests`
 - Phase base: `5b4fd01`
@@ -38,6 +38,6 @@
 | S02 | Text scan helper and avoid-synonym Rule | completed |
 | S03 | Retired-term Rule | completed |
 | S04 | Missing-term Rule | completed |
-| S05 | Size Rules | ready |
+| S05 | Size Rules | completed |
 | S06 | Out-of-stage Rule | ready |
 | S07 | Repair R2-12 fixture for the missing-term Rule (test-fix, fixture) | completed |
