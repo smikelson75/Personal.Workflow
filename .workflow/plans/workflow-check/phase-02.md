@@ -170,7 +170,7 @@
 ## S07 - Repair R2-09 fixture for Link Rules
 
 - **Kind:** test-fix
-- **Scope:** fixture
+- **Scope:** assertion
 - **Goal:** the locked R2-09 test passes unchanged against `chain/broken-link` because its valid-link fixture again breaks no spec rule.
 - **Depends on:** none
 - **Tier:** main - edits a locked oracle file through Fixture Repair
@@ -183,3 +183,4 @@
   - The `bad` run and its fixture stay unchanged.
   - Every assertion and test title stays byte-identical to `Tests locked`.
 - **Do not:** edit assertions, test titles, `R/tests/support/**`, or any product file.
+- **Fixture repair report:** test-reviewer failed the first repair: besides adding the two Sessions, it set the Session under test's relationship to `extend`, which the Decisions do not allow; assertions were unchanged and the suite passed.

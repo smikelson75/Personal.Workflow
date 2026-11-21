@@ -2,7 +2,7 @@
 
 - Spec: [workflow-check-spec.md](../../specs/workflow-check-spec.md)
 - Lane: standard
-- Next: fixture repair S07; blocked S03 - waits on S07; then P02 S03, S04, S05
+- Next: phase review P02; blocked S03 - waits on S07
 - Tests locked: `aa57551`
 - Oracle: `.github/tools/workflow-check/tests`
 - Phase base: `16d841e`
@@ -39,4 +39,4 @@
 | S04 | Requirement ID Rules | ready |
 | S05 | File argument | ready |
 | S06 | Repair P01 fixtures for Chain Rules (test-fix, fixture) | completed |
-| S07 | Repair R2-09 fixture for Link Rules (test-fix, fixture) | planned |
+| S07 | Repair R2-09 fixture for Link Rules (test-fix, assertion) | planned |
