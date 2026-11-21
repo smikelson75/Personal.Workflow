@@ -2,10 +2,10 @@
 
 - Spec: [workflow-check-spec.md](../../specs/workflow-check-spec.md)
 - Lane: standard
-- Next: phase review P05
-- Tests locked: `84f6f06`
+- Next: P05 S01, S04, S06
+- Tests locked: `c83391b`
 - Oracle: `.github/tools/workflow-check/tests`
-- Phase base: `84f6f06`
+- Phase base: `c83391b`
 - Reconciled: `d6d5e19ee9088934b981bf29e8c924cb380fb0fc`
 
 ## Current state
@@ -30,15 +30,15 @@
 | P02 | Glossary structure, Chain, file argument | completed | R1 (no-final, superseded Sessions), R2 (Glossary rules), R3, R6 (warnings, mixed), R8 | [phase-02](phase-02.md) |
 | P03 | Vocabulary and Excess | completed | R4, R5 | [phase-03](phase-03.md) |
 | P04 | Skill integration and qualities | completed | R10 (no stdin/network), R11, R12, Q-speed, Q-determinism | [phase-04](phase-04.md) |
-| P05 | Size-based sections and reword-proof skill checks | planned | R2 (sections by Size), R11 (command), R12 (command), R18 | [phase-05](phase-05.md) |
+| P05 | Size-based sections and reword-proof skill checks | in progress | R2 (sections by Size), R11 (command), R12 (command), R18 | [phase-05](phase-05.md) |
 
 ## P05 slices
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Required sections follow Size | planned |
-| S02 | Repair the R2-05 expectation | planned |
-| S03 | CONTEXT-FORMAT states required sections by Size | planned |
-| S04 | The suite checks skills only by command | planned |
-| S05 | Skill tests drop wording checks | planned |
-| S06 | brain-storm checks the whole folder | planned |
+| S01 | Required sections follow Size | ready |
+| S02 | Repair the R2-05 expectation | completed |
+| S03 | CONTEXT-FORMAT states required sections by Size | ready |
+| S04 | The suite checks skills only by command | ready |
+| S05 | Skill tests drop wording checks | completed |
+| S06 | brain-storm checks the whole folder | ready |
