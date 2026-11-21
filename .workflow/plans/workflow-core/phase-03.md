@@ -213,3 +213,20 @@
 - **Do not:** edit `.github/tools/workflow-core/tests/**`; add dependencies.
 - **Done when:** `node --test --test-reporter=tap ".github/tools/workflow-check/tests/acceptance/*.test.mjs" ".github/tools/workflow-core/tests/acceptance/*.test.mjs"` exits 0, and `node .github/skills/pull-work/scripts/parse-args.mjs "workflow-core fix the login bug: crashes"` exits 2 with the usage line on stderr
 - **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.
+
+## S09 - Validate the slug in the bug branch of parse-args
+
+- **Kind:** fix
+- **Goal:** `parse-args.mjs` rejects a slug that fails the slug rule when it precedes `bug:`, the same as it does without `bug:`.
+- **Depends on:** S08
+- **Tier:** delegate - one small edit to one script; the rule is pinned
+- **Review:** none
+- **Restores:** review - `parse-args.mjs "../../x bug: y"` prints slug `../../x` with exit 0, so a path-like slug reaches `.workflow/plans/<slug>/`
+- **Files:** edit `.github/skills/pull-work/scripts/parse-args.mjs`
+- **Patterns:** `.github/skills/pull-work/scripts/parse-args.mjs:21 - the existing slug check and usage exit`
+- **Decisions:**
+  - When the `bug:` pattern matches and group 1 is not null, group 1 must match `^[a-z0-9][a-z0-9-]*$`; otherwise print the usage line `/pull-work [<slug>] bug: <description>` to stderr and exit 2.
+  - Every other behavior and output stays as it is.
+- **Do not:** edit `.github/tools/workflow-core/tests/**`; add dependencies.
+- **Done when:** `node --test --test-reporter=tap ".github/tools/workflow-check/tests/acceptance/*.test.mjs" ".github/tools/workflow-core/tests/acceptance/*.test.mjs"` exits 0, and `node .github/skills/pull-work/scripts/parse-args.mjs "../../x bug: y"` exits 2 with the usage line on stderr
+- **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.
