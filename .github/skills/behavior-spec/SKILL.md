@@ -105,6 +105,7 @@ Stop drafting when every remaining detail fails both the observability and diver
 - Stop or redirect: write and commit nothing.
 - Stage: only the files you wrote, by path; other changes stay unstaged and unchanged.
 - Never: `git add -A`, push, or `--no-verify`.
+- Clean handoff: when you finish, `git status --porcelain` lists only changes you did not make.
 - On rejection: fix the cause if it lies in your own message or files and retry; otherwise stop and show the rejection output, leaving the files on disk.
 - Messages: follow the `conventional-commit` skill's Message Rules with type `docs` and the artifact slug as scope.
 

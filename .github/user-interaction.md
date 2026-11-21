@@ -18,6 +18,7 @@ A Checkpoint is a planned stop where the Developer reviews or approves, and it c
 - **Approve all:** every item is approved and the run continues with no further question.
 - **Name items:** unnamed items are approved; named items are discussed one at a time in the order named, following the question rules. Each ends approved, changed and approved, or rejected. After the last one the Checkpoint completes without asking the bundle again.
 - **Cascade:** a change agreed for a named item that alters another item's tests or Decisions adds that item to the discussion.
+- **Cost:** a Checkpoint where the Developer names no items costs exactly one question.
 
 ## Skill-specific formats
 

@@ -23,4 +23,5 @@ Load the `work-planner` skill and run its Plan mode only. You stand in for the m
 - Checkpoint: run the setup-card Checkpoint when the phase opens with setup cards; it is part of Plan mode.
 - Run ends: state the `Next` line and tell the Developer to continue with `/pull-work` in the main session.
 - Never: run Phase Review, Dispatch, or any later mode; write acceptance tests; push; use `--no-verify`.
+- Clean handoff: when you finish, `git status --porcelain` lists only changes you did not make.
 - On rejection: when a hook rejects the commit, fix the cause if it lies in your own message or files and retry; otherwise stop and show the rejection output, leaving the files on disk.

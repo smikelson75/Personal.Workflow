@@ -63,6 +63,8 @@ Commit at every transition, without asking: an approval, a passing gate, or a co
 
 Moving the lock takes two commits because a commit cannot record its own hash. Once a transition's commits are done, `git status --porcelain` may list only the `Files` of other slices still `in progress`. Anything else means a slice wrote outside its `Files`: revert those paths and set that slice `blocked`.
 
+Clean handoff: every stop leaves `git status --porcelain` empty, except the tests awaiting approval at Phase Review (Preflight).
+
 ## Dispatch (`Next: PNN S..` or `running ...`)
 
 One card at a time per implementer; never fold several cards into one pass. For each slice listed in `Next`:
