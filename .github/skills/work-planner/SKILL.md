@@ -19,7 +19,8 @@ Run this skill in the main session. The main session holds the conversation and 
 |---|---|---|---|
 | main session | the user's chosen model | every mode; `cloud` cards; tests for small phases | `plan.md`, `phase-NN.md`, statuses, lock ref |
 | `repo-scout` | agent, cheap | read-only survey; returns a fact sheet | nothing |
-| `test-author` | agent, mid | failing acceptance tests for one card | test files, fixtures |
+| `test-author` | agent, mid | failing acceptance tests for one card; fixture repairs | test files, fixtures |
+| `test-reviewer` | agent, mid | approves or rejects one fixture repair | nothing |
 | `coder` | agent, cheap or local | makes one `local` card's tests pass | product code |
 | `planner` | agent, strongest; optional | Plan mode for a large or architecture-heavy first plan | `plan.md`, `phase-NN.md` |
 
@@ -51,7 +52,7 @@ Stop and redirect to `behavior-spec` when the spec is missing, has a blocking `O
 
 - The spec is the target; this skill owns all current-state truth, sequencing, and the implementation decisions in the spec's `Left To Planning`.
 - Never edit the spec, sessions, or glossary. A discovery that changes observable behavior redirects to `behavior-spec`; anything else lands in the plan.
-- Do not reopen settled product decisions. Ask the user only about sequencing, tier confirmation, ADR candidates, and planning assumptions you cannot ground.
+- Do not reopen settled product decisions. Ask the user only for what Escalate Only lists.
 - Never contradict an `Accepted` ADR silently: either follow it, or raise a superseding ADR candidate.
 - Write current truth only; no history, no proposals.
 
@@ -69,7 +70,7 @@ Pick the mode from the request and `plan.md`'s `Next` line.
 
 ### Phase Review (`Next: phase review PNN`)
 
-1. Get failing acceptance tests for every `planned` card with scenarios or a test-fix kind. Give each card its own test file paths.
+1. Get failing acceptance tests for every `planned` card with scenarios, and the test diff for every `planned` `test-fix` card with `Scope: assertion`. Give each card its own test file paths, and pass the spec path with each card.
    - `small` lane, or at most 2 such cards: write them yourself, following the rules in `.github/agents/test-author.agent.md`.
    - Otherwise: dispatch `test-author` once per card, in parallel.
 
@@ -79,7 +80,22 @@ Pick the mode from the request and `plan.md`'s `Next` line.
 
 ### Revise (`Next: blocked SNN`)
 
-Edit only the affected cards. If the fix changes a decision a locked test asserts, add a test-fix card and set `Next: phase review PNN`. If the stop reveals a spec gap, redirect to `behavior-spec`.
+Edit only the affected cards. If the stop reveals a spec gap, redirect to `behavior-spec`. When the stop is a locked test of a completed slice:
+
+- The test fails only with extra output from Rules this phase adds, and its fixture breaks a spec rule beyond its scenario's fault: add a `test-fix` card with `Scope: fixture` and set `Next: fixture repair SNN`. The blocked slice waits on it.
+- Otherwise, if the fix changes what a locked test asserts: add a `test-fix` card with `Scope: assertion` and set `Next: phase review PNN`.
+- Otherwise, the new code is wrong: revise the blocked card so it keeps the locked behavior.
+
+### Fixture Repair (`Next: fixture repair SNN`)
+
+This mode does not involve the user. It repairs a fixture and never changes what a test expects.
+
+1. Restore the card's `Acceptance tests` paths to `Tests locked`, then dispatch `test-author` with the card, the `Harness` lines, and the spec path.
+2. Run the Fixture Repair Check (PHASE-FORMAT).
+3. Dispatch `test-reviewer` with the card, the spec path, and the `Tests locked` ref.
+4. If both pass, commit the card's paths, move `Tests locked` to that commit, set the card `completed`, set the slices it unblocks to `ready`, and recompute `Next`. If either fails, restore the paths to `Tests locked`, set the card's `Scope` to `assertion`, put the reviewer's report on the card, and set `Next: phase review PNN`.
+
+`small` lane: the main session writes the repair, there is no lock to diff or move, and `test-reviewer` reviews the change against the last commit.
 
 ### Dispatch (`Next: PNN S..` or `running ...`)
 
@@ -112,14 +128,15 @@ Classify each gate finding, then act:
 
 | Finding | Action |
 |---|---|
-| failing test of a completed slice | `fix` card; `Restores` that scenario ID |
+| failing test of a completed slice, only extra output from this phase's Rules, fixture breaks a further spec rule | `test-fix` card with `Scope: fixture`; Fixture Repair |
+| any other failing test of a completed slice | `fix` card; `Restores` that scenario ID |
 | owned scenario ID with no test that ran and passed | `fix` card if the test exists but fails; Revise if the test is missing |
 | oracle file changed since the lock | report to the user; never write a card that accepts the change |
 | surviving mutant a scenario should have caught | `test-fix` card; `Restores` that scenario ID and names the mutant |
 | surviving mutant in code no scenario covers | Revise: add the missing scenario, or remove dead code |
 | wrong slice boundary, missing behavior, or spec gap | Revise, or redirect to `behavior-spec` for a spec gap |
 
-Group findings that share a root cause into one card, and continue the `S` numbering. Add each card to the slice table as `planned`, set the phase back to `in progress`, and set `Next: phase review PNN`.
+Group findings that share a root cause into one card, and continue the `S` numbering. Add each card to the slice table as `planned` and set the phase back to `in progress`. Set `Next: fixture repair SNN` when only `Scope: fixture` cards were added, otherwise `Next: phase review PNN`.
 
 ## Slicing
 
@@ -131,6 +148,19 @@ Group findings that share a root cause into one card, and continue the `S` numbe
 - Pin every decision a weaker model would otherwise make: names, signatures, data shapes, error categories, file locations. A card with an open design choice is not ready.
 - Keep a card under ~60 lines. If it needs more, the planning isn't finished; split or pin more.
 - Propose a tier per card with a one-line reason: `local` for mechanical work against clear patterns (goes to `coder`), `cloud` for work needing judgment (the main session implements it). The user confirms at phase review. Setup cards are `cloud`.
+
+## Escalate Only
+
+Bring the user in only for:
+
+- setup-card approval and phase review approval: cards, tests, and tiers
+- ADR candidates
+- `test-fix` cards with `Scope: assertion`, meaning any change to what a locked test expects
+- an oracle file changed since the lock outside an approved path
+- a scenario or quality threshold no black-box test can express
+- a planning assumption you cannot ground
+
+Everything else proceeds without the user, including Fixture Repair, and appears in the brief. Spec gaps and new requirements redirect to `behavior-spec` or `brain-storm`.
 
 ## ADR Gate
 
@@ -145,4 +175,4 @@ Candidates go to the user at the next checkpoint (setup-card approval or phase r
 
 Write only when every card you touched is dispatch-ready or its gap is a question you are asking. Otherwise ask the next blocking question and do not write.
 
-Return a brief: status changes, cards added or revised, tests written, tiers awaiting confirmation, ADR candidates awaiting approval, ADRs written, and the `Next` line. The artifacts are durable; the brief is disposable.
+Return a brief: status changes, cards added or revised, tests written, fixture repairs applied, tiers awaiting confirmation, ADR candidates awaiting approval, ADRs written, and the `Next` line. The artifacts are durable; the brief is disposable.

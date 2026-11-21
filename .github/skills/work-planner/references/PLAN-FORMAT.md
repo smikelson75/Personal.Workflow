@@ -27,6 +27,7 @@ One line stating what happens next. During execution it can join the parts below
 - `running S03` lists slices that are `in progress`.
 - `blocked S04 - <reason>` lists slices awaiting Revise.
 - `phase review PNN` means `planned` cards need tests and user approval.
+- `fixture repair S06` means a `Scope: fixture` card runs Fixture Repair without the user.
 - `gate PNN` means every slice is `completed`.
 - `triage PNN` means the gate failed.
 - `plan PNN` means the previous phase completed.
@@ -47,9 +48,9 @@ The main session sets every status. Phase and card files carry no status.
 
 `Tests locked` is one plan-wide git ref. The oracle is the union of every card's `Acceptance tests` paths across all phases, including fixtures and test configuration.
 
-At each phase review approval, the main session:
+At each phase review approval, and after each passed Fixture Repair, the main session:
 
-1. confirms `git diff <current lock> -- <oracle>` touches only the paths of the cards just reviewed
+1. confirms `git diff <current lock> -- <oracle>` touches only the paths of the cards just reviewed or repaired
 2. commits those paths
 3. moves `Tests locked` to that commit
 

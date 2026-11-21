@@ -12,6 +12,8 @@ Run `/work-planner` in your main session and type `run next` at each step. You n
 4. The main session checks each `ready` card. `local` cards go to `coder`, in parallel where dependencies and files allow; the main session implements `cloud` cards itself. It confirms the tests pass by rerunning them.
 5. The phase gate runs: full suite, traceability, locked-test check, and mutation testing (`small` lane: full suite only). Triage turns failures into fix cards, which return to step 2.
 
+When new, spec-correct code makes an older locked test fail only because that test's fixture had a second, unchecked fault, the main session runs a fixture repair without you. `test-author` fixes only the fixture, a command confirms no assertion changed, and `test-reviewer` approves the change before the tests are re-locked. Any change to what a test expects comes to you at phase review. The full list of times you are asked is in SKILL.md's `Escalate Only`.
+
 To resume in a new session, read the `Next` line in the plan.
 
 ## Lanes
@@ -28,6 +30,7 @@ The main session runs on whatever model you pick; a Sonnet-class model on `mediu
 | `repo-scout` | cheap | `low` | High-volume reading kept out of the main context; it decides nothing. |
 | `coder` | cheap or local | `medium` | `local` cards only. A closed-world card plus locked tests act as the oracle; no design work. |
 | `test-author` | mid | `medium` | Writing and running tests is volume work; the card's scenarios already hold the judgment. Skipped for small phases. |
+| `test-reviewer` | mid | `medium` | Approves fixture repairs to locked tests, so the agent that changes a test never approves its own change. |
 | `planner` | strongest | `high` | Optional. Pick it yourself for a large or architecture-heavy first plan, where slice boundaries matter most. |
 
 ### Notes

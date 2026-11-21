@@ -13,6 +13,7 @@ A card is the brief. The main session sends a `local` card's section verbatim to
   - run: `<command>`, with how to select tests by scenario ID and how to exclude them
   - tag: how a test carries its scenario ID
   - count: how to read the number of tests that ran from the output
+  - assert: a regex matching any line that states an expectation or a test title (for example `^\s*(assert|expect)|\btest\(`)
 - **Known failures** (optional): pre-existing failing tests, each with its owning later phase
 - **Gate:**
   - suite: `<full test command>`, excluding `Known failures`
@@ -24,11 +25,12 @@ A card is the brief. The main session sends a `local` card's section verbatim to
 
 Write cards in plain, literal sentences. No pronouns pointing at other cards and no "as discussed". Fields are mandatory unless marked optional.
 
-- **Kind:** `build` (adds scenarios), `setup` (no scenarios), `fix` (restores failing scenarios), or `test-fix` (rewrites or strengthens locked tests during phase review; never dispatched)
+- **Kind:** `build` (adds scenarios), `setup` (no scenarios), `fix` (restores failing scenarios), or `test-fix` (rewrites, strengthens, or repairs locked tests; never dispatched to `coder`)
+- **Scope** (`test-fix` only): `fixture` (only fixture setup changes, every expectation stays the same; applied by Fixture Repair without the user) or `assertion` (what a test expects changes; approved by the user at phase review)
 - **Goal:** one sentence describing the observable result
 - **Depends on:** card IDs, or `none`
 - **Tier:** `local` (`coder` agent) | `cloud` (main session) - one-line reason
-- **Scenarios** (`build` only): `R3-01: Given <concrete>, when <concrete>, then <concrete>`, one per line. This card owns them.
+- **Scenarios** (`build` only): `R3-01: Given <concrete>, when <concrete>, then <concrete>`, one per line. This card owns them. The Given names only the fault; the rest of the fixture is implicitly valid under the whole spec.
 - **Restores** (`fix` and `test-fix` only): scenario IDs owned by other cards, plus the gate finding being addressed
 - **Acceptance tests** (`build`, `test-fix`): paths written during phase review, including fixtures. Each card's tests live in files no other card uses. They are locked; implementers never edit them.
 - **Files:** `create <path>` / `edit <path>`, the complete list
@@ -54,6 +56,16 @@ The main session runs these with plain file and command checks, not reasoning:
 
 Any miss sets the slice to `blocked`.
 
+## Fixture Repair Check
+
+The main session runs these with commands, not reasoning, after `test-author` returns a `Scope: fixture` repair. `small` lane: diff against `HEAD` instead of `Tests locked`.
+
+- `git diff --name-only <Tests locked> -- <oracle>` lists only this card's `Acceptance tests` paths
+- `git diff -U0 <Tests locked> -- <this card's paths>` has no added or removed line matching the Harness `assert` regex
+- the `Restores` tests pass, and the gate suite passes except for scenarios owned by cards that are not `completed`
+
+Any miss fails the repair.
+
 ## Rules
 
 - card IDs are `S01`, `S02`, ... in dependency order; fix cards from Triage continue the numbering
@@ -76,6 +88,7 @@ Any miss sets the slice to `blocked`.
   - run: `npx mocha`; select `--grep "<ids>"`; exclude `--grep "<ids>" --invert`
   - tag: test title starts with `[R3-01]`
   - count: `N passing` line
+  - assert: `^\s*(assert|expect)|\btest\(`
 - **Gate:**
   - suite: `npx mocha`
   - traceability: `npx mocha --reporter json | node scripts/trace.js R3 R4 Q-latency`
