@@ -122,7 +122,7 @@ t('[R14-07] --skip-pattern prints only later-owned Known Failures, regex-escaped
   try {
     const res = repo.run(TRACE, ['--phase-file', 'phase-02.md', '--skip-pattern']);
     assert.equal(res.status, 0, res.stderr);
-    assert.equal(res.stdout, 'a\\.b \\[x\\]\n');
+    assert.equal(res.stdout, '^a\\.b \\[x\\]$\n');
   } finally {
     repo.cleanup();
   }
