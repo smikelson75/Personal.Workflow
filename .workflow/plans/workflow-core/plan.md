@@ -2,10 +2,11 @@
 
 - Spec: [workflow-core-spec.md](../../specs/workflow-core-spec.md)
 - Lane: standard
-- Next: gate P03
+- Next: P03 S08
 - Tests locked: `37ff2d5`
 - Oracle: `.github/tools/workflow-core/tests`
 - Phase base: `37ff2d5`
+- Review pending: S08
 - Reconciled: `d6d5e19`
 
 ## Current state
@@ -29,7 +30,7 @@
 |---|-------|--------|--------|--------|
 | P01 | Interaction rules and stage commits | completed | R22, R23 (rules file and references), R13, R19 | [phase-01](phase-01.md) |
 | P02 | Gate and plan scripts | completed | R14, R15, R17 | [phase-02](phase-02.md) |
-| P03 | Reconcile, defects, pair coverage | gating | R20, R21, R16, Q-clean-handoff, Q-checkpoint-cost | [phase-03](phase-03.md) |
+| P03 | Reconcile, defects, pair coverage | in progress | R20, R21, R16, Q-clean-handoff, Q-checkpoint-cost | [phase-03](phase-03.md) |
 
 ## P03 slices
 
@@ -42,4 +43,5 @@
 | S05 | Pair gate in plan-check | completed |
 | S06 | Pair coverage text | completed |
 | S07 | Clean handoff and Checkpoint cost text | completed |
+| S08 | Reject malformed arguments in parse-args | ready |
 

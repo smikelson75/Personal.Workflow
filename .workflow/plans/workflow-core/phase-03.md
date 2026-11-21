@@ -196,3 +196,20 @@
 - **Do not:** edit `.github/tools/workflow-core/tests/**`; change other lines; add dependencies.
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" ".github/tools/workflow-check/tests/acceptance/*.test.mjs" ".github/tools/workflow-core/tests/acceptance/*.test.mjs"` exits 0; targets Q-clean-handoff, Q-checkpoint-cost; 2 target tests run
 - **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.
+
+## S08 - Reject malformed arguments in parse-args
+
+- **Kind:** fix
+- **Goal:** `parse-args.mjs` prints the usage line and exits 2 for argument text that is neither empty, a single slug, nor `[<slug>] bug: <description>`, instead of treating it as a slug.
+- **Depends on:** S03
+- **Tier:** delegate - one small edit to one script; the rule is pinned
+- **Review:** none
+- **Restores:** review - `parse-args.mjs` treats text such as `workflow-core fix the login bug: crashes` as a slug with `bug` null and exit 0, so a defect report whose `bug:` is not the first or second token is silently dropped
+- **Files:** edit `.github/skills/pull-work/scripts/parse-args.mjs`
+- **Patterns:** `.github/skills/pull-work/scripts/parse-args.mjs:21 - the non-bug branch and the usage exit`
+- **Decisions:**
+  - In the branch where the text does not match the `bug:` pattern, non-empty text must match `^[a-z0-9][a-z0-9-]*$`; otherwise print the usage line `/pull-work [<slug>] bug: <description>` to stderr and exit 2.
+  - Every other behavior and output stays as it is.
+- **Do not:** edit `.github/tools/workflow-core/tests/**`; add dependencies.
+- **Done when:** `node --test --test-reporter=tap ".github/tools/workflow-check/tests/acceptance/*.test.mjs" ".github/tools/workflow-core/tests/acceptance/*.test.mjs"` exits 0, and `node .github/skills/pull-work/scripts/parse-args.mjs "workflow-core fix the login bug: crashes"` exits 2 with the usage line on stderr
+- **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.
