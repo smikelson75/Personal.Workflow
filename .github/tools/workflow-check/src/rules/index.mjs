@@ -5,6 +5,7 @@ import { folderRules } from './folder.mjs';
 import { glossaryRules } from './glossary.mjs';
 import { sessionBodyRules } from './session-body.mjs';
 import { sessionHeaderRules } from './session-header.mjs';
+import { vocabularyConflictRules } from './vocabulary-conflict.mjs';
 
 export const RULES = [
   ...folderRules,
@@ -14,4 +15,5 @@ export const RULES = [
   ...chainStatusRules,
   ...chainLinkRules,
   ...chainIdRules,
+  ...vocabularyConflictRules,
 ];
