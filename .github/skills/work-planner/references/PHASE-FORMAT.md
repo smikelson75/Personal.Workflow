@@ -2,7 +2,7 @@
 
 Purpose: `.workflow/plans/<artifact-slug>/phase-NN.md` holds what no single slice owns (invariants, harness, gate) and every slice card for the phase. It is written just in time, when the phase becomes active, and kept after the phase completes.
 
-A card is the brief. The main session sends a `local` card's section verbatim to `coder`, adding only the materialized `Done when` command, and implements a `cloud` card itself. Either way, a weaker model given only that and the repo must finish without asking about intent.
+A card is the brief. The main session sends a `delegate` card's section verbatim to `coder`, adding only the materialized `Done when` command, and implements a `main` card itself. Either way, a weaker model given only that and the repo must finish without asking about intent.
 
 ## Phase Header
 
@@ -29,10 +29,11 @@ Write cards in plain, literal sentences. No pronouns pointing at other cards and
 - **Scope** (`test-fix` only): `fixture` (only fixture setup changes, every expectation stays the same; applied by Fixture Repair without the user) or `assertion` (what a test expects changes; approved by the user at phase review)
 - **Goal:** one sentence describing the observable result
 - **Depends on:** card IDs, or `none`
-- **Tier:** `local` (`coder` agent) | `cloud` (main session) - one-line reason
+- **Tier:** `delegate` (`coder` agent) | `main` (main session) - one-line reason
+- **Review:** `required - <criterion>` | `none` (work-planner SKILL.md Slicing lists the criteria)
 - **Scenarios** (`build` only): `R3-01: Given <concrete>, when <concrete>, then <concrete>`, one per line. This card owns them. The Given names only the fault; the rest of the fixture is implicitly valid under the whole spec.
-- **Restores** (`fix` and `test-fix` only): scenario IDs owned by other cards, plus the gate finding being addressed
-- **Acceptance tests** (`build`, `test-fix`): paths written during phase review, including fixtures. Each card's tests live in files no other card uses. They are locked; implementers never edit them.
+- **Restores** (`fix` and `test-fix` only): scenario IDs owned by other cards, plus the gate finding being addressed; or `review - <finding>` for a defect from Review that no black-box test can express
+- **Acceptance tests** (`build`, `test-fix`): repo-relative paths in backticks, with no aliases, written during phase review, including fixtures (a folder ends in `/`). Each card's tests live in files no other card uses. They are locked; implementers never edit them. The locked-test guard hook reads this line during Fixture Repair.
 - **Files:** `create <path>` / `edit <path>`, the complete list
 - **Patterns:** `<path>:<line> - <what to copy from it>`, at least one per new file
 - **Decisions:** pinned facts such as names, signatures, data shapes, and error categories, stated as facts and not as options
@@ -52,7 +53,7 @@ The main session runs these with plain file and command checks, not reasoning:
 - every `edit` path and every `Patterns` path:line exists
 - every `create` path does not exist yet
 - oracle paths are unchanged since `Tests locked` (`standard` lane only)
-- the materialized `Done when` command runs, selects the expected number of tests, and fails only on the target scenarios: this card's own for `build`, the `Restores` IDs for `fix`. For `setup`, the command just runs.
+- the materialized `Done when` command runs, selects the expected number of tests, and fails only on the target scenarios: this card's own for `build`, the `Restores` IDs for `fix`. For `setup` and `review -` fix cards, the command just runs.
 
 Any miss sets the slice to `blocked`.
 
@@ -100,7 +101,8 @@ Any miss fails the repair.
 - **Kind:** build
 - **Goal:** ...
 - **Depends on:** none
-- **Tier:** local - mirrors an existing command handler
+- **Tier:** delegate - mirrors an existing command handler
+- **Review:** none
 - **Scenarios:**
   - R3-01: Given ..., when ..., then ...
   - R3-02: Given ..., when ..., then ... (failure)

@@ -10,6 +10,9 @@ Phase files sit beside it as `phase-NN.md` ([format](PHASE-FORMAT.md)).
 - `Lane` line: `small` or `standard` (SKILL.md Lanes)
 - `Next` line
 - `Tests locked` ref
+- `Oracle` line: the repo-relative paths, in backticks, whose union holds every card's `Acceptance tests`, fixtures, and test configuration. The gate's lock command and the locked-test guard hook (`.github/hooks/locked-tests.json`) read it.
+- `Phase base` ref: the commit the active phase's code changes start from; Review diffs against it
+- `Review pending` line, only while the active phase is in Review: the card IDs still to review
 - current state and gap
 - phase table
 - slice table for the active phase
@@ -29,7 +32,8 @@ One line stating what happens next. During execution it can join the parts below
 - `phase review PNN` means `planned` cards need tests and user approval.
 - `fixture repair S06` means a `Scope: fixture` card runs Fixture Repair without the user.
 - `gate PNN` means every slice is `completed`.
-- `triage PNN` means the gate failed.
+- `review PNN` means the gate passed and `Review: required` cards await code review.
+- `triage PNN` means the gate or review failed.
 - `plan PNN` means the previous phase completed.
 - `done` means every requirement and quality threshold has a passing scenario.
 
@@ -51,10 +55,10 @@ The main session sets every status. Phase and card files carry no status.
 At each phase review approval, and after each passed Fixture Repair, the main session:
 
 1. confirms `git diff <current lock> -- <oracle>` touches only the paths of the cards just reviewed or repaired
-2. commits those paths
-3. moves `Tests locked` to that commit
+2. commits those paths, without asking (the approval or the passed repair is the permission)
+3. sets `Tests locked` to that commit and commits `plan.md` separately, because a commit cannot record its own hash
 
-The gate fails if `git diff --exit-code <lock> -- <oracle>` shows any change.
+The gate fails if `git diff --exit-code <lock> -- <oracle>` shows any change. Between locks, the guard hook denies edit-tool writes to oracle files that exist at the lock. During `phase review` it allows any oracle file, because the lock step above checks the diff; during `fixture repair SNN` it allows only that card's `Acceptance tests` in the newest phase file. Shell writes bypass the hook, so Dispatch also runs the lock diff after every slice.
 
 ## Rules
 
@@ -73,6 +77,8 @@ The gate fails if `git diff --exit-code <lock> -- <oracle>` shows any change.
 - Lane: standard
 - Next: P02 S03, S04
 - Tests locked: `e4f5a6b`
+- Oracle: `tests/acceptance`
+- Phase base: `e4f5a6b`
 
 ## Current state
 - stack: ...

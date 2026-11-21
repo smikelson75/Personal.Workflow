@@ -1,0 +1,113 @@
+// preToolUse hook: denies file edits to locked acceptance tests outside the
+// workflow modes allowed to change them (Fixture Repair and Phase Review).
+// Any internal error allows the call: command preToolUse hooks fail closed,
+// and a broken guard must not block every edit.
+import { execFileSync } from 'node:child_process';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { isAbsolute, join, relative, resolve } from 'node:path';
+
+const PHASE_REVIEW = /^phase review\b/;
+const FIXTURE_REPAIR = /^fixture repair (S\d+)/;
+const EDIT_TOOL = /edit|create|write|patch|replace|insert/i;
+
+function allow() {
+  process.stdout.write('{}');
+  process.exit(0);
+}
+
+function targetPaths(toolArgs) {
+  const paths = [];
+  const visit = (value, key) => {
+    if (typeof value === 'string') {
+      if (/^(path|filePath|file_path)$/.test(key ?? '')) paths.push(value);
+      if (key === 'input') {
+        for (const m of value.matchAll(/^\*\*\* (?:Update|Delete|Add) File: (.+)$/gm)) paths.push(m[1].trim());
+      }
+    } else if (Array.isArray(value)) {
+      value.forEach((v) => visit(v));
+    } else if (value && typeof value === 'object') {
+      for (const [k, v] of Object.entries(value)) visit(v, k);
+    }
+  };
+  visit(toolArgs);
+  return paths;
+}
+
+function git(root, args) {
+  return execFileSync('git', ['-C', root, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+}
+
+function isTrackedAt(root, ref, rel) {
+  try {
+    execFileSync('git', ['-C', root, 'cat-file', '-e', `${ref}:${rel}`], { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function backticked(text) {
+  return [...text.matchAll(/`([^`]+)`/g)].map((m) => m[1].replace(/\/+$/, ''));
+}
+
+// Paths the card being repaired may change, read from the newest phase file.
+function repairPaths(planDir, cardId) {
+  const phases = readdirSync(planDir).filter((n) => /^phase-\d+\.md$/.test(n)).sort();
+  if (phases.length === 0) return [];
+  const text = readFileSync(join(planDir, phases[phases.length - 1]), 'utf8');
+  const card = text.split(/^(?=## S\d+ )/m).find((c) => c.startsWith(`## ${cardId} `));
+  const line = card?.match(/^- \*\*Acceptance tests:\*\* (.*)$/m)?.[1];
+  return line ? backticked(line) : [];
+}
+
+const under = (rel, roots) => roots.some((o) => rel === o || rel.startsWith(`${o}/`));
+
+try {
+  const event = JSON.parse(readFileSync(0, 'utf8'));
+  const toolName = event.toolName ?? event.tool_name ?? '';
+  if (!EDIT_TOOL.test(toolName)) allow();
+  let toolArgs = event.toolArgs ?? event.tool_input ?? {};
+  if (typeof toolArgs === 'string') toolArgs = JSON.parse(toolArgs);
+
+  const cwd = event.cwd ?? process.cwd();
+  const root = git(cwd, ['rev-parse', '--show-toplevel']);
+  const plansDir = join(root, '.workflow', 'plans');
+  if (!existsSync(plansDir)) allow();
+
+  const locks = [];
+  for (const slug of readdirSync(plansDir)) {
+    const planPath = join(plansDir, slug, 'plan.md');
+    if (!existsSync(planPath)) continue;
+    const plan = readFileSync(planPath, 'utf8');
+    const ref = plan.match(/^- Tests locked: `([0-9a-f]{7,40})`/m)?.[1];
+    const next = plan.match(/^- Next: (.*)$/m)?.[1] ?? '';
+    const oracle = backticked(plan.match(/^- Oracle: (.*)$/m)?.[1] ?? '');
+    if (!ref || oracle.length === 0 || PHASE_REVIEW.test(next)) continue;
+    const repair = next.match(FIXTURE_REPAIR)?.[1];
+    const allowed = repair ? repairPaths(join(plansDir, slug), repair) : [];
+    locks.push({ slug, ref, oracle, allowed, repair });
+  }
+  if (locks.length === 0) allow();
+
+  for (const p of targetPaths(toolArgs)) {
+    const rel = relative(root, isAbsolute(p) ? p : resolve(cwd, p)).split('\\').join('/');
+    if (rel.startsWith('..')) continue;
+    for (const { slug, ref, oracle, allowed, repair } of locks) {
+      if (under(rel, oracle) && !under(rel, allowed) && isTrackedAt(root, ref, rel)) {
+        const scope = repair
+          ? `Fixture Repair ${repair} may change only its own Acceptance tests.`
+          : 'Only Fixture Repair or Phase Review may change it.';
+        process.stdout.write(JSON.stringify({
+          permissionDecision: 'deny',
+          permissionDecisionReason:
+            `${rel} is a locked acceptance test (plan ${slug}, Tests locked ${ref}). ` +
+            `${scope} Stop and report instead of editing it.`,
+        }));
+        process.exit(0);
+      }
+    }
+  }
+  allow();
+} catch {
+  allow();
+}

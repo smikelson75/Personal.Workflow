@@ -6,7 +6,9 @@ argument-hint: "Optional: describe your change to override the diff-based sugges
 
 # Conventional Commit
 
-Invoke as `/conventional-commit` to journal work: prepare each coherent, reviewable commit by default. Read the diff, stage only its files, and create a Conventional Commits 1.0.0 message. Always ask for explicit user approval before executing `git commit` in interactive human sessions. Ask before staging when scope is unclear, changes are mixed, or the user explicitly requests review first.
+Invoke as `/conventional-commit` to journal work: prepare each coherent, reviewable commit by default. Read the diff, stage only its files, and create a Conventional Commits 1.0.0 message. When the user invokes this skill directly, ask for explicit approval before executing `git commit`. Ask before staging when scope is unclear, changes are mixed, or the user explicitly requests review first.
+
+When a workflow skill commits (`pull-work`, `work-planner`, the `planner` agent), it follows only the Message Rules below and does not ask: the approval, passing gate, or completed slice that triggered the commit is the permission. It stages exactly the paths it names.
 
 ## Workflow
 

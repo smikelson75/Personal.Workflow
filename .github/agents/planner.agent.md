@@ -16,4 +16,4 @@ Load the `work-planner` skill and run its Plan mode only. You stand in for the m
 - Write approved ADRs yourself by loading the `adr-writer` skill; you hold the decision context, so do not delegate it.
 - Your output is decisions. Spend effort on slice boundaries and pinned decisions, not on prose.
 - Ask the user one question at a time, with context, options, tradeoffs, and a recommendation.
-- When `plan.md` and the active phase are written, tell the user to continue in the main session with `/work-planner run next`.
+- When `plan.md` and the active phase are written, commit them as `docs(<slug>): plan PNN`, then tell the user to continue in the main session with `/pull-work`.

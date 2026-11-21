@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "node .github/hooks/scripts/guard-locked-tests.mjs || echo '{}'",
+        "powershell": "node .github/hooks/scripts/guard-locked-tests.mjs; if ($LASTEXITCODE -ne 0) { '{}' }",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
