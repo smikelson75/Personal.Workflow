@@ -2,10 +2,10 @@
 
 - Spec: [workflow-core-spec.md](../../specs/workflow-core-spec.md)
 - Lane: standard
-- Next: phase review P02
-- Tests locked: `4653bee`
+- Next: P02 S01, S03, S05
+- Tests locked: `56122ec`
 - Oracle: `.github/tools/workflow-core/tests`
-- Phase base: `8294271`
+- Phase base: `56122ec`
 - Reconciled: `d6d5e19`
 
 ## Current state
@@ -28,16 +28,16 @@
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
 | P01 | Interaction rules and stage commits | completed | R22, R23 (rules file and references), R13, R19 | [phase-01](phase-01.md) |
-| P02 | Gate and plan scripts | planned | R14, R15, R17 | [phase-02](phase-02.md) |
+| P02 | Gate and plan scripts | in progress | R14, R15, R17 | [phase-02](phase-02.md) |
 | P03 | Reconcile, defects, pair coverage | planned | R20, R21, R16, Q-clean-handoff, Q-checkpoint-cost | |
 
 ## P02 slices
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Trace honors Known Failures | planned |
-| S02 | Gate text names Known Failures | planned |
-| S03 | Plan check script | planned |
-| S04 | Phase completion runs the plan check | planned |
-| S05 | Mutation add-on detection script | planned |
-| S06 | Plan mode and Gate use mutation detection | planned |
+| S01 | Trace honors Known Failures | ready |
+| S02 | Gate text names Known Failures | ready |
+| S03 | Plan check script | ready |
+| S04 | Phase completion runs the plan check | ready |
+| S05 | Mutation add-on detection script | ready |
+| S06 | Plan mode and Gate use mutation detection | ready |
