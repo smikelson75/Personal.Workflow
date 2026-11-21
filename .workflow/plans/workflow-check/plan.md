@@ -2,7 +2,7 @@
 
 - Spec: [workflow-check-spec.md](../../specs/workflow-check-spec.md)
 - Lane: standard
-- Next: gate P05
+- Next: done
 - Tests locked: `c83391b`
 - Oracle: `.github/tools/workflow-check/tests`
 - Phase base: `c83391b`
@@ -16,7 +16,7 @@
 - git repository on `main`; accepted ADR: [0001](../../adr/0001-node-runtime-for-workflow-check.md)
 - in place: CLI with folder discovery, Finding formatting/sorting/summary, exit codes, Rule registry `R/src/rules/index.mjs` (folder rules, Session header and body Rules)
 - in place (P02): Glossary structure, Chain model `R/src/chain.mjs`, Chain Rules, file argument, warnings-only exit
-- gap to spec: R2 partial, R11 partial, R12 partial, R18
+- gap to spec: none
 
 ## Decisions pinned by the plan
 - runtime: Node (zero dependencies, ES modules `.mjs`, built-in `node:test`); invoked `node .github/tools/workflow-check/bin/workflow-check.mjs [file]`; tool root `.github/tools/workflow-check/` (called `R` in cards)
@@ -26,19 +26,8 @@
 
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
-| P01 | Run, report, Session structure | completed | R1 (folder-level), R2 (Session rules), R6, R7, R9, R10 (CRLF/BOM), Q-message-length | [phase-01](phase-01.md) |
-| P02 | Glossary structure, Chain, file argument | completed | R1 (no-final, superseded Sessions), R2 (Glossary rules), R3, R6 (warnings, mixed), R8 | [phase-02](phase-02.md) |
+| P01 | Run, report, Session structure | completed | R1, R2, R6, R7, R9, R10, Q-agent-readable-output | [phase-01](phase-01.md) |
+| P02 | Glossary structure, Chain, file argument | completed | R3, R6, R8 | [phase-02](phase-02.md) |
 | P03 | Vocabulary and Excess | completed | R4, R5 | [phase-03](phase-03.md) |
 | P04 | Skill integration and qualities | completed | R10 (no stdin/network), R11, R12, Q-speed, Q-determinism | [phase-04](phase-04.md) |
-| P05 | Size-based sections and reword-proof skill checks | gating | R2 (sections by Size), R11 (command), R12 (command), R18 | [phase-05](phase-05.md) |
-
-## P05 slices
-
-| # | Slice | Status |
-|---|-------|--------|
-| S01 | Required sections follow Size | completed |
-| S02 | Repair the R2-05 expectation | completed |
-| S03 | CONTEXT-FORMAT states required sections by Size | completed |
-| S04 | The suite checks skills only by command | completed |
-| S05 | Skill tests drop wording checks | completed |
-| S06 | brain-storm checks the whole folder | completed |
+| P05 | Size-based sections and reword-proof skill checks | completed | R18 | [phase-05](phase-05.md) |
