@@ -130,9 +130,12 @@ const expected = specIds(specLines)
 // Found gap: items after "- gap to spec:" in the plan.
 const gapLine = planLines.find((line) => /^- gap to spec:/.test(line));
 const gapValue = gapLine ? gapLine.replace(/^- gap to spec:/, '').trim() : 'none';
-const found = gapValue === 'none' || gapValue === ''
+const gapItems = gapValue === 'none' || gapValue === ''
   ? []
   : gapValue.split(',').map((s) => s.trim()).filter((s) => s !== '');
+// Pair items (<ID> @ <capability>) are not spec IDs; they are checked against Next below.
+const pairs = gapItems.filter((s) => s.includes(' @ '));
+const found = gapItems.filter((s) => !s.includes(' @ '));
 
 if (!sameSet(expected, found)) {
   problems.push(`gap mismatch: expected ${fmt(expected)} but found ${fmt(found)}`);
@@ -142,6 +145,10 @@ const nextLine = planLines.find((line) => /^- Next:/.test(line));
 const nextValue = nextLine ? nextLine.replace(/^- Next:/, '').trim() : '';
 if (nextValue === 'done' && expected.length > 0) {
   problems.push(`Next is done with uncovered IDs: ${expected.join(', ')}`);
+}
+
+if (nextValue === 'done') {
+  for (const pair of pairs) problems.push(`uncovered pair: ${pair}`);
 }
 
 for (const problem of problems) console.error(problem);
