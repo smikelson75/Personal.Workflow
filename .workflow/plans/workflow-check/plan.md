@@ -2,7 +2,7 @@
 
 - Spec: [workflow-check-spec.md](../../specs/workflow-check-spec.md)
 - Lane: standard
-- Next: review P03
+- Next: plan P04
 - Tests locked: `da265b0`
 - Oracle: `.github/tools/workflow-check/tests`
 - Phase base: `5b4fd01`
@@ -27,7 +27,7 @@
 |---|-------|--------|--------|--------|
 | P01 | Run, report, Session structure | completed | R1 (folder-level), R2 (Session rules), R6, R7, R9, R10 (CRLF/BOM), Q-message-length | [phase-01](phase-01.md) |
 | P02 | Glossary structure, Chain, file argument | completed | R1 (no-final, superseded Sessions), R2 (Glossary rules), R3, R6 (warnings, mixed), R8 | [phase-02](phase-02.md) |
-| P03 | Vocabulary and Excess | gating | R4, R5 | [phase-03](phase-03.md) |
+| P03 | Vocabulary and Excess | completed | R4, R5 | [phase-03](phase-03.md) |
 | P04 | Skill integration and qualities | planned | R10 (no stdin/network), R11, R12, Q-speed, Q-determinism | |
 
 ## P03 slices
@@ -41,5 +41,3 @@
 | S05 | Size Rules | completed |
 | S06 | Out-of-stage Rule | completed |
 | S07 | Repair R2-12 fixture for the missing-term Rule (test-fix, fixture) | completed |
-
-- Review pending: S01, S02
