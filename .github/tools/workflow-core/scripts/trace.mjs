@@ -52,7 +52,7 @@ if (phasePath !== undefined) {
       if (entry) known.push({ title: entry[1], owner: Number(entry[2].slice(1)) });
     }
   }
-  excluded = known.filter((k) => k.owner > gatedNumber).map((k) => k.title);
+  excluded = gated ? known.filter((k) => k.owner > gatedNumber).map((k) => k.title) : [];
 }
 
 if (skipPattern) {
