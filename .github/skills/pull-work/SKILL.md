@@ -24,6 +24,8 @@ Run these as commands, not reasoning.
    - Anything else was made outside the workflow, because the workflow commits everything it writes. Stop and show the files grouped by folder, then recommend `/conventional-commit` for finished work or `git stash` for experiments. Never commit, stash, or discard them yourself.
 
 Plan candidates come from `node .github/skills/pull-work/scripts/reconcile-check.mjs candidates`: open plans, `done` plans whose spec changed, and specs with no plan. After selecting a plan, run `node .github/skills/pull-work/scripts/reconcile-check.mjs status <slug>`; on `changed`, load `work-planner` and run Reconcile mode before routing on `Next`.
+Arguments are parsed by `node .github/skills/pull-work/scripts/parse-args.mjs <arguments>`, which prints JSON with `slug` and `bug`; exit 2 shows the usage line `/pull-work [<slug>] bug: <description>` and stops with no question and no change. With `bug` set, Preflight and the spec reconcile run first, then load `work-planner` and run Defect mode.
+With `bug` set and no plan for the slug, or no plan at all, report that and change nothing.
 
 ## Route
 
@@ -57,6 +59,7 @@ Commit at every transition, without asking: an approval, a passing gate, or a co
 | then | none; `plan.md` records that commit as `Tests locked` | `docs(<slug>): relock tests after SNN` |
 | Fixture Repair failed, gate or review routed to triage, phase completed | none | `docs(<slug>): <what changed>` |
 | Reconcile spec | none | `docs(<slug>): reconcile spec` |
+| Defect planned | none | `docs(<slug>): plan fix PNN` |
 
 Moving the lock takes two commits because a commit cannot record its own hash. Once a transition's commits are done, `git status --porcelain` may list only the `Files` of other slices still `in progress`. Anything else means a slice wrote outside its `Files`: revert those paths and set that slice `blocked`.
 

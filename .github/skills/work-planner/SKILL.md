@@ -107,6 +107,15 @@ Commit the revision (pull-work's Commits), then hand back to `pull-work`.
 - Redirect: a missing spec file, or a changed requirement with a blocking `Open Decision`, redirects to `behavior-spec` and leaves the plan unchanged.
 - Record: set `Reconciled` to `git log -1 --format=%H -- <spec>`, update gap, phases, and cards, and commit `docs(<slug>): reconcile spec`.
 
+### Defect (`/pull-work [<slug>] bug: <description>`)
+
+- Classify: built behavior that breaks the spec becomes fix work; spec silent or wrong redirects to `behavior-spec`; new behavior redirects to `brain-storm`; a redirect leaves the plan unchanged.
+- Scenario: the fix card's scenario reproduces the defect and fails before the fix.
+- Place: a `done` plan gets a new phase `PNN+1`, otherwise the fix goes into the active phase.
+- Next: set `Next: phase review PNN` so the reproducing tests reach the Developer at the Phase Review Checkpoint.
+- Card: a `build` card owns the scenario and its Goal is `Defect: <description>` with the description verbatim.
+- Commit: `docs(<slug>): plan fix PNN`.
+
 ## Slicing
 
 - One slice is one observable behavior, thin through every layer it touches. If a slice needs two behaviors to be useful, resplit.
