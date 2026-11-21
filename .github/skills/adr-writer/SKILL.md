@@ -7,6 +7,8 @@ user-invocable: true
 
 # ADR Writer
 
+Question rules: follow `.github/user-interaction.md`.
+
 Record why a hard-to-reverse build decision was made, so a later planning run or a future reader does not undo it unknowingly. An ADR (Architecture Decision Record) is a point-in-time record, not a living document.
 
 ## Where It Fits

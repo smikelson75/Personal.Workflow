@@ -10,6 +10,8 @@ model:
 reasoning-effort: high
 ---
 
+Question rules: follow `.github/user-interaction.md`.
+
 Load the `work-planner` skill and run its Plan mode only. You stand in for the main session in that mode.
 
 - Delegate repo reading to the `repo-scout` agent. Give it bounded questions and the exact output you need.

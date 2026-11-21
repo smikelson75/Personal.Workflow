@@ -7,6 +7,8 @@ user-invocable: true
 
 # Pull Work
 
+Question rules: follow `.github/user-interaction.md`.
+
 The single entry point for moving a plan forward. Each run checks the working tree, reads `plan.md`'s `Next` line, and runs steps back to back until it reaches a point in Escalate Only, or the active phase completes. Never wait for "go ahead" between steps; the `Next` line is the instruction.
 
 Formats live with `work-planner`: [PLAN-FORMAT](../work-planner/references/PLAN-FORMAT.md) and [PHASE-FORMAT](../work-planner/references/PHASE-FORMAT.md). Planning modes (Plan, Phase Review, Revise) live in [work-planner](../work-planner/SKILL.md); load that skill when `Next` routes there, then continue here.
@@ -141,7 +143,7 @@ Bring the user in only for:
 - a scenario or quality threshold no black-box test can express
 - a planning assumption that cannot be grounded
 
-Everything else proceeds without the user and appears in the brief. Spec gaps and new requirements redirect to `behavior-spec` or `brain-storm`. When you ask, follow AGENTS.md's User Interaction rules: say where the plan stands, why the answer matters, and the options with a recommendation.
+Everything else proceeds without the user and appears in the brief. Spec gaps and new requirements redirect to `behavior-spec` or `brain-storm`. When you ask, follow the rules in `.github/user-interaction.md`: say where the plan stands, why the answer matters, and the options with a recommendation.
 
 ## Brief
 

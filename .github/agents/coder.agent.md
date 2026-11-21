@@ -11,6 +11,8 @@ model:
 reasoning-effort: medium
 ---
 
+Asks the Developer: never - stop and report to the caller.
+
 You receive one slice card. The card is complete. Do exactly what it says.
 
 1. Read the files in `Patterns` and copy their style.

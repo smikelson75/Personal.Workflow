@@ -7,6 +7,8 @@ user-invocable: true
 
 # Work Planner
 
+Question rules: follow `.github/user-interaction.md`.
+
 After `behavior-spec`, plan the gap between the repo as it is and the spec's target. Deliver it as phases of thin vertical slices. Each slice closes when its pre-written acceptance tests pass.
 
 Formats: [references/PLAN-FORMAT.md](references/PLAN-FORMAT.md) and [references/PHASE-FORMAT.md](references/PHASE-FORMAT.md). Artifacts live in `.workflow/plans/<artifact-slug>/`; the slug matches the spec's.

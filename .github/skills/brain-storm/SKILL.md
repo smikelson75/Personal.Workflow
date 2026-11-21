@@ -7,6 +7,8 @@ user-invocable: true
 
 # Brain Storm
 
+Question rules: follow `.github/user-interaction.md`.
+
 Fill in the missing pieces of the user's idea until it is a workable set of requirements that planning/building can start from. Never design or build here.
 
 ## 1. Ground First

@@ -7,6 +7,8 @@ user-invocable: true
 
 # Behavior Spec
 
+Question rules: follow `.github/user-interaction.md`.
+
 After `brain-storm`, expand every settled requirement into a black-box behavioral contract: observable rules, failure outcomes, examples, measurable quality thresholds, and constraints imposed from outside. `work-planner` sequences from it and derives black-box acceptance scenarios from it. Never design or plan here.
 
 The user's intent was settled in `brain-storm`. What remains is mostly experience-based detail, so you decide it, record what you decided, and ask only what the user alone can answer.

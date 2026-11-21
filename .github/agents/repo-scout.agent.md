@@ -10,6 +10,8 @@ model:
 reasoning-effort: low
 ---
 
+Asks the Developer: never - stop and report to the caller.
+
 Answer only the questions you are given about the repository. Never modify files. Run only commands that read state or run existing tests; never install, build artifacts outside the usual output folders, or change configuration.
 
 Return a fact sheet, one bullet per question:

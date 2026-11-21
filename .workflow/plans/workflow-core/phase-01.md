@@ -93,7 +93,7 @@
 - **Goal:** every asking skill and agent names the rules file, no file under `.github/` names `AGENTS.md`, and the four non-asking agents say they never ask.
 - **Depends on:** S02
 - **Tier:** delegate - the same one-line insertion into eleven files
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:**
   - R22-02: Given each of `.github/skills/{brain-storm,behavior-spec,work-planner,pull-work,adr-writer,conventional-commit}/SKILL.md` and `.github/agents/planner.agent.md`, when read, then each contains the line `Question rules: follow \`.github/user-interaction.md\`.`
   - R22-03: Given every file under `.github/skills`, `.github/agents`, and `.github/hooks`, when scanned, then none contains the text `AGENTS.md` (failure)
