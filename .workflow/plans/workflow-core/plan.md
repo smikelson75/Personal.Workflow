@@ -2,7 +2,7 @@
 
 - Spec: [workflow-core-spec.md](../../specs/workflow-core-spec.md)
 - Lane: standard
-- Next: P01 S01
+- Next: phase review P01
 - Tests locked: `d6d5e19`
 - Oracle: `.github/tools/workflow-core/tests`
 - Phase base: `8294271`
@@ -35,7 +35,7 @@
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Core test harness and trace script | ready |
+| S01 | Core test harness and trace script | completed |
 | S02 | User-interaction rules file | planned |
 | S03 | Skills and agents refer to the rules file | planned |
 | S04 | Checkpoint references in work-planner and pull-work | planned |
