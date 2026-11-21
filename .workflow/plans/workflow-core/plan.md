@@ -2,8 +2,8 @@
 
 - Spec: [workflow-core-spec.md](../../specs/workflow-core-spec.md)
 - Lane: standard
-- Next: phase review P02
-- Tests locked: `56122ec`
+- Next: P02 S09
+- Tests locked: `2c54851`
 - Oracle: `.github/tools/workflow-core/tests`
 - Phase base: `56122ec`
 - Review pending: S09
@@ -43,5 +43,5 @@
 | S05 | Mutation add-on detection script | completed |
 | S06 | Plan mode and Gate use mutation detection | completed |
 | S07 | Trace excludes nothing on an unparseable phase title | completed |
-| S08 | Skip pattern matches whole titles | planned |
-| S09 | Skip pattern anchors each title | planned |
+| S08 | Skip pattern matches whole titles | completed |
+| S09 | Skip pattern anchors each title | ready |
