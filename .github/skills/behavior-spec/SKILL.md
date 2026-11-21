@@ -99,8 +99,16 @@ Resolve findings yourself. Never turn them into confirmation questions.
 
 Stop drafting when every remaining detail fails both the observability and divergence tests. Those belong to planning or coding: list them under `Left To Planning`, do not pursue them. Never keep refining once the Quality Bar in the format is met.
 
-## Exit
+## Commit
 
+- Commit: every spec file you wrote or updated, in one commit `docs(<slug>): specify behavior`, without asking.
+- Stop or redirect: write and commit nothing.
+- Stage: only the files you wrote, by path; other changes stay unstaged and unchanged.
+- Never: `git add -A`, push, or `--no-verify`.
+- On rejection: fix the cause if it lies in your own message or files and retry; otherwise stop and show the rejection output, leaving the files on disk.
+- Messages: follow the `conventional-commit` skill's Message Rules with type `docs` and the artifact slug as scope.
+
+## Exit
 Write only when every active requirement meets the Quality Bar, or its gap is a blocking `Open Decision` the user has acknowledged.
 
 Return a brief:

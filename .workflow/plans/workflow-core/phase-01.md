@@ -115,7 +115,7 @@
 - **Goal:** `work-planner` and `pull-work` tie their Checkpoints to the rules file.
 - **Depends on:** S03
 - **Tier:** delegate - pinned line insertion into two files
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:**
   - R23-05: Given `.github/skills/work-planner/SKILL.md`, when read, then a line contains both `.github/user-interaction.md` and `## Checkpoint` and `Phase Review`
   - R23-06: Given `.github/skills/pull-work/SKILL.md`, when read, then a line contains both `.github/user-interaction.md` and `## Checkpoint` and `Phase Review`
@@ -135,7 +135,7 @@
 - **Goal:** the `planner` agent can run `git`, commits its plan, and hands back to `/pull-work`.
 - **Depends on:** S03
 - **Tier:** delegate - pinned front matter and text edit of one file
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:**
   - R13-01: Given `.github/agents/planner.agent.md`, when its `tools:` front-matter line is read, then it lists `execute` besides `read`, `search`, `edit`, `agent`, `todo`
   - R13-02: Given the same file, when read, then a line starts `- Commit:` and contains `docs(<slug>): plan PNN`, `plan.md`, and the active phase file, and a line starts `- Stage:` and contains `by path`
@@ -168,7 +168,7 @@
 - **Goal:** `brain-storm` commits its Session and Glossary without asking, including draft Sessions and runs that stop on a prior-Session error.
 - **Depends on:** S03
 - **Tier:** delegate - pinned section insertion into one file
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:**
   - R19-01: Given `.github/skills/brain-storm/SKILL.md`, when read, then a `### Commit` heading follows the `### Check` heading, and a line starts `- Commit:` and contains `docs(workflow): session <topic>`, `.workflow/language.md`, and `without asking`
   - R19-02: Given the same file, when the `- Commit:` line is read, then it contains `draft`
@@ -203,7 +203,7 @@
 - **Goal:** `behavior-spec` commits every spec file it wrote in one commit, and commits nothing when it stops or redirects.
 - **Depends on:** S03
 - **Tier:** delegate - pinned section insertion into one file
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:**
   - R19-06: Given `.github/skills/behavior-spec/SKILL.md`, when read, then a `## Commit` heading precedes `## Exit`, and a line starts `- Commit:` and contains `docs(<slug>): specify behavior` and `without asking`
   - R19-07: Given the same file, when read, then a line starts `- Stop or redirect:` and contains `commit nothing` (failure)
