@@ -42,7 +42,7 @@ test('[R2-11] Glossary without ## Retired is a glossary-section error at line 1'
 
 test('[R2-12] Term line without backticks is a glossary-term-format error at that line', () => {
   const bad = '- Finding - a reported break';
-  const glossary = `# Language\n\n## Terms\n${bad}\n\n## Retired\n`;
+  const glossary = `# Language\n\n## Terms\n${bad}\n- \`Finding\` - a reported break.\n\n## Retired\n`;
   assert.equal(lineOf(glossary, bad), 4);
   const result = runCheck({ files: folder(glossary) });
   assertSingleGlossaryError(result, 'structure/glossary-term-format', 4);
