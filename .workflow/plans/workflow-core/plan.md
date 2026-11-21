@@ -6,7 +6,7 @@
 - Tests locked: `37ff2d5`
 - Oracle: `.github/tools/workflow-core/tests`
 - Phase base: `37ff2d5`
-- Review pending: S08
+- Review pending: S09
 - Reconciled: `d6d5e19`
 
 ## Current state
@@ -44,4 +44,5 @@
 | S06 | Pair coverage text | completed |
 | S07 | Clean handoff and Checkpoint cost text | completed |
 | S08 | Reject malformed arguments in parse-args | completed |
+| S09 | Validate the slug in the bug branch | completed |
 

@@ -12,6 +12,10 @@ const match = BUG.exec(text);
 if (match) {
   const slug = match[1] ?? null;
   const bug = match[2].trim();
+  if (slug !== null && !/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
+    console.error(USAGE);
+    process.exit(2);
+  }
   if (bug === '') {
     console.error(USAGE);
     process.exit(2);
