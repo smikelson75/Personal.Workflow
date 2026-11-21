@@ -119,4 +119,15 @@ After writing the Session and Glossary, run `node .github/tools/workflow-check/b
 - Weigh each `warning`: fix it, or leave it deliberately and name it in the brief.
 - Never edit a prior Session to clear a Finding. When an `error` Finding is anchored at a prior Session, stop and report it to the user instead of finishing.
 
+### Commit
+
+After the Check, commit what you wrote.
+
+- Commit: the Session file and, when changed, `.workflow/language.md`, in one commit `docs(workflow): session <topic>`, without asking. A `draft` Session from an early exit is committed the same way.
+- On a prior-Session error: still commit your own Session and Glossary, then report the error.
+- Stage: only the files you wrote, by path; other changes stay unstaged and unchanged.
+- Never: `git add -A`, push, or `--no-verify`.
+- On rejection: fix the cause if it lies in your own message or files and retry; otherwise stop and show the rejection output, leaving the files on disk.
+- Messages: follow the `conventional-commit` skill's Message Rules with type `docs`.
+
 Finish with a brief: finalized requirements, branch map summary, new/changed terms, and architecture-shaping security concerns. Offer the next step (plan, spec, or implementation).
