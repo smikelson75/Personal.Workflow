@@ -2,10 +2,10 @@
 
 - Spec: [workflow-check-spec.md](../../specs/workflow-check-spec.md)
 - Lane: standard
-- Next: phase review P03
-- Tests locked: `af0bcb2`
+- Next: P03 S01
+- Tests locked: `5b4fd01`
 - Oracle: `.github/tools/workflow-check/tests`
-- Phase base: `16d841e`
+- Phase base: `5b4fd01`
 
 ## Current state
 - stack: Node ES modules under `.github/tools/workflow-check/` (`R`); runtimes on the machine: node 25.9, python 3.13, dotnet 10, pwsh 7.6.
@@ -27,16 +27,16 @@
 |---|-------|--------|--------|--------|
 | P01 | Run, report, Session structure | completed | R1 (folder-level), R2 (Session rules), R6, R7, R9, R10 (CRLF/BOM), Q-message-length | [phase-01](phase-01.md) |
 | P02 | Glossary structure, Chain, file argument | completed | R1 (no-final, superseded Sessions), R2 (Glossary rules), R3, R6 (warnings, mixed), R8 | [phase-02](phase-02.md) |
-| P03 | Vocabulary and Excess | planned | R4, R5 | [phase-03](phase-03.md) |
+| P03 | Vocabulary and Excess | in progress | R4, R5 | [phase-03](phase-03.md) |
 | P04 | Skill integration and qualities | planned | R10 (no stdin/network), R11, R12, Q-speed, Q-determinism | |
 
 ## P03 slices
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Glossary model and conflict Rule | planned |
-| S02 | Text scan helper and avoid-synonym Rule | planned |
-| S03 | Retired-term Rule | planned |
-| S04 | Missing-term Rule | planned |
-| S05 | Size Rules | planned |
-| S06 | Out-of-stage Rule | planned |
+| S01 | Glossary model and conflict Rule | ready |
+| S02 | Text scan helper and avoid-synonym Rule | ready |
+| S03 | Retired-term Rule | ready |
+| S04 | Missing-term Rule | ready |
+| S05 | Size Rules | ready |
+| S06 | Out-of-stage Rule | ready |
