@@ -98,7 +98,13 @@ test('[R2-10] open decision is an error in a final Session and ignored in a draf
   const result = runCheck({ files: folder(finalSession) });
   assertSingleFinding(result, 'structure/final-open', lineOf(finalSession, open));
 
-  const draft = runCheck({ files: folder(validSession({ status: 'draft', sections })) });
+  const draftFiles = folder(validSession({ status: 'draft', sections }));
+  draftFiles['.workflow/sessions/context-2026-11-21-0900.md'] = validSession({
+    title: '# Context - 2026-11-21 09:00',
+    header: [`- Supersedes: \`${SESSION_NAME}\``],
+    sections: { Requirements: '- R50 - Users can run it. Accept: it runs.' },
+  });
+  const draft = runCheck({ files: draftFiles });
   assert.equal(draft.stdout, CLEAN);
   assert.equal(draft.code, 0);
 });

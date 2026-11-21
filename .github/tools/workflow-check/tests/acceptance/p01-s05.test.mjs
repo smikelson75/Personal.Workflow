@@ -11,6 +11,12 @@ function folderWith(sessions) {
   return files;
 }
 
+const EARLIER_NAME = 'context-2026-11-19-0900.md';
+const EARLIER = validSession({
+  title: '# Context - 2026-11-19 09:00',
+  sections: { Requirements: '- R50 - Users can run it. Accept: it runs.' },
+});
+
 function withoutLine(text, prefix) {
   return text.split('\n').filter((l) => !l.startsWith(prefix)).join('\n');
 }
@@ -48,7 +54,7 @@ test('[R2-02] title time not matching file name reports structure/session-title 
 
 test('[R2-03] Session with no Status line reports structure/session-status at line 1', () => {
   const r = runCheck({
-    files: folderWith({ [SESSION_NAME]: withoutLine(validSession(), '- Status:') }),
+    files: folderWith({ [EARLIER_NAME]: EARLIER, [SESSION_NAME]: withoutLine(validSession(), '- Status:') }),
   });
   assertFindings(r.stdout, [[SESS, 1, 'structure/session-status']]);
   assert.equal(r.code, 1);
@@ -84,8 +90,8 @@ test('[R10-01] CRLF endings and leading BOM produce the same output as LF withou
     Buffer.from([0xef, 0xbb, 0xbf]),
     Buffer.from(lf.replace(/\n/g, '\r\n'), 'utf8'),
   ]);
-  const plain = runCheck({ files: folderWith({ [SESSION_NAME]: lf }) });
-  const files = folderWith({});
+  const plain = runCheck({ files: folderWith({ [EARLIER_NAME]: EARLIER, [SESSION_NAME]: lf }) });
+  const files = folderWith({ [EARLIER_NAME]: EARLIER });
   files[SESS] = crlf;
   const r = runCheck({ files });
   assertFindings(r.stdout, [[SESS, 1, 'structure/session-status']]);

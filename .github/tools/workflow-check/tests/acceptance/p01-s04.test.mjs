@@ -57,7 +57,13 @@ test('[R1-05] missing language.md reports structure/glossary-missing', () => {
 
 test('[R1-06] unreadable Session and missing glossary both reported', () => {
   const { code, stdout } = runCheck({
-    files: { [`.workflow/sessions/${SESSION_NAME}`]: Buffer.from([0xc3, 0x28]) },
+    files: {
+      '.workflow/sessions/context-2026-11-19-0900.md': validSession({
+        title: '# Context - 2026-11-19 09:00',
+        sections: { Requirements: '- R50 - Users can run it. Accept: it runs.' },
+      }),
+      [`.workflow/sessions/${SESSION_NAME}`]: Buffer.from([0xc3, 0x28]),
+    },
   });
   const lines = stdout.split('\n');
   assert.equal(lines.length, 4, `stdout was: ${JSON.stringify(stdout)}`);
@@ -76,6 +82,10 @@ test('[Q-message-length] every Finding message is at most 160 characters', () =>
   assert.equal(name.length, 200);
   const { code, stdout } = runCheck({
     files: {
+      '.workflow/sessions/context-2026-11-19-0900.md': validSession({
+        title: '# Context - 2026-11-19 09:00',
+        sections: { Requirements: '- R50 - Users can run it. Accept: it runs.' },
+      }),
       [`.workflow/sessions/${name}`]: Buffer.from([0xc3, 0x28]),
       '.workflow/language.md': validGlossary(),
     },
