@@ -2,8 +2,8 @@
 
 - Spec: [workflow-check-spec.md](../../specs/workflow-check-spec.md)
 - Lane: standard
-- Next: plan P02
-- Tests locked: `41ef436`
+- Next: fixture repair S06; blocked S02 - waits on S06; then P02 S02, S03, S04, S05
+- Tests locked: `16d841e`
 
 ## Current state
 - stack: Node ES modules under `.github/tools/workflow-check/` (`R`); runtimes on the machine: node 25.9, python 3.13, dotnet 10, pwsh 7.6.
@@ -23,6 +23,17 @@
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
 | P01 | Run, report, Session structure | completed | R1 (folder-level), R2 (Session rules), R6, R7, R9, R10 (CRLF/BOM), Q-message-length | [phase-01](phase-01.md) |
-| P02 | Glossary structure, Chain, file argument | planned | R1 (chain failures, superseded Sessions), R2 (Glossary rules), R3, R8, R6 (warnings only) | |
+| P02 | Glossary structure, Chain, file argument | in progress | R1 (no-final, superseded Sessions), R2 (Glossary rules), R3, R6 (warnings, mixed), R8 | [phase-02](phase-02.md) |
 | P03 | Vocabulary and Excess | planned | R4, R5 | |
 | P04 | Skill integration and qualities | planned | R10 (no stdin/network), R11, R12, Q-speed, Q-determinism | |
+
+## P02 slices
+
+| # | Slice | Status |
+|---|-------|--------|
+| S01 | Glossary structure Rules | completed |
+| S02 | Chain model and Session status Rules | blocked |
+| S03 | Link Rules | ready |
+| S04 | Requirement ID Rules | ready |
+| S05 | File argument | ready |
+| S06 | Repair P01 fixtures for Chain Rules (test-fix, fixture) | planned |
