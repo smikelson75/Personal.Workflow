@@ -86,7 +86,16 @@ test('[R2-09] Builds on link without backticks is a link-format error at that li
   assertSingleFinding(result, 'structure/link-format', lineOf(session, bad));
 
   const good = validSession({ header: ['- Builds on: `context-2026-11-19-0900.md`, `context-2026-11-18-1000.md`'] });
-  const ok = runCheck({ files: folder(good) });
+  const goodFiles = folder(good);
+  goodFiles['.workflow/sessions/context-2026-11-19-0900.md'] = validSession({
+    title: '# Context - 2026-11-19 09:00',
+    sections: { Requirements: '- R51 - Users can run it. Accept: it runs.' },
+  });
+  goodFiles['.workflow/sessions/context-2026-11-18-1000.md'] = validSession({
+    title: '# Context - 2026-11-18 10:00',
+    sections: { Requirements: '- R52 - Users can run it. Accept: it runs.' },
+  });
+  const ok = runCheck({ files: goodFiles });
   assert.equal(ok.stdout, CLEAN);
   assert.equal(ok.code, 0);
 });
