@@ -2,10 +2,10 @@
 
 - Spec: [workflow-core-spec.md](../../specs/workflow-core-spec.md)
 - Lane: standard
-- Next: plan P01
+- Next: P01 S01
 - Tests locked: `d6d5e19`
 - Oracle: `.github/tools/workflow-core/tests`
-- Phase base: `d6d5e19`
+- Phase base: `8294271`
 - Reconciled: `d6d5e19`
 
 ## Current state
@@ -27,7 +27,7 @@
 
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
-| P01 | Interaction rules and stage commits | planned | R22, R23 (rules file and references), R13, R19 | [phase-01](phase-01.md) |
+| P01 | Interaction rules and stage commits | in progress | R22, R23 (rules file and references), R13, R19 | [phase-01](phase-01.md) |
 | P02 | Gate and plan scripts | planned | R14, R15, R17 | |
 | P03 | Reconcile, defects, pair coverage | planned | R20, R21, R16, Q-clean-handoff, Q-checkpoint-cost | |
 
@@ -35,7 +35,7 @@
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Core test harness and trace script | planned |
+| S01 | Core test harness and trace script | ready |
 | S02 | User-interaction rules file | planned |
 | S03 | Skills and agents refer to the rules file | planned |
 | S04 | Checkpoint references in work-planner and pull-work | planned |
