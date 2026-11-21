@@ -32,7 +32,7 @@ function assertSingleFinding(result, ruleId, line) {
 }
 
 test('[R2-05] missing Scope Guardrails section is a session-section error at line 1', () => {
-  const session = validSession({ sections: { 'Scope Guardrails': null } });
+  const session = validSession({ size: 'medium', sections: { 'Scope Guardrails': null } });
   const files = folder(session);
   const result = runCheck({ files });
   assertSingleFinding(result, 'structure/session-section', 1);
