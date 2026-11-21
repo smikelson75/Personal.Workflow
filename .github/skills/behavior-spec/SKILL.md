@@ -21,6 +21,8 @@ Format, boundary tests, and stage ownership: [references/SPEC-FORMAT.md](referen
 
 Stop and redirect to `brain-storm` when: the newest session is a draft, no final session exists, requirement IDs collide, or the user's direction conflicts with the session chain or glossary.
 
+Before reading the inputs, run `node .github/tools/workflow-check/bin/workflow-check.mjs` from the repo root. When any `error` Finding appears or the exit code is 2, stop, show the `error` Findings, and redirect to `brain-storm`. `warning` Findings do not stop it.
+
 Do not read `.workflow/plans/` or survey the repo for progress. Read code or existing artifacts only to confirm an external constraint, an existing behavior the target must preserve, or a value to calibrate a threshold against.
 
 ## Artifact Naming
