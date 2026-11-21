@@ -7,6 +7,7 @@ import { sessionBodyRules } from './session-body.mjs';
 import { sessionHeaderRules } from './session-header.mjs';
 import { vocabularyAvoidRules } from './vocabulary-avoid.mjs';
 import { vocabularyConflictRules } from './vocabulary-conflict.mjs';
+import { vocabularyRetiredRules } from './vocabulary-retired.mjs';
 
 export const RULES = [
   ...folderRules,
@@ -18,4 +19,5 @@ export const RULES = [
   ...chainIdRules,
   ...vocabularyConflictRules,
   ...vocabularyAvoidRules,
+  ...vocabularyRetiredRules,
 ];

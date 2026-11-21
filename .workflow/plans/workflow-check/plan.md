@@ -2,7 +2,7 @@
 
 - Spec: [workflow-check-spec.md](../../specs/workflow-check-spec.md)
 - Lane: standard
-- Next: P03 S03, S04, S05, S06
+- Next: P03 S04, S05, S06
 - Tests locked: `5b4fd01`
 - Oracle: `.github/tools/workflow-check/tests`
 - Phase base: `5b4fd01`
@@ -36,7 +36,7 @@
 |---|-------|--------|
 | S01 | Glossary model and conflict Rule | completed |
 | S02 | Text scan helper and avoid-synonym Rule | completed |
-| S03 | Retired-term Rule | ready |
+| S03 | Retired-term Rule | completed |
 | S04 | Missing-term Rule | ready |
 | S05 | Size Rules | ready |
 | S06 | Out-of-stage Rule | ready |
