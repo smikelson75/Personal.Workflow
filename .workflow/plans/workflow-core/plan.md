@@ -2,8 +2,7 @@
 
 - Spec: [workflow-core-spec.md](../../specs/workflow-core-spec.md)
 - Lane: standard
-- Next: review P01
-- Review pending: S01, S02, S03, S04, S05, S06, S07
+- Next: plan P02
 - Tests locked: `4653bee`
 - Oracle: `.github/tools/workflow-core/tests`
 - Phase base: `8294271`
@@ -28,7 +27,7 @@
 
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
-| P01 | Interaction rules and stage commits | in progress | R22, R23 (rules file and references), R13, R19 | [phase-01](phase-01.md) |
+| P01 | Interaction rules and stage commits | completed | R22, R23 (rules file and references), R13, R19 | [phase-01](phase-01.md) |
 | P02 | Gate and plan scripts | planned | R14, R15, R17 | |
 | P03 | Reconcile, defects, pair coverage | planned | R20, R21, R16, Q-clean-handoff, Q-checkpoint-cost | |
 
