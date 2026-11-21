@@ -9,7 +9,7 @@
   - A missing section is a `structure/session-section` error at line 1.
 - **Harness:**
   - run: `node --test --test-reporter=tap --test-name-pattern="<regex of IDs>" ".github/tools/workflow-check/tests/acceptance/*.test.mjs"`; exclude with `--test-skip-pattern="<regex>"`
-  - tag: test title starts with `[R2-08]`
+  - tag: test title starts with `[R2-15]`
   - count: the `# pass N` line of the tap output
   - assert: `^\s*assert|\btest\(`
 - **Not expressible:**
@@ -28,11 +28,11 @@
 - **Tier:** delegate - one table replaces a constant in one Rule
 - **Review:** none
 - **Scenarios:**
-  - R2-08: Given a `small` `extend` Session with only Existing Solution, Problem, and Requirements, when run, then no `structure/session-section` Finding
-  - R2-09: Given a `large` Session missing `## Constraints`, when run, then `structure/session-section` error at that Session, line 1 (failure)
-  - R2-10: Given a `medium` Session with no `## Language`, when run, then no `structure/session-section` Finding
-  - R2-11: Given a `medium` Session missing `## Users`, when run, then `structure/session-section` error at line 1 (failure)
-  - R2-12: Given a `small` Session missing `## Requirements`, when run, then `structure/session-section` error at line 1 (failure)
+  - R2-15: Given a `small` `extend` Session with only Existing Solution, Problem, and Requirements, when run, then no `structure/session-section` Finding
+  - R2-16: Given a `large` Session missing `## Constraints`, when run, then `structure/session-section` error at that Session, line 1 (failure)
+  - R2-17: Given a `medium` Session with no `## Language`, when run, then no `structure/session-section` Finding
+  - R2-18: Given a `medium` Session missing `## Users`, when run, then `structure/session-section` error at line 1 (failure)
+  - R2-19: Given a `small` Session missing `## Requirements`, when run, then `structure/session-section` error at line 1 (failure)
 - **Acceptance tests:** written at Phase Review
 - **Files:** edit `R/src/rules/session-body.mjs`
 - **Patterns:** `R/src/rules/session-body.mjs:3 - the REQUIRED constant and the session-section Rule to change`
@@ -42,7 +42,7 @@
   - When the Size line is missing or invalid, require `CORE` and `FULL` (the Size Finding is reported elsewhere); `Language` is never required.
   - Message text stays `missing required section: ## <name>`.
 - **Do not:** edit `R/tests/**`; add dependencies; change any other Rule.
-- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" ".github/tools/workflow-check/tests/acceptance/*.test.mjs"` exits 0; targets R2-08, R2-09, R2-10, R2-11, R2-12; each target test reports `ok`
+- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" ".github/tools/workflow-check/tests/acceptance/*.test.mjs"` exits 0; targets R2-15, R2-16, R2-17, R2-18, R2-19; each target test reports `ok`
 - **Stop and report if:** a file outside Files must change; a locked test looks wrong; same failure after 3 attempts.
 
 ## S02 - Repair the R2-05 expectation
@@ -66,7 +66,7 @@
 - **Tier:** delegate - pinned text insertion into one file
 - **Review:** required - changes a persisted format
 - **Scenarios:**
-  - R2-13: Given the table in `CONTEXT-FORMAT.md`, when a Session is built per Size holding exactly the sections the table marks `required` (plus Existing Solution for `extend`), then run reports no `structure/session-section` Finding for each Size, and dropping any one required section yields that Finding
+  - R2-20: Given the table in `CONTEXT-FORMAT.md`, when a Session is built per Size holding exactly the sections the table marks `required` (plus Existing Solution for `extend`), then run reports no `structure/session-section` Finding for each Size, and dropping any one required section yields that Finding
 - **Acceptance tests:** written at Phase Review
 - **Files:** edit `.github/skills/brain-storm/references/CONTEXT-FORMAT.md`
 - **Patterns:** `.github/skills/brain-storm/references/CONTEXT-FORMAT.md:3 - bullet style`
@@ -90,7 +90,7 @@
   - Under the table add the line `- Cut any optional section that does not change planning or naming.`
   - Every other line stays unchanged.
 - **Do not:** edit `R/tests/**`; edit any other file.
-- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" ".github/tools/workflow-check/tests/acceptance/*.test.mjs"` exits 0; targets R2-13; each target test reports `ok`
+- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" ".github/tools/workflow-check/tests/acceptance/*.test.mjs"` exits 0; targets R2-20; each target test reports `ok`
 - **Stop and report if:** a file outside Files must change; a locked test looks wrong; same failure after 3 attempts.
 
 ## S04 - The suite checks skills only by command
