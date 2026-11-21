@@ -1,6 +1,12 @@
 import { headerFields } from './session-header.mjs';
 
-const REQUIRED = ['Problem', 'Users', 'Workflow', 'Requirements', 'Scope Guardrails', 'Constraints', 'Success', 'Decisions', 'Language'];
+const CORE = ['Problem', 'Requirements'];
+const FULL = ['Users', 'Workflow', 'Scope Guardrails', 'Constraints', 'Success', 'Decisions'];
+const SIZE_SECTIONS = new Map([
+  ['small', []],
+  ['medium', FULL],
+  ['large', FULL],
+]);
 const REQUIREMENT_FORMS = [/^- R\d+ - .+\. Accept: .+\.$/, /^- R\d+ - retired, superseded by R\d+\.$/, /^- R\d+ - retired\.$/];
 const LINK_NAME = '`context-\\d{4}-\\d{2}-\\d{2}-\\d{4}\\.md`';
 const LINKS = new RegExp(`^${LINK_NAME}(, ${LINK_NAME})*$`);
@@ -36,7 +42,10 @@ export const sessionBodyRules = [
       sessions(folder).flatMap((s) => {
         const map = sectionMap(s);
         const relationship = headerFields(s).Relationship?.value;
-        const required = relationship === 'extend' || relationship === 'amend' ? ['Existing Solution', ...REQUIRED] : REQUIRED;
+        const size = headerFields(s).Size?.value;
+        const extended = relationship === 'extend' || relationship === 'amend' ? ['Existing Solution'] : [];
+        const sized = SIZE_SECTIONS.has(size) ? SIZE_SECTIONS.get(size) : FULL;
+        const required = [...extended, ...CORE, ...sized];
         return required
           .filter((name) => !map.has(name))
           .map((name) => ({ path: s.path, line: 1, message: `missing required section: ## ${name}` }));
