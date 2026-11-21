@@ -2,7 +2,7 @@
 
 - Spec: [workflow-check-spec.md](../../specs/workflow-check-spec.md)
 - Lane: standard
-- Next: P02 S05
+- Next: gate P02
 - Tests locked: `af0bcb2`
 - Oracle: `.github/tools/workflow-check/tests`
 - Phase base: `16d841e`
@@ -25,7 +25,7 @@
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
 | P01 | Run, report, Session structure | completed | R1 (folder-level), R2 (Session rules), R6, R7, R9, R10 (CRLF/BOM), Q-message-length | [phase-01](phase-01.md) |
-| P02 | Glossary structure, Chain, file argument | in progress | R1 (no-final, superseded Sessions), R2 (Glossary rules), R3, R6 (warnings, mixed), R8 | [phase-02](phase-02.md) |
+| P02 | Glossary structure, Chain, file argument | gating | R1 (no-final, superseded Sessions), R2 (Glossary rules), R3, R6 (warnings, mixed), R8 | [phase-02](phase-02.md) |
 | P03 | Vocabulary and Excess | planned | R4, R5 | |
 | P04 | Skill integration and qualities | planned | R10 (no stdin/network), R11, R12, Q-speed, Q-determinism | |
 
@@ -37,7 +37,7 @@
 | S02 | Chain model and Session status Rules | completed |
 | S03 | Link Rules | completed |
 | S04 | Requirement ID Rules | completed |
-| S05 | File argument | ready |
+| S05 | File argument | completed |
 | S06 | Repair P01 fixtures for Chain Rules (test-fix, fixture) | completed |
 | S07 | Repair R2-09 fixture for Link Rules (test-fix, assertion) | completed |
 | S08 | Repair P01 fixtures for Requirement ID Rules (test-fix, fixture) | completed |
