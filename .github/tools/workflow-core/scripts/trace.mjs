@@ -57,7 +57,7 @@ if (phasePath !== undefined) {
 
 if (skipPattern) {
   if (excluded.length) {
-    const escaped = excluded.map((title) => title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const escaped = excluded.map((title) => `^${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`);
     console.log(escaped.join('|'));
   }
   process.exit(0);
