@@ -10,11 +10,11 @@
   - Documents are read as UTF-8; a leading BOM is dropped; lines split on `\r\n` or `\n`.
   - Never write, create, or delete anything.
 - **Harness:**
-  - run: `node --test --test-reporter=tap --test-name-pattern="<regex of IDs>" .github/tools/workflow-check/tests/acceptance/`; exclude with `--test-skip-pattern="<regex>"`
+  - run: `node --test --test-reporter=tap --test-name-pattern="<regex of IDs>" ".github/tools/workflow-check/tests/acceptance/*.test.mjs"` (Node 25 needs the quoted glob, not a directory); exclude with `--test-skip-pattern="<regex>"`
   - tag: test title starts with `[R2-01]`
   - count: the `# pass N` line of the tap output
 - **Gate:**
-  - suite: `node --test .github/tools/workflow-check/tests/acceptance/`
+  - suite: `node --test ".github/tools/workflow-check/tests/acceptance/*.test.mjs"`
   - traceability: `node .github/tools/workflow-check/scripts/trace.mjs <IDs owned by the phase>`
   - lock: `git diff --exit-code <Tests locked> -- .github/tools/workflow-check/tests`
   - mutation: unsupported for node - no mutation tool is installed and the spec forbids an install step
@@ -102,7 +102,7 @@
 - **Kind:** build
 - **Goal:** Session file name, title, and Status/Relationship/Size lines are checked.
 - **Depends on:** S04
-- **Tier:** local - adds Rules to an existing registry
+- **Tier:** cloud - no `coder` agent is available yet
 - **Scenarios:**
   - R2-01: Given a Session file named `notes.md`, when run, then `structure/session-name` error at `.workflow/sessions/notes.md:1`
   - R2-02: Given `context-2026-11-20-1124.md` whose line 1 is `# Context - 2026-11-20 11:25`, when run, then `structure/session-title` error at line 1
@@ -126,7 +126,7 @@
 - **Kind:** build
 - **Goal:** required sections, requirement lines, links, and final-open Decisions are checked.
 - **Depends on:** S05
-- **Tier:** local - adds Rules to an existing registry
+- **Tier:** cloud - no `coder` agent is available yet
 - **Scenarios:**
   - R2-05: Given a Session without `## Scope Guardrails`, when run, then `structure/session-section` error at line 1
   - R2-06: Given `Relationship: extend` and no `## Existing Solution`, when run, then a `structure/session-section` error; with `Relationship: new` and the same omission, no Finding
