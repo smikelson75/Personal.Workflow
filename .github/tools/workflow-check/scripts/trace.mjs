@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const USAGE = 'usage: node trace.mjs <scenario-ID>...  (exit 0 only when every ID has a passing test and none fail)';
@@ -15,7 +15,7 @@ if (ids.length === 0) {
 }
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const run = spawnSync(process.execPath, ['--test', '--test-reporter=tap', join(root, 'tests', 'acceptance')], {
+const run = spawnSync(process.execPath, ['--test', '--test-reporter=tap', `${root.split('\\').join('/')}/tests/acceptance/*.test.mjs`], {
   encoding: 'utf8',
 });
 const passed = new Set();
