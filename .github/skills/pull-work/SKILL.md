@@ -23,6 +23,8 @@ Run these as commands, not reasoning.
    - `Next` includes `running SNN`: `plan.md` and the `Files` of those slices, which are partial work from an interrupted run. Resume Dispatch.
    - Anything else was made outside the workflow, because the workflow commits everything it writes. Stop and show the files grouped by folder, then recommend `/conventional-commit` for finished work or `git stash` for experiments. Never commit, stash, or discard them yourself.
 
+Plan candidates come from `node .github/skills/pull-work/scripts/reconcile-check.mjs candidates`: open plans, `done` plans whose spec changed, and specs with no plan. After selecting a plan, run `node .github/skills/pull-work/scripts/reconcile-check.mjs status <slug>`; on `changed`, load `work-planner` and run Reconcile mode before routing on `Next`.
+
 ## Route
 
 | `Next` | Step |
@@ -54,6 +56,7 @@ Commit at every transition, without asking: an approval, a passing gate, or a co
 | Fixture Repair passed | the card's `Acceptance tests` (without `plan.md`) | `test(<slug>): repair fixtures for SNN` |
 | then | none; `plan.md` records that commit as `Tests locked` | `docs(<slug>): relock tests after SNN` |
 | Fixture Repair failed, gate or review routed to triage, phase completed | none | `docs(<slug>): <what changed>` |
+| Reconcile spec | none | `docs(<slug>): reconcile spec` |
 
 Moving the lock takes two commits because a commit cannot record its own hash. Once a transition's commits are done, `git status --porcelain` may list only the `Files` of other slices still `in progress`. Anything else means a slice wrote outside its `Files`: revert those paths and set that slice `blocked`.
 

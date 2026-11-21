@@ -97,6 +97,16 @@ Edit only the affected cards. If the stop reveals a spec gap, redirect to `behav
 
 Commit the revision (pull-work's Commits), then hand back to `pull-work`.
 
+### Reconcile (spec changed since the plan's reconcile point)
+
+- Trigger: pull-work's `reconcile-check.mjs status <slug>` prints `changed`.
+- Plan: Plan mode also writes the `Reconciled` header line.
+- Done plan: add a new phase `PNN+1` for the change, completed phases stay `completed`.
+- Mid-phase: revise unstarted cards, and completed slices the change invalidates get `fix` or `test-fix` cards.
+- No new work: move only the `Reconciled` line and leave `Next` unchanged.
+- Redirect: a missing spec file, or a changed requirement with a blocking `Open Decision`, redirects to `behavior-spec` and leaves the plan unchanged.
+- Record: set `Reconciled` to `git log -1 --format=%H -- <spec>`, update gap, phases, and cards, and commit `docs(<slug>): reconcile spec`.
+
 ## Slicing
 
 - One slice is one observable behavior, thin through every layer it touches. If a slice needs two behaviors to be useful, resplit.

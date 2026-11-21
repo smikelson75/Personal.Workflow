@@ -2,7 +2,7 @@
 
 - Spec: [workflow-core-spec.md](../../specs/workflow-core-spec.md)
 - Lane: standard
-- Next: P03 S02
+- Next: P03 S04
 - Tests locked: `37ff2d5`
 - Oracle: `.github/tools/workflow-core/tests`
 - Phase base: `37ff2d5`
@@ -36,7 +36,7 @@
 | # | Slice | Status |
 |---|-------|--------|
 | S01 | Spec change detection script | completed |
-| S02 | Reconcile text | ready |
+| S02 | Reconcile text | completed |
 | S03 | Argument parser script | completed |
 | S04 | Defect report text | ready |
 | S05 | Pair gate in plan-check | completed |

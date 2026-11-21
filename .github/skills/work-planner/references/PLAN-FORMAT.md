@@ -12,6 +12,7 @@ Phase files sit beside it as `phase-NN.md` ([format](PHASE-FORMAT.md)).
 - `Tests locked` ref
 - `Oracle` line: the repo-relative paths, in backticks, whose union holds every card's `Acceptance tests`, fixtures, and test configuration. The gate's lock command and the locked-test guard hook (`.github/hooks/locked-tests.json`) read it.
 - `Phase base` ref: the commit the active phase's code changes start from; Review diffs against it
+- `Reconciled` line: the commit that last changed the spec when the plan was last reconciled with it; `/pull-work` compares the spec at `HEAD` with that commit
 - `Review pending` line, only while the active phase is in Review: the card IDs still to review
 - current state and gap
 - phase table
@@ -80,6 +81,7 @@ The gate fails if `git diff --exit-code <lock> -- <oracle>` shows any change. Be
 - Tests locked: `e4f5a6b`
 - Oracle: `tests/acceptance`
 - Phase base: `e4f5a6b`
+- Reconciled: `e4f5a6b`
 
 ## Current state
 - stack: ...
