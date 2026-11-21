@@ -1,3 +1,4 @@
+import { buildChain } from './chain.mjs';
 import { formatFindings } from './finding.mjs';
 import { RULES } from './rules/index.mjs';
 import { findWorkflowRoot, loadFolder } from './workspace.mjs';
@@ -12,6 +13,7 @@ export function run({ cwd, args }) {
     };
   }
   const folder = loadFolder(root);
+  folder.chain = buildChain(folder);
   const findings = [];
   for (const rule of RULES) {
     for (const hit of rule.check(folder)) {
