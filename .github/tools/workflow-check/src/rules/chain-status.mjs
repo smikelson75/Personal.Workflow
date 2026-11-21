@@ -6,7 +6,7 @@ export const chainStatusRules = [
     severity: 'error',
     check: ({ sessions, chain }) => {
       if (sessions.length === 0 || [...chain.status.values()].includes('final')) return [];
-      return [{ path: sessionPath(chain.newest), line: 1, message: 'no Session has Status: final' }];
+      return [{ path: sessionPath(chain.newest), line: 1, message: 'no final Session exists' }];
     },
   },
   {
