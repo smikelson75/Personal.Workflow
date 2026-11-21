@@ -190,3 +190,32 @@
 - **Do not:** edit `.github/tools/workflow-core/tests/**`; change any other behavior; add dependencies.
 - **Done when:** `node --test --test-reporter=tap ".github/tools/workflow-check/tests/acceptance/*.test.mjs" ".github/tools/workflow-core/tests/acceptance/*.test.mjs"` exits 0; 139 tests pass
 - **Stop and report if:** a file outside Files must change; the same failure after 3 attempts.
+
+## S08 - Skip pattern matches whole titles
+
+- **Kind:** test-fix
+- **Scope:** assertion
+- **Goal:** R14-07 expects each excluded title wrapped in `^` and `$`, so the suite step skips exactly the tests traceability excludes.
+- **Depends on:** S07
+- **Tier:** main - rewrites a locked expectation
+- **Review:** none
+- **Restores:** R14-07 - review finding: unanchored `--skip-pattern` also skips tests whose name merely contains a Known Failure title
+- **Acceptance tests:** `.github/tools/workflow-core/tests/acceptance/p02-s01.test.mjs`
+- **Files:** edit `.github/tools/workflow-core/tests/acceptance/p02-s01.test.mjs`
+- **Decisions:** the expected stdout of R14-07 changes from `a\.b \[x\]` plus a newline to `^a\.b \[x\]$` plus a newline.
+- **Done when:** the test diff is approved at Phase Review.
+
+## S09 - Skip pattern anchors each title
+
+- **Kind:** fix
+- **Goal:** `trace.mjs --skip-pattern` prints each escaped title as `^<title>$`, joined by `|`.
+- **Depends on:** S08
+- **Tier:** delegate - one-line change in an existing script
+- **Review:** required - review-driven fix to a trust-boundary parse
+- **Restores:** R14-07
+- **Files:** edit `.github/tools/workflow-core/scripts/trace.mjs`
+- **Patterns:** `.github/tools/workflow-core/scripts/trace.mjs:55 - the `--skip-pattern` output`
+- **Decisions:** only the printed pattern changes; exclusion in traceability stays an exact title match.
+- **Do not:** edit `.github/tools/workflow-core/tests/**`; add dependencies.
+- **Done when:** `node --test --test-reporter=tap ".github/tools/workflow-check/tests/acceptance/*.test.mjs" ".github/tools/workflow-core/tests/acceptance/*.test.mjs"` exits 0; 139 tests pass
+- **Stop and report if:** a file outside Files must change; the same failure after 3 attempts.

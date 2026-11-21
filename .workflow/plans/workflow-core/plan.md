@@ -2,11 +2,11 @@
 
 - Spec: [workflow-core-spec.md](../../specs/workflow-core-spec.md)
 - Lane: standard
-- Next: review P02
+- Next: phase review P02
 - Tests locked: `56122ec`
 - Oracle: `.github/tools/workflow-core/tests`
 - Phase base: `56122ec`
-- Review pending: S07
+- Review pending: S09
 - Reconciled: `d6d5e19`
 
 ## Current state
@@ -29,7 +29,7 @@
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
 | P01 | Interaction rules and stage commits | completed | R22, R23 (rules file and references), R13, R19 | [phase-01](phase-01.md) |
-| P02 | Gate and plan scripts | gating | R14, R15, R17 | [phase-02](phase-02.md) |
+| P02 | Gate and plan scripts | in progress | R14, R15, R17 | [phase-02](phase-02.md) |
 | P03 | Reconcile, defects, pair coverage | planned | R20, R21, R16, Q-clean-handoff, Q-checkpoint-cost | |
 
 ## P02 slices
@@ -43,3 +43,5 @@
 | S05 | Mutation add-on detection script | completed |
 | S06 | Plan mode and Gate use mutation detection | completed |
 | S07 | Trace excludes nothing on an unparseable phase title | completed |
+| S08 | Skip pattern matches whole titles | planned |
+| S09 | Skip pattern anchors each title | planned |
