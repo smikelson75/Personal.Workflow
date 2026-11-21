@@ -26,13 +26,14 @@
 - **Kind:** build
 - **Goal:** a Glossary missing `## Terms` or `## Retired`, or holding a malformed Term or Retired line, yields `structure` errors.
 - **Depends on:** none
-- **Tier:** cloud - no `coder` agent is available yet
+- **Tier:** main - implemented in the main session before tiers were renamed
+- **Review:** required - no mutation gate
 - **Scenarios:**
   - R2-11: Given a Glossary with `# Language` and `## Terms` (one valid Term) but no `## Retired`, when run, then `structure/glossary-section` error at `.workflow/language.md:1`
   - R2-12: Given Terms line 4 `- Finding - a reported break` (no backticks), when run, then `structure/glossary-term-format` error at `.workflow/language.md:4` (failure)
   - R2-13: Given Retired line `` - `Old` -> `New` `` (no reason), when run, then `structure/glossary-term-format` error at that line (failure)
   - R2-14: Given Terms line `` - `Finding` - a reported break. Avoid: issue. States: open -> closed. Code: `.workflow/` `` and Retired line `` - `Old` -> `New` - renamed ``, when run, then no Finding
-- **Acceptance tests:** `R/tests/acceptance/p02-s01.test.mjs`
+- **Acceptance tests:** `.github/tools/workflow-check/tests/acceptance/p02-s01.test.mjs`
 - **Files:** create `R/src/rules/glossary.mjs`; edit `R/src/rules/index.mjs`
 - **Patterns:** `R/src/rules/session-body.mjs:11 - sectionMap (private; write an equivalent in glossary.mjs, do not edit or export the original)`; `R/src/rules/folder.mjs:1 - Rule object shape`
 - **Decisions:**
@@ -49,7 +50,8 @@
 - **Kind:** build
 - **Goal:** the Session Chain is computed, and no-final, newest-draft and stale-draft Sessions are reported; warnings-only runs pass.
 - **Depends on:** S01
-- **Tier:** cloud - creates the Chain model the other Chain cards use
+- **Tier:** main - creates the Chain model the other Chain cards use
+- **Review:** required - creates the Chain model later cards build on
 - **Scenarios:**
   - R1-07: Given two draft Sessions A (older) and B (newer), when run, then `chain/no-final` error at B line 1
   - R3-04: Given final A and draft B (newer), when run, then `chain/draft-newest` error at B line 1 and no other `chain/` Finding
@@ -57,7 +59,7 @@
   - R6-01: Given the R3-05 folder, when run, then exit 0 and stdout ends `workflow-check: 0 errors, 1 warnings`
   - R6-02: Given drafts A, B, C (older) and final D whose `- Size:` line is missing, when run, then exit 1 and stdout ends `workflow-check: 1 errors, 3 warnings`
   - R1-08: Given draft A and final C where C has `- Supersedes: ` + backticked A's name, and A is not the newest, when run, then no `chain/stale-draft` Finding at A
-- **Acceptance tests:** `R/tests/acceptance/p02-s02.test.mjs`
+- **Acceptance tests:** `.github/tools/workflow-check/tests/acceptance/p02-s02.test.mjs`
 - **Files:** create `R/src/chain.mjs`, `R/src/rules/chain-status.mjs`; edit `R/src/run.mjs`, `R/src/rules/index.mjs`
 - **Patterns:** `R/src/rules/session-header.mjs:11 - headerFields usage`; `R/src/run.mjs:16 - rule loop`
 - **Decisions:**
@@ -74,13 +76,14 @@
 - **Kind:** build
 - **Goal:** `Builds on` and `Supersedes` links that name a missing file, themselves, or form a cycle are reported.
 - **Depends on:** S02
-- **Tier:** cloud - no `coder` agent is available yet
+- **Tier:** delegate - adds Rules to the registry following the S02 Chain model
+- **Review:** none
 - **Scenarios:**
   - R3-01: Given Session B with `` - Builds on: `context-2026-11-19-0900.md` `` and no such file, when run, then `chain/broken-link` error at B's `Builds on` line
   - R3-02: Given Session B whose `Supersedes` names B's own file name, when run, then `chain/broken-link` error at that line
   - R3-03: Given A with `Builds on` B and B with `Builds on` A, when run, then one `chain/broken-link` error at each of A and B, each at its link line (failure)
   - R1-09: Given final C that supersedes A, and A has `Builds on` naming a missing file, when run, then the `chain/broken-link` error at A is still reported
-- **Acceptance tests:** `R/tests/acceptance/p02-s03.test.mjs`
+- **Acceptance tests:** `.github/tools/workflow-check/tests/acceptance/p02-s03.test.mjs`
 - **Files:** create `R/src/rules/chain-links.mjs`; edit `R/src/rules/index.mjs`
 - **Patterns:** `R/src/rules/chain-status.mjs:1 - Rule shape using folder.chain`
 - **Decisions:**
@@ -97,7 +100,8 @@
 - **Kind:** build
 - **Goal:** reused or unknown requirement IDs are reported, with amend Sessions allowed to restate IDs.
 - **Depends on:** S03
-- **Tier:** cloud - ancestry and chain semantics need judgment
+- **Tier:** main - ancestry and chain semantics need judgment
+- **Review:** required - no mutation gate
 - **Scenarios:**
   - R3-06: Given `context-A` and later `context-B` (`extend`) that both define R3, when run, then `chain/duplicate-id` error at B's R3 line and none at A
   - R3-07: Given B (`amend`, `Builds on` A) restating R3, when run, then no `chain/duplicate-id`
@@ -106,7 +110,7 @@
   - R3-10: Given `- R1 - retired, superseded by R7.` and no Session in the chain defines R7, when run, then `chain/unknown-retirement` error at that line (failure)
   - R3-11: Given A defines R3, B (`extend`, `Builds on` A) defines only R4, and C (`amend`, `Builds on` B) restates R3, when run, then no `chain/duplicate-id` at C (ancestry is transitive)
   - R1-10: Given final C that supersedes A, and A defines R1 twice, when run, then no `chain/duplicate-id` at A
-- **Acceptance tests:** `R/tests/acceptance/p02-s04.test.mjs`
+- **Acceptance tests:** `.github/tools/workflow-check/tests/acceptance/p02-s04.test.mjs`
 - **Files:** create `R/src/rules/chain-ids.mjs`; edit `R/src/rules/index.mjs`
 - **Patterns:** `R/src/rules/session-body.mjs:24 - sectionLines (private; write an equivalent in chain-ids.mjs, do not edit or export the original)`; `R/src/rules/chain-links.mjs:1 - using folder.chain.links`
 - **Decisions:**
@@ -124,7 +128,8 @@
 - **Kind:** build
 - **Goal:** `workflow-check <file>` prints only Findings anchored at that Session or the Glossary, and rejects unusable arguments with exit 2.
 - **Depends on:** S04
-- **Tier:** cloud - changes the run flow and exit handling
+- **Tier:** main - changes the run flow and exit handling
+- **Review:** required - changes the CLI interface
 - **Scenarios:**
   - R8-01: Given Sessions A and B (B later, `extend`) that both define R3, when run with B's path, then stdout holds the `chain/duplicate-id` Finding and a summary counting it, exit 1
   - R8-02: Given the R8-01 folder, when run with A's path, then stdout is exactly `workflow-check: 0 errors, 0 warnings` and exit 0
@@ -133,7 +138,7 @@
   - R8-05: Given `.workflow/notes.md` that exists but is neither a Session nor the Glossary, when run with it, then exit 2, empty stdout, one stderr line (failure)
   - R8-06: Given a Glossary with a `structure/glossary-section` error, when run with its absolute path from a subdirectory, then that Finding is printed and exit 1
   - R8-07: Given two file arguments, when run, then exit 2, empty stdout, one stderr line (failure)
-- **Acceptance tests:** `R/tests/acceptance/p02-s05.test.mjs`
+- **Acceptance tests:** `.github/tools/workflow-check/tests/acceptance/p02-s05.test.mjs`
 - **Files:** edit `R/src/run.mjs`
 - **Patterns:** `R/src/run.mjs:6 - exit 2 handling for a missing folder`
 - **Decisions:**
@@ -151,9 +156,10 @@
 - **Scope:** fixture
 - **Goal:** locked P01 tests whose fixtures hold no final Session, or only a draft, pass unchanged against the Chain Rules because each fixture again breaks only its own scenario's rule.
 - **Depends on:** none
-- **Tier:** cloud - edits locked oracle files through Fixture Repair
+- **Tier:** main - edits locked oracle files through Fixture Repair
+- **Review:** none
 - **Restores:** R1-06, Q-message-length, R2-03, R10-01, R2-10 (owned by P01 cards); gate finding: S02's `chain/no-final` and `chain/draft-newest` Rules add Findings to these five, because their fixtures also break R1 and R3 (no final Session, or a draft as the newest)
-- **Acceptance tests:** `R/tests/acceptance/p01-s04.test.mjs`, `R/tests/acceptance/p01-s05.test.mjs`, `R/tests/acceptance/p01-s06.test.mjs`
+- **Acceptance tests:** `.github/tools/workflow-check/tests/acceptance/p01-s04.test.mjs`, `.github/tools/workflow-check/tests/acceptance/p01-s05.test.mjs`, `.github/tools/workflow-check/tests/acceptance/p01-s06.test.mjs`
 - **Decisions:**
   - Start from the files at `Tests locked`; the earlier uncommitted assertion edits are discarded.
   - R1-06, Q-message-length, R2-03, R10-01: add one spec-valid final Session to the fixture, named so it sorts before the Session under test, and defining no requirement ID that the Session under test defines.

@@ -24,7 +24,7 @@
 - **Kind:** setup
 - **Goal:** the repo is a git repository with one commit so a test lock ref can exist.
 - **Depends on:** none
-- **Tier:** cloud - touches the whole repo
+- **Tier:** main - touches the whole repo
 - **Files:** none (creates `.git/`)
 - **Decisions:** run `git init -b main`, stage everything, commit `Initial workflow baseline`.
 - **Do not:** add a remote; edit any file.
@@ -36,7 +36,7 @@
 - **Kind:** setup
 - **Goal:** acceptance tests can build a temp Workflow Folder, run the CLI, and prove which scenario IDs passed.
 - **Depends on:** S01
-- **Tier:** cloud - sets the shared harness every later card relies on
+- **Tier:** main - sets the shared harness every later card relies on
 - **Files:** create `R/tests/support/harness.mjs`, `R/tests/support/fixtures.mjs`, `R/scripts/trace.mjs`
 - **Patterns:** none exist in the repo; follow Decisions.
 - **Decisions:**
@@ -53,13 +53,13 @@
 - **Kind:** build
 - **Goal:** the CLI finds the nearest Workflow Folder and prints only the summary line for a clean folder.
 - **Depends on:** S02
-- **Tier:** cloud - creates the module layout every later card extends
+- **Tier:** main - creates the module layout every later card extends
 - **Scenarios:**
   - R1-01: Given a directory tree with no `.workflow/` anywhere above the working directory, when run, then exit 2, stdout empty, stderr one line naming `.workflow`, no summary line (failure)
   - R1-02: Given a clean folder at the temp root and working directory `a/b`, when run, then stdout is exactly `workflow-check: 0 errors, 0 warnings\n` and exit 0
   - R1-03: Given a clean `proj/.workflow` and an outer `.workflow` with no `language.md`, when run from `proj/src`, then stdout is exactly the 0-errors summary (the nearest folder is used)
   - R9-01: Given a clean folder, when run, then the tree snapshot is identical before and after
-- **Acceptance tests:** `R/tests/acceptance/p01-s03.test.mjs`
+- **Acceptance tests:** `.github/tools/workflow-check/tests/acceptance/p01-s03.test.mjs`
 - **Files:** create `R/bin/workflow-check.mjs`, `R/src/run.mjs`, `R/src/workspace.mjs`, `R/src/finding.mjs`
 - **Patterns:** none exist; follow Decisions.
 - **Decisions:**
@@ -77,14 +77,14 @@
 - **Kind:** build
 - **Goal:** folder-level Findings print in the specified shape, exit code follows errors, and nothing is written.
 - **Depends on:** S03
-- **Tier:** cloud - creates the Rule framework the remaining cards plug into
+- **Tier:** main - creates the Rule framework the remaining cards plug into
 - **Scenarios:**
   - R1-04: Given `language.md` and an empty `.workflow/sessions/`, when run, then stdout is `.workflow/sessions:1: error: structure/no-session: <message>` then `workflow-check: 1 errors, 0 warnings`, exit 1
   - R1-05: Given a valid Session and no `.workflow/language.md`, when run, then `.workflow/language.md:1: error: structure/glossary-missing: ...`, exit 1
   - R1-06: Given a Session with invalid UTF-8 bytes `C3 28` and no `language.md`, when run, then a `structure/unreadable` error at that Session line 1 and the `structure/glossary-missing` error both appear, exit 1 (failure)
   - Q-message-length: Given an unreadable Session whose file name is 200 characters, when run, then every Finding message is at most 160 characters
   - R9-02: Given the R1-04 folder and the R1-01 no-folder case, when run, then the tree snapshot is unchanged after each run
-- **Acceptance tests:** `R/tests/acceptance/p01-s04.test.mjs`
+- **Acceptance tests:** `.github/tools/workflow-check/tests/acceptance/p01-s04.test.mjs`
 - **Files:** create `R/src/rules/index.mjs`, `R/src/rules/folder.mjs`; edit `R/src/run.mjs`, `R/src/finding.mjs`, `R/src/workspace.mjs`
 - **Patterns:** `R/src/run.mjs:1 - run() and output assembly`; `R/src/workspace.mjs:1 - Doc loading`
 - **Decisions:**
@@ -102,7 +102,7 @@
 - **Kind:** build
 - **Goal:** Session file name, title, and Status/Relationship/Size lines are checked.
 - **Depends on:** S04
-- **Tier:** cloud - no `coder` agent is available yet
+- **Tier:** main - the user kept all P01 cards in the main session
 - **Scenarios:**
   - R2-01: Given a Session file named `notes.md`, when run, then `structure/session-name` error at `.workflow/sessions/notes.md:1`
   - R2-02: Given `context-2026-11-20-1124.md` whose line 1 is `# Context - 2026-11-20 11:25`, when run, then `structure/session-title` error at line 1
@@ -110,7 +110,7 @@
   - R2-04: Given a Session whose line 4 is `- Relationship: replace`, when run, then `structure/session-status` error at line 4 (failure)
   - R7-02: Given `notes.md` with a wrong title and no Status line, plus a second valid-named Session missing its Size line, when run, then Findings are sorted by path, line, rule-id (`session-name`, `session-status`, `session-title` at one line), then the summary
   - R10-01: Given the R2-03 Session saved with CRLF endings and a leading BOM, when run, then stdout equals the LF, no-BOM output
-- **Acceptance tests:** `R/tests/acceptance/p01-s05.test.mjs`
+- **Acceptance tests:** `.github/tools/workflow-check/tests/acceptance/p01-s05.test.mjs`
 - **Files:** create `R/src/rules/session-header.mjs`; edit `R/src/rules/index.mjs`
 - **Patterns:** `R/src/rules/folder.mjs:1 - Rule object shape and check() return`
 - **Decisions:**
@@ -126,7 +126,7 @@
 - **Kind:** build
 - **Goal:** required sections, requirement lines, links, and final-open Decisions are checked.
 - **Depends on:** S05
-- **Tier:** cloud - no `coder` agent is available yet
+- **Tier:** main - the user kept all P01 cards in the main session
 - **Scenarios:**
   - R2-05: Given a Session without `## Scope Guardrails`, when run, then `structure/session-section` error at line 1
   - R2-06: Given `Relationship: extend` and no `## Existing Solution`, when run, then a `structure/session-section` error; with `Relationship: new` and the same omission, no Finding
@@ -134,7 +134,7 @@
   - R2-08: Given Requirements holding one bad line, `- R4 - retired.`, and `- R5 - retired, superseded by R4.`, when run, then exactly one Finding
   - R2-09: Given `- Builds on: context-2026-11-19-0900.md` without backticks, when run, then `structure/link-format` error at that line
   - R2-10: Given a `Status: final` Session with `- open: confirm limit` under Decisions, when run, then `structure/final-open` error at that line; the same line in a `Status: draft` Session yields no Finding
-- **Acceptance tests:** `R/tests/acceptance/p01-s06.test.mjs`
+- **Acceptance tests:** `.github/tools/workflow-check/tests/acceptance/p01-s06.test.mjs`
 - **Files:** create `R/src/rules/session-body.mjs`; edit `R/src/rules/index.mjs`
 - **Patterns:** `R/src/rules/session-header.mjs:1 - header field parsing and Rule shape`
 - **Decisions:**

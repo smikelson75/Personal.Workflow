@@ -4,6 +4,8 @@
 - Lane: standard
 - Next: fixture repair S06; blocked S02 - waits on S06; then P02 S02, S03, S04, S05
 - Tests locked: `16d841e`
+- Oracle: `.github/tools/workflow-check/tests`
+- Phase base: `16d841e`
 
 ## Current state
 - stack: Node ES modules under `.github/tools/workflow-check/` (`R`); runtimes on the machine: node 25.9, python 3.13, dotnet 10, pwsh 7.6.
