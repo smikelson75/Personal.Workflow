@@ -16,6 +16,7 @@ A card is the brief. The main session sends a `delegate` card's section verbatim
   - assert: a regex matching any line that states an expectation or a test title (for example `^\s*(assert|expect)|\btest\(`)
 - **Known failures** (optional): pre-existing failing tests, each written as a sub-bullet `<test title>` - owner PNN, where `<test title>` is the title as the harness reports it and `PNN` is a later phase. Excluded only from the gates of phases before `PNN`.
   - `<test title>` - owner PNN
+- **Not expressible** (optional): pairs and scenarios no black-box test can express, one sub-bullet each, presented at Phase Review for approval.
 - **Gate:**
   - suite: `<full test command>`, excluding `Known failures`
   - traceability: `<command or procedure>` listing scenario IDs with a test that ran and passed

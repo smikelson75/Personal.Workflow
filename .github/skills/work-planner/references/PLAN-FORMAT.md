@@ -36,7 +36,7 @@ One line stating what happens next. During execution it can join the parts below
 - `review PNN` means the gate passed and `Review: required` cards await code review.
 - `triage PNN` means the gate or review failed.
 - `plan PNN` means the previous phase completed.
-- `done` means every requirement and quality threshold has a passing scenario.
+- `done` means every requirement and quality threshold has a passing scenario, and every rule-by-capability pair has a passing scenario or an approved not-expressible entry.
 
 Whoever changes a status recomputes `Next` in the same write.
 
@@ -68,7 +68,7 @@ The gate fails if `git diff --exit-code <lock> -- <oracle>` shows any change. Be
 - never restate card content; the slice table holds only ID, name, and status
 - the slice table covers the active phase only; when a phase completes, drop its slice table and keep its phase row
 - future phases need enough intent to plan from later, nothing more
-- the gap line lists IDs separated by `, `, adds ` partial` to a partly covered ID, and reads `none` when `Next: done`
+- the gap line lists IDs separated by `, `, adds ` partial` to a partly covered ID, adds `<ID> @ <capability>` for each pair with neither a passing scenario nor an approved not-expressible entry, and reads `none` when `Next: done`.
 
 ## Skeleton
 
