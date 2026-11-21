@@ -30,6 +30,23 @@ Purpose: a compact, self-contained record of one brain-storm session at `.workfl
 - use canonical terms from `.workflow/language.md`; do not redefine them here
 - if a section does not change planning or naming, cut it
 
+## Required Sections
+
+| Section | small | medium | large |
+|---|---|---|---|
+| Problem | required | required | required |
+| Requirements | required | required | required |
+| Existing Solution | if extend or amend | if extend or amend | if extend or amend |
+| Users | optional | required | required |
+| Workflow | optional | required | required |
+| Scope Guardrails | optional | required | required |
+| Constraints | optional | required | required |
+| Success | optional | required | required |
+| Decisions | optional | required | required |
+| Language | optional | optional | optional |
+
+- Cut any optional section that does not change planning or naming.
+
 ## Skeleton
 
 ```md
