@@ -20,6 +20,11 @@ if (match) {
   process.exit(0);
 }
 
+if (text !== '' && !/^[a-z0-9][a-z0-9-]*$/.test(text)) {
+  console.error(USAGE);
+  process.exit(2);
+}
+
 const slug = text === '' ? null : text;
 process.stdout.write(`${JSON.stringify({ slug, bug: null })}\n`);
 process.exit(0);

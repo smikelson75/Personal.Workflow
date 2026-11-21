@@ -2,7 +2,7 @@
 
 - Spec: [workflow-core-spec.md](../../specs/workflow-core-spec.md)
 - Lane: standard
-- Next: P03 S08
+- Next: review P03
 - Tests locked: `37ff2d5`
 - Oracle: `.github/tools/workflow-core/tests`
 - Phase base: `37ff2d5`
@@ -43,5 +43,5 @@
 | S05 | Pair gate in plan-check | completed |
 | S06 | Pair coverage text | completed |
 | S07 | Clean handoff and Checkpoint cost text | completed |
-| S08 | Reject malformed arguments in parse-args | ready |
+| S08 | Reject malformed arguments in parse-args | completed |
 
