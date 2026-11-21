@@ -1,3 +1,4 @@
+import { chainIdRules } from './chain-ids.mjs';
 import { chainLinkRules } from './chain-links.mjs';
 import { chainStatusRules } from './chain-status.mjs';
 import { folderRules } from './folder.mjs';
@@ -12,4 +13,5 @@ export const RULES = [
   ...glossaryRules,
   ...chainStatusRules,
   ...chainLinkRules,
+  ...chainIdRules,
 ];
