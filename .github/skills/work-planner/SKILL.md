@@ -70,7 +70,8 @@ Pick the mode from the request and `plan.md`'s `Next` line.
 ### Plan (`Next: plan PNN`, or no plan yet)
 
 1. Validate inputs.
-2. Dispatch `repo-scout` with concrete questions: stack and build/test commands; full-suite baseline (pass, or the failing tests); whether a harness can drive the spec's product interfaces and whether it runs; supported mutation tool; existing code each requirement touches; candidate pattern pointers.
+2. Dispatch `repo-scout` with concrete questions: stack and build/test commands; full-suite baseline (pass, or the failing tests); whether a harness can drive the spec's product interfaces and whether it runs; existing code each requirement touches; candidate pattern pointers.
+2a. Run `node .github/skills/work-planner/scripts/mutation-addon.mjs <stack>` and copy its output line into Current state and each phase Gate's mutation line; ask the Developer nothing about mutation. A mutation Language Add-on is a skill under `.github/skills/` whose `SKILL.md` has the lines `- **Mutation stack:** <stack>` and `- **Mutation command:** <command>`; one installed later takes effect at the next Plan mode.
 3. Write or update `plan.md`: lane (see Lanes), current state, gap, phase roadmap. Shape phases around end-to-end value. On a new plan, map every requirement and every quality threshold to a phase.
 4. Write the active `phase-NN.md`: header, then every card (see Slicing).
 5. If the harness or the suite baseline needs work, the phase opens with setup cards, which run before any test authoring. Present them, their tiers, and any `ADR candidates` to the user. On approval, record approved candidates (see ADR Gate), set the setup cards `ready`, the phase `in progress`, `Phase base` to `HEAD`, and `Next: PNN S01`. Otherwise set `Next: phase review PNN`.

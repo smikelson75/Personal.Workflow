@@ -93,7 +93,7 @@ Run the phase header's `Gate` commands. The `small` lane runs only the first:
 1. full suite passes, excluding only the `Known failures` listed with an owning phase
 2. traceability: every scenario ID owned by this phase's cards has a tagged test that ran and passed; every failing test is a `Known failures` entry of this phase whose owner is a later phase
 3. locked oracle files are unchanged since the lock ref
-4. mutation testing, scoped to files the phase changed
+4. mutation testing, scoped to files the phase changed; a mutation line `unsupported for <stack>` is skipped and counts as passed
 
 For this repository's Gate, `node .github/tools/workflow-core/scripts/trace.mjs --phase-file <phase file> --skip-pattern` prints the pattern for the suite step's `--test-skip-pattern`, so steps 1 and 2 exclude the same tests.
 

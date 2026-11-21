@@ -158,7 +158,7 @@
 - **Goal:** work-planner's Plan mode runs the detection script instead of asking about mutation, and the Gate treats an unsupported mutation line as passed.
 - **Depends on:** S04, S05
 - **Tier:** delegate - adds and replaces lines in two markdown files
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:**
   - R17-06: Given `.github/skills/work-planner/SKILL.md`, when its lines are read, then one line contains `node .github/skills/work-planner/scripts/mutation-addon.mjs <stack>`
   - R17-07: Given the same file, when its lines are read, then no line contains `supported mutation tool` (failure: the repo-scout question is gone)
