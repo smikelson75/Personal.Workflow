@@ -174,3 +174,19 @@
 - **Do not:** edit `.github/tools/workflow-core/tests/**`; change other lines; add dependencies.
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" ".github/tools/workflow-check/tests/acceptance/*.test.mjs" ".github/tools/workflow-core/tests/acceptance/*.test.mjs"` exits 0; targets R17-06 to R17-09; 4 target tests run
 - **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.
+
+
+## S07 - Trace excludes nothing on an unparseable phase title
+
+- **Kind:** fix
+- **Goal:** `trace.mjs` with `--phase-file` whose first line does not match `^# P(\d+)\b` excludes no Known Failure, so no failing test is hidden.
+- **Depends on:** S01
+- **Tier:** delegate - one-line change in an existing script
+- **Review:** required - review-driven fix to a trust-boundary parse
+- **Restores:** review - unparseable phase title made every Known Failure excluded (fail open)
+- **Files:** edit `.github/tools/workflow-core/scripts/trace.mjs`
+- **Patterns:** `.github/tools/workflow-core/scripts/trace.mjs:46 - the gated phase number and the excluded filter`
+- **Decisions:** when the first line does not match, the gated phase has no number and the excluded list is empty; `--skip-pattern` then prints nothing. A matching title behaves as now.
+- **Do not:** edit `.github/tools/workflow-core/tests/**`; change any other behavior; add dependencies.
+- **Done when:** `node --test --test-reporter=tap ".github/tools/workflow-check/tests/acceptance/*.test.mjs" ".github/tools/workflow-core/tests/acceptance/*.test.mjs"` exits 0; 139 tests pass
+- **Stop and report if:** a file outside Files must change; the same failure after 3 attempts.
