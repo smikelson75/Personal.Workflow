@@ -109,4 +109,12 @@ All artifacts live in `.workflow/`:
 
 If the user ends early, still write the session file with `Status: draft` and the open nodes so the next session can resume from it.
 
+### Check
+
+After writing the Session and Glossary, run `node .github/tools/workflow-check/bin/workflow-check.mjs .workflow/sessions/<new session file>` from the repo root.
+
+- Fix every `error` Finding and rerun until the summary reads `0 errors`.
+- Weigh each `warning`: fix it, or leave it deliberately and name it in the brief.
+- Never edit a prior Session to clear a Finding. When an `error` Finding is anchored at a prior Session, stop and report it to the user instead of finishing.
+
 Finish with a brief: finalized requirements, branch map summary, new/changed terms, and architecture-shaping security concerns. Offer the next step (plan, spec, or implementation).
