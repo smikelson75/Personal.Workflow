@@ -166,3 +166,20 @@
   - R2-10 draft case: add a newer final Session whose `- Supersedes:` names the draft, defining no requirement ID the draft defines, so the run stays clean.
   - Every assertion and test title stays byte-identical to `Tests locked`.
 - **Do not:** edit assertions, test titles, `R/tests/support/**`, or any product file.
+
+## S07 - Repair R2-09 fixture for Link Rules
+
+- **Kind:** test-fix
+- **Scope:** fixture
+- **Goal:** the locked R2-09 test passes unchanged against `chain/broken-link` because its valid-link fixture again breaks no spec rule.
+- **Depends on:** none
+- **Tier:** main - edits a locked oracle file through Fixture Repair
+- **Review:** none
+- **Restores:** R2-09 (owned by a P01 card); dispatch stop on S03: the `good` fixture's `Builds on` names `context-2026-11-19-0900.md` and `context-2026-11-18-1000.md`, which do not exist, so S03's `chain/broken-link` Rule adds two Findings
+- **Acceptance tests:** `.github/tools/workflow-check/tests/acceptance/p01-s06.test.mjs`
+- **Decisions:**
+  - Start from the file at `Tests locked`.
+  - In R2-09's `good` run only, add the two named Sessions to the fixture as spec-valid final Sessions, each defining one requirement ID that no other Session in that fixture defines, with no `Builds on` or `Supersedes` line.
+  - The `bad` run and its fixture stay unchanged.
+  - Every assertion and test title stays byte-identical to `Tests locked`.
+- **Do not:** edit assertions, test titles, `R/tests/support/**`, or any product file.
