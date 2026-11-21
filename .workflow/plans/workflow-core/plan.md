@@ -2,11 +2,10 @@
 
 - Spec: [workflow-core-spec.md](../../specs/workflow-core-spec.md)
 - Lane: standard
-- Next: review P02
+- Next: plan P03
 - Tests locked: `2c54851`
 - Oracle: `.github/tools/workflow-core/tests`
 - Phase base: `56122ec`
-- Review pending: S09
 - Reconciled: `d6d5e19`
 
 ## Current state
@@ -14,8 +13,8 @@
 - harness: `node --test --test-reporter=tap ".github/tools/workflow-check/tests/acceptance/*.test.mjs" ".github/tools/workflow-core/tests/acceptance/*.test.mjs"` - drives skill text and scripts through `C/support/harness.mjs`; runs
 - suite baseline: green
 - mutation: unsupported for node - no mutation Language Add-on installed
-- in place: six skills (adr-writer, behavior-spec, brain-storm, conventional-commit, pull-work, work-planner), five agents, locked-tests hook, `.github/user-interaction.md`, `workflow-check`, `pull-work/scripts/fixture-leak.mjs`; `C/scripts/trace.mjs` (no Known Failure support yet); planner, brain-storm, and behavior-spec commit their output
-- gap to spec: R14, R15, R16, R17, R20, R21, R23 partial, Q-clean-handoff, Q-checkpoint-cost
+- in place: six skills (adr-writer, behavior-spec, brain-storm, conventional-commit, pull-work, work-planner), five agents, locked-tests hook, `.github/user-interaction.md`, `workflow-check`, `pull-work/scripts/fixture-leak.mjs`, `pull-work/scripts/plan-check.mjs`, `work-planner/scripts/mutation-addon.mjs`; `C/scripts/trace.mjs` honors Known Failures (`--tap`, `--phase-file`, `--skip-pattern`); planner, brain-storm, and behavior-spec commit their output
+- gap to spec: R16, R20, R21, R23 partial, Q-clean-handoff, Q-checkpoint-cost
 
 ## Decisions pinned by the plan
 - tests read skill and agent text only through stable markers: paths, commands, commit templates, `- **Label:**` or `Label:` line starts, headings. Never whole sentences.
@@ -29,19 +28,6 @@
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
 | P01 | Interaction rules and stage commits | completed | R22, R23 (rules file and references), R13, R19 | [phase-01](phase-01.md) |
-| P02 | Gate and plan scripts | gating | R14, R15, R17 | [phase-02](phase-02.md) |
+| P02 | Gate and plan scripts | completed | R14, R15, R17 | [phase-02](phase-02.md) |
 | P03 | Reconcile, defects, pair coverage | planned | R20, R21, R16, Q-clean-handoff, Q-checkpoint-cost | |
 
-## P02 slices
-
-| # | Slice | Status |
-|---|-------|--------|
-| S01 | Trace honors Known Failures | completed |
-| S02 | Gate text names Known Failures | completed |
-| S03 | Plan check script | completed |
-| S04 | Phase completion runs the plan check | completed |
-| S05 | Mutation add-on detection script | completed |
-| S06 | Plan mode and Gate use mutation detection | completed |
-| S07 | Trace excludes nothing on an unparseable phase title | completed |
-| S08 | Skip pattern matches whole titles | completed |
-| S09 | Skip pattern anchors each title | completed |
