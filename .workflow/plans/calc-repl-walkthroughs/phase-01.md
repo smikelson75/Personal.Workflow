@@ -80,7 +80,7 @@
 
 - **Kind:** build
 - **Goal:** `docs/walkthrough-csharp.md` guides a Developer end-to-end on `calc-repl` in C# / .NET with zero stale `todo-cli`/`TodoCli` references, and all three walkthroughs satisfy cross-stack consistency, zero stale leaks, and PowerShell copy-pasteability.
-- **Depends on:** S01, S02
+- **Depends on:** S01, S02, S04
 - **Tier:** delegate - mirrors `S01` for C# / .NET with all solution/project names, prompts, paths, and commands pinned below
 - **Review:** none
 - **Scenarios:**
@@ -108,3 +108,20 @@
 - **Do not:** edit `tests/acceptance/**`, `.github/**`, or any other walkthrough file; add runtime dependencies; use `**` for exponents; copy `AGENTS.md`; break `CalcRepl.Core`/`CalcRepl.Cli` separation.
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/acceptance/*.test.mjs"` exits 0; targets R24-05, R24-06, R25-03, R26-03, R27-03, R28-03, Q-cross-stack-consistency, Q-zero-stale-featured-app-leaks, Q-powershell-copy-pasteability; 9 target tests run.
 - **Stop and report if:** a file outside Files must change; a locked test looks wrong; same failure after 3 attempts.
+
+## S04 - Fix fence-aware section slicing in tests/acceptance/p01-s03.test.mjs
+
+- **Kind:** test-fix
+- **Scope:** assertion
+- **Goal:** `section()` in `tests/acceptance/p01-s03.test.mjs` ignores lines inside fenced code blocks so PowerShell `# ` comments are not misparsed as Markdown headings.
+- **Depends on:** none
+- **Tier:** main - locked test repair reviewed at Phase Review
+- **Review:** none
+- **Restores:** Q-cross-stack-consistency, R26-03, R28-03 (misparsing `# ` PowerShell comments inside fenced blocks as Markdown headings truncates Step 4 before its closing fence)
+- **Acceptance tests:** `tests/acceptance/p01-s03.test.mjs`
+- **Files:** edit `tests/acceptance/p01-s03.test.mjs`
+- **Patterns:** `tests/acceptance/p01-s03.test.mjs:70 - prose() fence-tracking loop`
+- **Decisions:** Track `inFence` on `/^[\s>]*```/` inside `section(ls, re, level)` in `tests/acceptance/p01-s03.test.mjs` so lines inside fenced code blocks are ignored when finding the start and end headings. Change no assertions or test titles.
+- **Do not:** edit any walkthrough docs; change any test assertions or expectations.
+- **Done when:** `git diff -- tests/acceptance/p01-s03.test.mjs` updates only `section()` to skip fenced code blocks and is approved at Phase Review.
+- **Stop and report if:** any assertion or test title must change.
