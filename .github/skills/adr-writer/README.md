@@ -13,6 +13,19 @@ It is not a separate stage. It is a side-output of `work-planner`:
 
 No other stage reads or writes ADRs. You can also invoke it directly to record a decision made outside planning.
 
-## Models
+## Recommended Models
 
-It runs in whichever session loaded it (the main session, or the optional `planner` agent), so it uses that session's model. It needs no separate pin.
+When loaded by `work-planner` or the `planner` agent, `adr-writer` runs in that session and inherits its model—no separate pin is needed. When invoked directly to record a standalone decision, use a mid-tier model at `medium` effort, or raise to `high` for major architectural trade-offs.
+
+| Provider  | Model               | Default effort | Raise to `high` when                                          |
+| --------- | ------------------- | -------------- | ------------------------------------------------------------- |
+| Anthropic | `claude-sonnet-5.5` | `medium`       | Standalone, high-impact architectural decisions with many trade-offs |
+| OpenAI    | `gpt-6.1-terra`     | `medium`       | Standalone, high-impact architectural decisions with many trade-offs |
+| Google    | `gemini-4-neon`     | `medium`       | Standalone, high-impact architectural decisions with many trade-offs |
+
+### Effort Guidance
+
+- **`low`**: not recommended; trade-offs and consequences tend to become generic.
+- **`medium`** (default): produces concise, accurate ADRs from already-settled context.
+- **`high`**: useful when invoking `adr-writer` directly to weigh competing architectures before committing to one.
+

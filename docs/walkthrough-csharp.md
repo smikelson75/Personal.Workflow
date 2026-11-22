@@ -115,7 +115,7 @@ Open Copilot Chat in the `C:\Projects\calc-repl` workspace.
 
 ### 2.1 Configure `.editorconfig` and `Directory.Build.props`
 
-Type in **Copilot Chat**:
+Type in **Copilot Chat** (use Anthropic Sonnet 5.5 with medium effort):
 
 ```text
 /dotnet-editorconfig baseline
@@ -146,7 +146,7 @@ Commit the code-style setup in **Copilot Chat**:
 
 Per [stryker-dotnet/SKILL.md](../language-addons/csharp/stryker-dotnet/SKILL.md) and [protocol.md](../language-addons/mutation-testing/protocol.md), **wait to run `/stryker-dotnet baseline` until `CalcRepl.UnitTests` has at least one real unit test covering `CalcRepl.Core`** (during or right after Phase 1 setup).
 
-Once your first unit test exists, run in **Copilot Chat**:
+Once your first unit test exists, run in **Copilot Chat** (use Anthropic Sonnet 5.5 with medium effort):
 
 ```text
 /stryker-dotnet baseline
@@ -177,7 +177,7 @@ git status --short
 
 ### Step 1 — Brainstorm Requirements (`/brain-storm`)
 
-Type in **Copilot Chat**:
+Type in **Copilot Chat** (recommended: use Anthropic Opus 5.5 with medium effort):
 
 ```text
 /brain-storm I want to build an interactive integer calculator REPL called calc-repl in C# .NET with zero external runtime dependencies. It reads arithmetic expressions from stdin, evaluates binary +, -, *, and / with standard operator precedence (* and / before + and -), uses truncating integer division toward zero (for example, 7 / 2 = 3), reports a clear error on divide-by-zero or invalid expressions and re-prompts without crashing the loop, and exits cleanly on exit, quit, or EOF.
@@ -199,7 +199,7 @@ Type in **Copilot Chat**:
 
 ### Step 2 — Write the Black-Box Behavior Spec (`/behavior-spec`)
 
-Start a **new Copilot Chat session** and type:
+Start a **new Copilot Chat session** (with recommended Anthropic Opus 5.5 and medium effort) and type:
 
 ```text
 /behavior-spec calc-repl
@@ -220,7 +220,7 @@ Start a **new Copilot Chat session** and type:
 
 ### Step 3 — Plan, Lock Tests, Build, Gate, and Review (`/pull-work`)
 
-Start a **new Copilot Chat session** and type:
+Start a **new Copilot Chat session** (with recommended Anthropic Sonnet 5.5 and medium effort) and type:
 
 ```text
 /pull-work

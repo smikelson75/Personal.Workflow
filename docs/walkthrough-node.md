@@ -97,7 +97,7 @@ Open Copilot Chat in the `C:\Projects\calc-repl` workspace. Configure the three 
 
 ### 2.1 Configure ESLint + Prettier
 
-Type in **Copilot Chat**:
+Type in **Copilot Chat** (use Anthropic Sonnet 5.5 with medium effort):
 
 ```text
 /eslint-javascript baseline
@@ -121,7 +121,7 @@ Commit the style setup cleanly in **Copilot Chat**:
 
 ### 2.2 Configure Vitest
 
-Type in **Copilot Chat**:
+Type in **Copilot Chat** (use Anthropic Sonnet 5.5 with medium effort):
 
 ```text
 /vitest-javascript setup
@@ -139,7 +139,7 @@ Commit the harness setup in **Copilot Chat**:
 
 Per [stryker-javascript/SKILL.md](../language-addons/node-javascript/stryker-javascript/SKILL.md) and [protocol.md](../language-addons/mutation-testing/protocol.md), **wait to run `/stryker-javascript baseline` until at least one unit test exists** (during or right after Phase 1 setup). Running it before any unit tests exist will stop with *"no unit tests"*.
 
-Once your first unit test exists, run in **Copilot Chat**:
+Once your first unit test exists, run in **Copilot Chat** (use Anthropic Sonnet 5.5 with medium effort):
 
 ```text
 /stryker-javascript baseline
@@ -172,7 +172,7 @@ git status --short
 
 ### Step 1 — Brainstorm Requirements (`/brain-storm`)
 
-Type in **Copilot Chat**:
+Type in **Copilot Chat** (recommended: use Anthropic Opus 5.5 with medium effort):
 
 ```text
 /brain-storm I want to build an interactive integer calculator REPL called calc-repl in Node.js with zero external runtime dependencies. It reads arithmetic expressions from stdin, evaluates binary +, -, *, and / with standard operator precedence (* and / before + and -), uses truncating integer division toward zero (for example, 7 / 2 = 3), reports a clear error on divide-by-zero or invalid expressions and re-prompts without crashing the loop, and exits cleanly on exit, quit, or EOF.
@@ -195,7 +195,7 @@ Type in **Copilot Chat**:
 
 ### Step 2 — Write the Black-Box Behavior Spec (`/behavior-spec`)
 
-Start a **new Copilot Chat session** (keeps token usage low) and type:
+Start a **new Copilot Chat session** (with recommended Anthropic Opus 5.5 and medium effort) and type:
 
 ```text
 /behavior-spec calc-repl
@@ -219,7 +219,7 @@ Start a **new Copilot Chat session** (keeps token usage low) and type:
 
 **Black-box REPL testing:** the acceptance tests treat `calc-repl` as a black box. Each test runs the REPL with multi-line input piped over `stdin` (or by spawning `node bin/calc-repl.js` with redirected `stdin`, `stdout`, and `stderr`) and asserts only on what comes out of `stdout`, `stderr`, and the exit code. Setup cards and Phase Review examples follow the same pattern, for example a `tests/support/repl.js` helper that spawns `node bin/calc-repl.js`.
 
-Start a **new Copilot Chat session** and type:
+Start a **new Copilot Chat session** (with recommended Anthropic Sonnet 5.5 and medium effort) and type:
 
 ```text
 /pull-work

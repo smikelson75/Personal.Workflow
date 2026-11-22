@@ -27,9 +27,26 @@ To resume in a new session, run `/pull-work`.
 - `small`: at most 2 slices, no new product interface, no ADR candidate. The main session writes the tests, nothing is locked, and the gate is the full suite.
 - `standard`: everything else.
 
+## Recommended Models
+
+The main session runs `work-planner` for day-to-day planning, revisions, and triage; a mid-tier model at `medium` effort is the default. For a large or architecture-heavy first plan where Slice boundaries matter most, invoke the optional `planner` agent on a frontier model at `high` effort.
+
+| Provider  | Model               | Default effort | Raise to `high` (or use `planner` agent) when                        |
+| --------- | ------------------- | -------------- | -------------------------------------------------------------------- |
+| Anthropic | `claude-sonnet-5.5` | `medium`       | Large or architecture-heavy first plan (`claude-opus-5.5` at `high`) |
+| OpenAI    | `gpt-6.1-terra`     | `medium`       | Large or architecture-heavy first plan (`gpt-6.1-sol` at `high`)     |
+| Google    | `gemini-4-neon`     | `medium`       | Large or architecture-heavy first plan (`gemini-4-neon` at `high`)   |
+
+### Effort Guidance
+
+- **`low`**: not recommended. Cards end up under-pinned, causing `coder` to stop and report back repeatedly.
+- **`medium`** (default): handles standard phases, revisions, and Gate triage reliably.
+- **`high`**: use for a large first plan, complex sequencing, or cross-cutting refactors.
+- **`xhigh` / `max`**: rarely needed; prefer pinning cleaner specs and ADRs over burning extra reasoning tokens.
+
 ## Agents and Models
 
-The main session runs on whatever model you pick; a Sonnet-class model on `medium` is the recommended default. Subagents exist only where they cost less than doing the work in place, because every subagent start reloads its instructions and re-reads its inputs. Each is a custom agent in [.github/agents/](../../agents/) with its model list in frontmatter. The first available model is used. To change a pin, edit that agent's `model:` list.
+Subagents exist only where they cost less than doing the work in place, because every subagent start reloads its instructions and re-reads its inputs. Each is a custom agent in [.github/agents/](../../agents/README.md) with its model list in frontmatter. The first available model is used. To change a pin, edit that agent's `model:` list.
 
 | Agent | Tier | Effort | Why |
 |---|---|---|---|
