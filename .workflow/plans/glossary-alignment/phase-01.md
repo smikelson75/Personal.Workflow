@@ -69,3 +69,21 @@
 - **Do not:** edit `tests/glossary-alignment/**`; edit `tests/acceptance/**`; edit `.github/**`; edit `.workflow/**`; add dependencies
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern "{regression-exclude}" "tests/glossary-alignment/*.test.mjs"` exits 0; targets R31-01, R31-02, R31-03; 3 target tests run
 - **Stop and report if:** a file outside Files must change; a locked test looks wrong; `tests/acceptance/*.test.mjs` regresses; same failure after 3 attempts
+
+## S03 - Repair S01 fixture for executable paths with spaces
+
+- **Kind:** test-fix
+- **Scope:** fixture
+- **Goal:** `[R30-02]` runs the acceptance suite when the node executable path contains spaces.
+- **Depends on:** none
+- **Tier:** main - fixture-only repair applied by Fixture Repair
+- **Review:** none
+- **Restores:** R30-02; gate finding: `process.execPath` is passed unquoted with `shell: true`, so a spaced path (`C:\Users\smmik\AppData\Local\Author Software\...`) is split by the shell
+- **Acceptance tests:** `tests/glossary-alignment/p01-s01.test.mjs`
+- **Files:** edit `tests/glossary-alignment/p01-s01.test.mjs`
+- **Patterns:** `tests/glossary-alignment/p01-s01.test.mjs:180 - spawnSync call in R30-02`
+- **Decisions:**
+  - Quote the executable in the spawnSync call at line 180 only; no assertion or expectation changes.
+- **Do not:** change any assertion; edit other tests or product files
+- **Done when:** `node --test --test-reporter=tap --test-skip-pattern "R31-01|R31-02|R31-03" "tests/glossary-alignment/*.test.mjs"` exits 0; targets R30-02
+- **Stop and report if:** an expectation would need to change
