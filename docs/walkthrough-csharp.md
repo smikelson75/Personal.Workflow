@@ -1,6 +1,6 @@
 # C# / .NET Workflow Walkthrough
 
-This guide walks through setting up a brand-new C# / .NET repository with the Personal Workflow, configuring the C# language skills (`dotnet-editorconfig` and `stryker-dotnet`), and building a small CLI application from initial idea to finished, verified code.
+This guide walks through setting up a brand-new C# / .NET repository with the Personal Workflow, configuring the C# Language Add-ons (`dotnet-editorconfig` and `stryker-dotnet`), and building a small CLI application from initial idea to finished, verified code.
 
 ---
 
@@ -18,7 +18,7 @@ Each of these cleanly separates a pure-logic class library (`*.Core`, targeted b
 
 ## Part 1: Set Up the New Repository (PowerShell)
 
-Run these commands in **PowerShell** to create `C:\Projects\calc-repl`, scaffold a clean `.NET` solution with separate `Core`, `Cli`, `UnitTests`, and `AcceptanceTests` projects, and copy the core workflow plus the C# language skills.
+Run these commands in **PowerShell** to create `C:\Projects\calc-repl`, scaffold a clean `.NET` solution with separate `Core`, `Cli`, `UnitTests`, and `AcceptanceTests` projects, and copy the Workflow Core plus the C# Language Add-ons.
 
 ### 1.1 Verify prerequisites (.NET SDK, Node.js, and Git)
 
@@ -66,7 +66,7 @@ dotnet tool install dotnet-stryker
 dotnet test
 ```
 
-### 1.3 Copy the core workflow and C# language skills
+### 1.3 Copy the Workflow Core and C# Language Add-ons
 
 This copies the portable workflow pieces (`.github/agents`, `.github/hooks`, `.github/skills`, `.github/tools/workflow-check`, and `.github/user-interaction.md`) along with the C# skills ([dotnet-editorconfig](../language-addons/csharp/dotnet-editorconfig/SKILL.md), [stryker-dotnet](../language-addons/csharp/stryker-dotnet/SKILL.md)) and the shared [mutation-testing](../language-addons/mutation-testing/protocol.md) protocol.
 
@@ -76,14 +76,14 @@ $workflowSrc = "C:\Projects\Personal.Workflow"
 # Create .github folders
 New-Item -ItemType Directory -Path .github\tools, .github\skills -Force | Out-Null
 
-# Copy core workflow
+# Copy Workflow Core
 Copy-Item -Recurse "$workflowSrc\.github\agents"                ".github\agents"
 Copy-Item -Recurse "$workflowSrc\.github\hooks"                 ".github\hooks"
 Copy-Item -Recurse "$workflowSrc\.github\skills\*"              ".github\skills"
 Copy-Item -Recurse "$workflowSrc\.github\tools\workflow-check"  ".github\tools\workflow-check"
 Copy-Item          "$workflowSrc\.github\user-interaction.md"   ".github\user-interaction.md"
 
-# Copy C# language skills + shared mutation-testing protocol
+# Copy C# Language Add-ons + shared mutation-testing protocol
 Copy-Item -Recurse "$workflowSrc\language-addons\csharp\dotnet-editorconfig" ".github\skills\dotnet-editorconfig"
 Copy-Item -Recurse "$workflowSrc\language-addons\csharp\stryker-dotnet"      ".github\skills\stryker-dotnet"
 Copy-Item -Recurse "$workflowSrc\language-addons\mutation-testing"           ".github\skills\mutation-testing"
@@ -109,7 +109,7 @@ code C:\Projects\calc-repl
 
 ---
 
-## Part 2: Configure the C# Language Skills (Copilot Chat)
+## Part 2: Configure the C# Language Add-ons (Copilot Chat)
 
 Open Copilot Chat in the `C:\Projects\calc-repl` workspace.
 
@@ -236,16 +236,16 @@ From here on, `/pull-work` drives the workflow automatically until a **Checkpoin
    - Sets up the .NET test harness conventions (for example, xUnit `[Fact(DisplayName = "[R1-01] ...")]` with `dotnet test --filter "DisplayName~[R1-01]"` and `dotnet build -c Release && dotnet format --verify-no-changes && dotnet test -c Release` in the phase Gate).
    - Commits `docs(calc-repl): plan P01`.
 
-2. **Setup-Card Checkpoint (if the phase needs a REPL process-runner helper in `tests/CalcRepl.AcceptanceTests/Support/`):**
+2. **Setup-Card Approval (if the phase needs a REPL process-runner helper in `tests/CalcRepl.AcceptanceTests/Support/`):**
    - Reply in **Copilot Chat**:
 
      ```text
      approve all
      ```
 
-3. **Phase Review Checkpoint:**
+3. **Phase Review:**
    - Authors failing black-box acceptance tests in `tests/CalcRepl.AcceptanceTests/` tagged with `[R1-01]`, `[R1-02]`, … that pipe expressions into the built `CalcRepl.Cli` executable (spawned with redirected stdin/stdout/stderr) and assert on its output and exit code (never referencing `CalcRepl.Core` internals).
-   - Presents all cards, tests, `delegate`/`main` tiers, `Review: required` flags (cards touching file writes/deletes will be flagged `Review: required`), and any ADR candidates in one checkpoint.
+   - Presents all cards, tests, `delegate`/`main` tiers, `Review: required` flags, and any ADR candidates in one checkpoint.
    - Reply in **Copilot Chat**:
 
      ```text

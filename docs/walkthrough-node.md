@@ -1,6 +1,6 @@
 # Node.js JavaScript Workflow Walkthrough
 
-This guide walks through setting up a brand-new Node.js JavaScript repository with the Personal Workflow, configuring the Node.js language skills, and building a small CLI application from initial idea to finished, verified code.
+This guide walks through setting up a brand-new Node.js JavaScript repository with the Personal Workflow, configuring the Node.js Language Add-ons, and building a small CLI application from initial idea to finished, verified code.
 
 ---
 
@@ -18,7 +18,7 @@ Each of these uses zero external runtime dependencies, has clear black-box CLI b
 
 ## Part 1: Set Up the New Repository (PowerShell)
 
-Run these commands in **PowerShell** to create `C:\Projects\calc-repl`, initialize Git and Node.js (ESM + LTS), and copy the core workflow plus the Node.js JavaScript language skills.
+Run these commands in **PowerShell** to create `C:\Projects\calc-repl`, initialize Git and Node.js (ESM + LTS), and copy the Workflow Core plus the Node.js JavaScript Language Add-ons.
 
 ### 1.1 Verify prerequisites (Node.js LTS 22.12+ or 24, and Git)
 
@@ -41,7 +41,7 @@ npm pkg set name="calc-repl" version="0.1.0" type="module" engines.node=">=22.12
 "22" | Set-Content -Path .nvmrc -NoNewline
 ```
 
-### 1.3 Copy the core workflow and Node.js language skills
+### 1.3 Copy the Workflow Core and Node.js Language Add-ons
 
 This copies the portable workflow pieces (`.github/agents`, `.github/hooks`, `.github/skills`, `.github/tools/workflow-check`, and `.github/user-interaction.md`) along with the Node.js JavaScript skills ([eslint-javascript](../language-addons/node-javascript/eslint-javascript/SKILL.md), [vitest-javascript](../language-addons/node-javascript/vitest-javascript/SKILL.md), [stryker-javascript](../language-addons/node-javascript/stryker-javascript/SKILL.md)) and the shared [mutation-testing](../language-addons/mutation-testing/protocol.md) protocol that `stryker-javascript` links to.
 
@@ -51,14 +51,14 @@ $workflowSrc = "C:\Projects\Personal.Workflow"
 # Create .github folders
 New-Item -ItemType Directory -Path .github\tools, .github\skills -Force | Out-Null
 
-# Copy core workflow
+# Copy Workflow Core
 Copy-Item -Recurse "$workflowSrc\.github\agents"                ".github\agents"
 Copy-Item -Recurse "$workflowSrc\.github\hooks"                 ".github\hooks"
 Copy-Item -Recurse "$workflowSrc\.github\skills\*"              ".github\skills"
 Copy-Item -Recurse "$workflowSrc\.github\tools\workflow-check"  ".github\tools\workflow-check"
 Copy-Item          "$workflowSrc\.github\user-interaction.md"   ".github\user-interaction.md"
 
-# Copy Node.js JavaScript language skills + shared mutation-testing protocol
+# Copy Node.js JavaScript Language Add-ons + shared mutation-testing protocol
 Copy-Item -Recurse "$workflowSrc\language-addons\node-javascript\eslint-javascript"  ".github\skills\eslint-javascript"
 Copy-Item -Recurse "$workflowSrc\language-addons\node-javascript\vitest-javascript"  ".github\skills\vitest-javascript"
 Copy-Item -Recurse "$workflowSrc\language-addons\node-javascript\stryker-javascript" ".github\skills\stryker-javascript"
@@ -91,9 +91,9 @@ code C:\Projects\calc-repl
 
 ---
 
-## Part 2: Configure the Node.js Language Skills (Copilot Chat)
+## Part 2: Configure the Node.js Language Add-ons (Copilot Chat)
 
-Open Copilot Chat in the `C:\Projects\calc-repl` workspace. Configure the three Node.js language skills in order: **ESLint + Prettier** → **Vitest** → **StrykerJS**.
+Open Copilot Chat in the `C:\Projects\calc-repl` workspace. Configure the three Node.js Language Add-ons in order: **ESLint + Prettier** → **Vitest** → **StrykerJS**.
 
 ### 2.1 Configure ESLint + Prettier
 
@@ -229,10 +229,10 @@ From here on, `/pull-work` is the **only command you need**. It Reads `Next:` in
 
 1. **Plan Mode (automatic):**
    - Dispatches `repo-scout` to inspect your repo (`package.json`, Vitest config, ESLint config).
-   - Creates `.workflow/plans/calc-repl/plan.md` and `.workflow/plans/calc-repl/phase-01.md` with thin vertical slice cards (`S01`, `S02`, …).
+   - Creates `.workflow/plans/calc-repl/plan.md` and `.workflow/plans/calc-repl/phase-01.md` with thin vertical Slices and their Cards (`S01`, `S02`, …).
    - Commits `docs(calc-repl): plan P01`.
 
-2. **Setup-Card Checkpoint (if the phase needs harness setup, e.g., `tests/support/cli.js`):**
+2. **Setup-Card Approval (if the phase needs harness setup, e.g., `tests/support/cli.js`):**
    - Shows the setup card(s) and any ADR candidates in one bundled question.
    - Reply in **Copilot Chat**:
 
@@ -242,7 +242,7 @@ From here on, `/pull-work` is the **only command you need**. It Reads `Next:` in
 
      *(Or name a specific card ID like `S01` to discuss or adjust it first.)*
 
-3. **Phase Review Checkpoint:**
+3. **Phase Review:**
    - Authors failing black-box acceptance tests (`tests/acceptance/p01-s02.test.js`, etc.) with `[R1-01]` scenario tags—leaving them uncommitted so you can inspect the diff.
    - Presents all cards, tests, `delegate`/`main` tiers, `Review: required` flags, and any ADR candidates in one bundled checkpoint.
    - Reply in **Copilot Chat**:

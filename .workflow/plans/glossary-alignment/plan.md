@@ -2,7 +2,7 @@
 
 - Spec: [glossary-alignment-spec.md](../../specs/glossary-alignment-spec.md)
 - Lane: standard
-- Next: P01 S02
+- Next: gate P01
 - Tests locked: `0fcc4f8`
 - Oracle: `tests/glossary-alignment`
 - Phase base: `bfd0b22`
@@ -25,7 +25,7 @@
 
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
-| P01 | Glossary, language-addons rename, and walkthrough alignment | in progress | R29, R30, R31, Q-zero-workflow-check-errors, Q-zero-stale-language-skills-references | [phase-01](phase-01.md) |
+| P01 | Glossary, language-addons rename, and walkthrough alignment | gating | R29, R30, R31, Q-zero-workflow-check-errors, Q-zero-stale-language-skills-references | [phase-01](phase-01.md) |
 | P02 | Workflow Core prose and Glossary contracts | planned | R32, R33, R34, Q-zero-vocabulary-drift, Q-suite-preservation | |
 
 ## P01 slices
@@ -33,5 +33,5 @@
 | # | Slice | Status |
 |---|-------|--------|
 | S01 | Rename language-skills to language-addons and verify Glossary | completed |
-| S02 | Align walkthroughs to canonical vocabulary | ready |
+| S02 | Align walkthroughs to canonical vocabulary | completed |
 | S03 | Repair S01 fixture for executable paths with spaces | completed |

@@ -1,6 +1,6 @@
 # Node.js TypeScript Workflow Walkthrough
 
-This guide walks through setting up a brand-new Node.js TypeScript repository with the Personal Workflow, configuring the TypeScript language skills (`eslint-typescript`, `vitest-typescript`, `stryker-typescript`), and building a small CLI application from initial idea to finished, verified code.
+This guide walks through setting up a brand-new Node.js TypeScript repository with the Personal Workflow, configuring the TypeScript Language Add-ons (`eslint-typescript`, `vitest-typescript`, `stryker-typescript`), and building a small CLI application from initial idea to finished, verified code.
 
 ---
 
@@ -18,7 +18,7 @@ Each of these uses zero external runtime dependencies, has clear black-box CLI b
 
 ## Part 1: Set Up the New Repository (PowerShell)
 
-Run these commands in **PowerShell** to create `C:\Projects\calc-repl`, initialize Git and Node.js (ESM + LTS), and copy the core workflow plus the Node.js TypeScript language skills.
+Run these commands in **PowerShell** to create `C:\Projects\calc-repl`, initialize Git and Node.js (ESM + LTS), and copy the Workflow Core plus the Node.js TypeScript Language Add-ons.
 
 ### 1.1 Verify prerequisites (Node.js LTS 22.12+ or 24, and Git)
 
@@ -44,7 +44,7 @@ npm install --save-dev typescript@~6.0.3
 "22" | Set-Content -Path .nvmrc -NoNewline
 ```
 
-### 1.3 Copy the core workflow and TypeScript language skills
+### 1.3 Copy the Workflow Core and TypeScript Language Add-ons
 
 This copies the portable workflow pieces (`.github/agents`, `.github/hooks`, `.github/skills`, `.github/tools/workflow-check`, and `.github/user-interaction.md`) along with the TypeScript skills ([eslint-typescript](../language-addons/node-typescript/eslint-typescript/SKILL.md), [vitest-typescript](../language-addons/node-typescript/vitest-typescript/SKILL.md), [stryker-typescript](../language-addons/node-typescript/stryker-typescript/SKILL.md)) and the shared [mutation-testing](../language-addons/mutation-testing/protocol.md) protocol.
 
@@ -54,14 +54,14 @@ $workflowSrc = "C:\Projects\Personal.Workflow"
 # Create .github folders
 New-Item -ItemType Directory -Path .github\tools, .github\skills -Force | Out-Null
 
-# Copy core workflow
+# Copy Workflow Core
 Copy-Item -Recurse "$workflowSrc\.github\agents"                ".github\agents"
 Copy-Item -Recurse "$workflowSrc\.github\hooks"                 ".github\hooks"
 Copy-Item -Recurse "$workflowSrc\.github\skills\*"              ".github\skills"
 Copy-Item -Recurse "$workflowSrc\.github\tools\workflow-check"  ".github\tools\workflow-check"
 Copy-Item          "$workflowSrc\.github\user-interaction.md"   ".github\user-interaction.md"
 
-# Copy Node.js TypeScript language skills + shared mutation-testing protocol
+# Copy Node.js TypeScript Language Add-ons + shared mutation-testing protocol
 Copy-Item -Recurse "$workflowSrc\language-addons\node-typescript\eslint-typescript"  ".github\skills\eslint-typescript"
 Copy-Item -Recurse "$workflowSrc\language-addons\node-typescript\vitest-typescript"  ".github\skills\vitest-typescript"
 Copy-Item -Recurse "$workflowSrc\language-addons\node-typescript\stryker-typescript" ".github\skills\stryker-typescript"
@@ -94,7 +94,7 @@ code C:\Projects\calc-repl
 
 ---
 
-## Part 2: Configure the TypeScript Language Skills (Copilot Chat)
+## Part 2: Configure the TypeScript Language Add-ons (Copilot Chat)
 
 Open Copilot Chat in the `C:\Projects\calc-repl` workspace. Configure the skills in order: **TypeScript + ESLint + Prettier** → **Vitest** → **StrykerJS**.
 
@@ -237,14 +237,14 @@ From here on, `/pull-work` drives the workflow automatically until a **Checkpoin
    - Creates `.workflow/plans/calc-repl/plan.md` and `.workflow/plans/calc-repl/phase-01.md`.
    - Commits `docs(calc-repl): plan P01`.
 
-2. **Setup-Card Checkpoint (if the phase needs harness setup, e.g., `tests/support/cli.ts` spawning `dist/cli.js`):**
+2. **Setup-Card Approval (if the phase needs harness setup, e.g., `tests/support/cli.ts` spawning `dist/cli.js`):**
    - Reply in **Copilot Chat**:
 
      ```text
      approve all
      ```
 
-3. **Phase Review Checkpoint:**
+3. **Phase Review:**
    - Authors failing acceptance tests (`tests/acceptance/p01-s02.test.ts`, etc.) with `[R1-01]` scenario tags that spawn `node dist/cli.js` (never importing `src/`).
    - Presents cards, tests, `delegate`/`main` tiers, `Review: required` flags, and any ADR candidates in one checkpoint.
    - Reply in **Copilot Chat**:
