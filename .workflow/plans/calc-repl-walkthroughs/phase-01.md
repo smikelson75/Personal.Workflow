@@ -53,7 +53,7 @@
 - **Goal:** `docs/walkthrough-typescript.md` guides a Developer end-to-end on `calc-repl` in Node.js TypeScript with zero stale `csv-stats` references and accurate Workflow Core setup.
 - **Depends on:** none
 - **Tier:** delegate - mirrors `S01` for TypeScript with all prompts, paths, and commands pinned below
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:**
   - R24-03: Given `docs/walkthrough-typescript.md`, when `## Simple CLI Ideas` and Parts 1–4 are inspected, then `#1` is `calc-repl` (marked as used throughout), `#2`–`#5` are `env-check`, `csv-stats`, `todo-cli`, `slug-rename` in order, and Parts 1–4 use `C:\Projects\calc-repl`, `package.json` `name="calc-repl"`, `bin.calc-repl="dist/cli.js"`, `node dist\cli.js`, `.workflow/specs/calc-repl-spec.md`, `.workflow/plans/calc-repl/`, and `calc-repl` commit examples.
   - R24-04: Given `docs/walkthrough-typescript.md`, when Parts 1–4 and `## Quick Reference` are searched for `env-check`, `csv-stats`, `todo-cli`, `TodoCli`, `.env.example`, `sample.csv`, and `todo-demo.json`, then zero matches exist.

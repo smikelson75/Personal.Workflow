@@ -2,7 +2,7 @@
 
 - Spec: [calc-repl-walkthroughs-spec.md](../../specs/calc-repl-walkthroughs-spec.md)
 - Lane: standard
-- Next: running S02
+- Next: P01 S03
 - Tests locked: `9a3ff11`
 - Oracle: `tests/acceptance`
 - Phase base: `9a3ff11`
@@ -31,5 +31,5 @@
 | # | Slice | Status |
 |---|-------|--------|
 | S01 | Migrate docs/walkthrough-node.md to calc-repl | completed |
-| S02 | Migrate docs/walkthrough-typescript.md to calc-repl | in progress |
+| S02 | Migrate docs/walkthrough-typescript.md to calc-repl | completed |
 | S03 | Migrate docs/walkthrough-csharp.md to calc-repl and verify cross-stack consistency | ready |

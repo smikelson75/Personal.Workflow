@@ -8,16 +8,17 @@ This guide walks through setting up a brand-new Node.js TypeScript repository wi
 
 Each of these uses zero external runtime dependencies, has clear black-box CLI behavior for Vitest acceptance tests against `dist/`, and has pure logic modules that make strict TypeScript + StrykerJS mutation testing meaningful:
 
-1. **`csv-stats`** *(used throughout this walkthrough)* — Reads a CSV file and prints row count plus `min`, `max`, and `avg` for a chosen numeric column (`--column`, `--delimiter`, `--json`). Great for seeing strict TypeScript types and StrykerJS catch boundary-condition bugs (`<` vs `<=`, empty rows, non-numeric cells).
+1. **`calc-repl`** *(used throughout this walkthrough)* — Interactive integer calculator REPL that reads arithmetic expressions from stdin, applies `+`, `-`, `*`, and `/` with standard precedence, uses truncating integer division, re-prompts after errors, and exits cleanly on `exit`, `quit`, or EOF. Great for seeing strict TypeScript types and StrykerJS catch boundary-condition bugs (precedence, division toward zero, divide-by-zero).
 2. **`env-check`** — Validates a `.env` file against a `.env.example` template (missing keys, empty values, extra keys, `--strict`, `--json`, distinct exit codes).
-3. **`todo-cli`** — Local JSON-backed task list (`add`, `list`, `done`, `remove`, `--file`).
-4. **`slug-rename`** — Batch-renames files in a folder to lowercase kebab-case (`--dry-run` default, `--apply` to rename, refuses on collisions).
+3. **`csv-stats`** — Reads a CSV file and prints row count plus `min`, `max`, and `avg` for a chosen numeric column (`--column`, `--delimiter`, `--json`). Good for boundary-condition practice (`<` vs `<=`, empty rows, non-numeric cells).
+4. **`todo-cli`** — Local JSON-backed task list (`add`, `list`, `done`, `remove`, `--file`).
+5. **`slug-rename`** — Batch-renames files in a folder to lowercase kebab-case (`--dry-run` default, `--apply` to rename, refuses on collisions).
 
 ---
 
 ## Part 1: Set Up the New Repository (PowerShell)
 
-Run these commands in **PowerShell** to create `C:\Projects\csv-stats`, initialize Git and Node.js (ESM + LTS), and copy the core workflow plus the Node.js TypeScript language skills.
+Run these commands in **PowerShell** to create `C:\Projects\calc-repl`, initialize Git and Node.js (ESM + LTS), and copy the core workflow plus the Node.js TypeScript language skills.
 
 ### 1.1 Verify prerequisites (Node.js LTS 22.12+ or 24, and Git)
 
@@ -33,18 +34,19 @@ git --version
 Acceptance tests in TypeScript drive the **built** output in `dist/`, so `bin` points to `dist/cli.js`:
 
 ```powershell
-New-Item -ItemType Directory -Path C:\Projects\csv-stats | Out-Null
-Set-Location C:\Projects\csv-stats
+New-Item -ItemType Directory -Path C:\Projects\calc-repl | Out-Null
+Set-Location C:\Projects\calc-repl
 
 git init -b main
 npm init -y
-npm pkg set name="csv-stats" version="0.1.0" type="module" engines.node=">=22.12.0" bin.csv-stats="dist/cli.js"
+npm pkg set name="calc-repl" version="0.1.0" type="module" engines.node=">=22.12.0" bin.calc-repl="dist/cli.js"
+npm install --save-dev typescript@~6.0.3
 "22" | Set-Content -Path .nvmrc -NoNewline
 ```
 
 ### 1.3 Copy the core workflow and TypeScript language skills
 
-This copies the portable workflow pieces (`.github/agents`, `.github/hooks`, `.github/skills`, `.github/tools/workflow-check`, `.github/user-interaction.md`, and `AGENTS.md`) along with the TypeScript skills ([eslint-typescript](../language-skills/node-typescript/eslint-typescript/SKILL.md), [vitest-typescript](../language-skills/node-typescript/vitest-typescript/SKILL.md), [stryker-typescript](../language-skills/node-typescript/stryker-typescript/SKILL.md)) and the shared [mutation-testing](../language-skills/mutation-testing/protocol.md) protocol.
+This copies the portable workflow pieces (`.github/agents`, `.github/hooks`, `.github/skills`, `.github/tools/workflow-check`, and `.github/user-interaction.md`) along with the TypeScript skills ([eslint-typescript](../language-skills/node-typescript/eslint-typescript/SKILL.md), [vitest-typescript](../language-skills/node-typescript/vitest-typescript/SKILL.md), [stryker-typescript](../language-skills/node-typescript/stryker-typescript/SKILL.md)) and the shared [mutation-testing](../language-skills/mutation-testing/protocol.md) protocol.
 
 ```powershell
 $workflowSrc = "C:\Projects\Personal.Workflow"
@@ -58,7 +60,6 @@ Copy-Item -Recurse "$workflowSrc\.github\hooks"                 ".github\hooks"
 Copy-Item -Recurse "$workflowSrc\.github\skills\*"              ".github\skills"
 Copy-Item -Recurse "$workflowSrc\.github\tools\workflow-check"  ".github\tools\workflow-check"
 Copy-Item          "$workflowSrc\.github\user-interaction.md"   ".github\user-interaction.md"
-Copy-Item          "$workflowSrc\AGENTS.md"                     "AGENTS.md"
 
 # Copy Node.js TypeScript language skills + shared mutation-testing protocol
 Copy-Item -Recurse "$workflowSrc\language-skills\node-typescript\eslint-typescript"  ".github\skills\eslint-typescript"
@@ -81,21 +82,21 @@ reports/
 '@ | Set-Content -Path .gitignore
 
 git add .
-git commit -m "chore: initialize csv-stats repository with personal workflow"
+git commit -m "chore(calc-repl): initialize calc-repl repository with personal workflow"
 git status --short
 ```
 
 ### 1.5 Open the new repository in VS Code
 
 ```powershell
-code C:\Projects\csv-stats
+code C:\Projects\calc-repl
 ```
 
 ---
 
 ## Part 2: Configure the TypeScript Language Skills (Copilot Chat)
 
-Open Copilot Chat in the `C:\Projects\csv-stats` workspace. Configure the skills in order: **TypeScript + ESLint + Prettier** → **Vitest** → **StrykerJS**.
+Open Copilot Chat in the `C:\Projects\calc-repl` workspace. Configure the skills in order: **TypeScript + ESLint + Prettier** → **Vitest** → **StrykerJS**.
 
 ### 2.1 Configure TypeScript + typescript-eslint + Prettier
 
@@ -133,7 +134,7 @@ Type in **Copilot Chat**:
 
 The skill installs `vitest`, creates `vitest.config.ts` and `vitest.unit.config.ts`, adds `"test": "vitest run"` and `"test:unit": "vitest run --config vitest.unit.config.ts"` to `package.json`, and verifies that `npm run typecheck`, `npx vitest run`, and `npm run test:unit` all pass.
 
-> **Important:** Vitest strips types without type-checking them. That is why `vitest-typescript` puts `npm run typecheck && npm run build` in front of `npx vitest run` in the phase `Harness` and `Gate` lines, and why relative imports inside `.ts` files use the `.js` extension (`import { stats } from "../src/stats.js";`) required by `"module": "nodenext"`.
+> **Important:** Vitest strips types without type-checking them. That is why `vitest-typescript` puts `npm run typecheck && npm run build` in front of `npx vitest run` in the phase `Harness` and `Gate` lines, and why relative imports inside `.ts` files use the `.js` extension (`import { evaluate } from "../src/evaluate.js";`) required by `"module": "nodenext"`.
 
 Commit the harness setup in **Copilot Chat**:
 
@@ -166,7 +167,7 @@ node .github\skills\stryker-typescript\scripts\mutation-gate.mjs --since <phase-
 
 ---
 
-## Part 3: Build `csv-stats` End-to-End with the Workflow
+## Part 3: Build `calc-repl` End-to-End with the Workflow
 
 Verify your working tree is clean before starting:
 
@@ -181,7 +182,7 @@ git status --short
 Type in **Copilot Chat**:
 
 ```text
-/brain-storm I want to build a small Node.js TypeScript CLI called csv-stats that reads a CSV file and prints the row count plus min, max, and average for a chosen numeric column. It should support --column, --delimiter, and --json output, and exit non-zero on missing files, unknown columns, or non-numeric values.
+/brain-storm I want to build an interactive integer calculator REPL called calc-repl in Node.js TypeScript with zero external runtime dependencies. It reads arithmetic expressions from stdin, evaluates binary +, -, *, and / with standard operator precedence (* and / before + and -), uses truncating integer division toward zero (for example, 7 / 2 = 3), reports a clear error on divide-by-zero or invalid expressions and re-prompts without crashing the loop, and exits cleanly on exit, quit, or EOF.
 ```
 
 **What happens:**
@@ -194,7 +195,7 @@ Type in **Copilot Chat**:
 
 - `.workflow/sessions/context-YYYY-MM-DD-HHmm.md` (`Status: final`)
 - `.workflow/language.md`
-- Runs `node .github/tools/workflow-check/bin/workflow-check.mjs` automatically and commits `docs(workflow): session csv-stats`.
+- Runs `node .github/tools/workflow-check/bin/workflow-check.mjs` automatically and commits `docs(workflow): session calc-repl`.
 
 ---
 
@@ -203,7 +204,7 @@ Type in **Copilot Chat**:
 Start a **new Copilot Chat session** and type:
 
 ```text
-/behavior-spec csv-stats
+/behavior-spec calc-repl
 ```
 
 **What happens:**
@@ -214,8 +215,8 @@ Start a **new Copilot Chat session** and type:
 
 **Outputs created & auto-committed:**
 
-- `.workflow/specs/csv-stats-spec.md`
-- Auto-commits `docs(csv-stats): specify behavior`.
+- `.workflow/specs/calc-repl-spec.md`
+- Auto-commits `docs(calc-repl): specify behavior`.
 
 ---
 
@@ -227,12 +228,14 @@ Start a **new Copilot Chat session** and type:
 /pull-work
 ```
 
+**Black-box REPL testing:** acceptance tests treat `calc-repl` as a black box. They either pipe multi-line input over `stdin` (for example, `2 + 3 * 4` followed by `exit`) into `node dist/cli.js`, or spawn `node dist/cli.js` with redirected `stdin`, `stdout`, and `stderr` and assert on the captured output and exit code. Tests never import `src/`, so the same scenarios hold regardless of internal structure.
+
 From here on, `/pull-work` drives the workflow automatically until a **Checkpoint** or phase completion:
 
 1. **Plan Mode (automatic):**
    - `repo-scout` inspects `package.json`, `tsconfig.json`, `tsconfig.build.json`, `vitest.config.ts`, and `eslint.config.js`.
-   - Creates `.workflow/plans/csv-stats/plan.md` and `.workflow/plans/csv-stats/phase-01.md`.
-   - Commits `docs(csv-stats): plan P01`.
+   - Creates `.workflow/plans/calc-repl/plan.md` and `.workflow/plans/calc-repl/phase-01.md`.
+   - Commits `docs(calc-repl): plan P01`.
 
 2. **Setup-Card Checkpoint (if the phase needs harness setup, e.g., `tests/support/cli.ts` spawning `dist/cli.js`):**
    - Reply in **Copilot Chat**:
@@ -250,11 +253,11 @@ From here on, `/pull-work` drives the workflow automatically until a **Checkpoin
      approve all
      ```
 
-   - Commits and locks the acceptance tests (`test(csv-stats): lock P01 acceptance tests` + `docs(csv-stats): start P01`). The pre-tool hook in [locked-tests.json](../.github/hooks/locked-tests.json) now blocks edits to locked acceptance tests.
+   - Commits and locks the acceptance tests (`test(calc-repl): lock P01 acceptance tests` + `docs(calc-repl): start P01`). The pre-tool hook in [locked-tests.json](../.github/hooks/locked-tests.json) now blocks edits to locked acceptance tests.
 
 4. **Dispatch (automatic):**
    - `main` cards build core structure/types in the main session; `delegate` cards run in parallel on the `coder` subagent.
-   - Each slice runs `npm run typecheck && npm run build && npx vitest run -t "\[(...)\]"`, runs [fixture-leak.mjs](../.github/skills/pull-work/scripts/fixture-leak.mjs) on `delegate` cards, and commits (`feat(csv-stats): <slice name>`).
+   - Each slice runs `npm run typecheck && npm run build && npx vitest run -t "\[(...)\]"`, runs [fixture-leak.mjs](../.github/skills/pull-work/scripts/fixture-leak.mjs) on `delegate` cards, and commits (`feat(calc-repl): <slice name>`).
 
 5. **Phase Gate & Critical-Code Review (automatic):**
    - Runs all 4 gate checks:
@@ -273,38 +276,34 @@ From here on, `/pull-work` drives the workflow automatically until a **Checkpoin
 
 ### Step 4 — Verify Your Finished CLI (PowerShell)
 
-Once `Next: done` is reached, build and run the CLI directly in PowerShell:
+Once `Next: done` is reached, build and run the REPL directly in PowerShell:
 
 ```powershell
 # Build dist/
 npm run build
 
-# Create a sample CSV file
+# Pipe a multi-line session into the built REPL
 @"
-item,price,qty
-apple,1.50,4
-banana,0.75,10
-cherry,3.25,2
-"@ | Set-Content -Path sample.csv
-
-# Run the built CLI
-node dist\cli.js sample.csv --column price
-node dist\cli.js sample.csv --column price --json
+2 + 3 * 4
+7 / 2
+10 / 0
+2 + * 3
+exit
+"@ | node dist\cli.js
 Write-Host "Exit code: $LASTEXITCODE"
 
 # Run the full local verification suite
 npm run typecheck
 npm run lint
 npm run format:check
+npm run build
 npx vitest run
 npm run test:unit
 ```
 
-Clean up your scratch CSV file when done:
+The piped session should print `14` for `2 + 3 * 4`, `3` for `7 / 2`, a clear error for `10 / 0` and for `2 + * 3` (the REPL re-prompts after each error without crashing), and exit cleanly on `exit`, so `$LASTEXITCODE` should be `0`.
 
-```powershell
-Remove-Item sample.csv
-```
+Running `node dist\cli.js` without piped input starts an interactive session: type one expression per line, and type `exit` (or `quit`, or press `Ctrl+Z` then `Enter` for end-of-input) to leave.
 
 ---
 
@@ -313,13 +312,15 @@ Remove-Item sample.csv
 - **Report a spec bug:** in a new Copilot Chat session, run:
 
   ```text
-  /pull-work csv-stats bug: negative numbers in the target column are rejected as non-numeric
+  /pull-work calc-repl bug: chained subtraction like 10 - 3 - 2 returns 9 instead of 5
   ```
 
-- **Add a new feature (e.g., `--median`):**
-  1. New chat: `/brain-storm Add a --median flag to include the median in csv-stats output`
-  2. New chat: `/behavior-spec csv-stats`
+- **Add new features (unary negatives, parentheses, and `^` exponents) in one pass:**
+  1. New chat: `/brain-storm Add unary negative numbers (for example, -5 + 2 = -3), parentheses for grouping (for example, (2 + 3) * 4 = 20), and integer exponents using ^ (for example, 2 ^ 3 = 8), reporting negative exponents like 2 ^ -3 as an unsupported error and re-prompting without crashing.`
+  2. New chat: `/behavior-spec calc-repl`
   3. New chat: `/pull-work` *(auto-reconciles the updated spec into a new phase)*
+
+> **Note:** These three features can alternatively be split into separate smaller passes (for example, unary negatives first, then parentheses, then `^`), each running its own new-chat cycle. Smaller passes produce smaller phases that are easier to review, at the cost of more round trips.
 
 ---
 
