@@ -45,6 +45,7 @@ If any is missing, skip it. Routine or easily reversed choices do not get an ADR
 
 1. The `Status` line and title of every file in `.workflow/adr/`, to continue numbering and catch a duplicate or contradicting decision. Open a body only when its title overlaps this decision.
 2. The approved candidate in `plan.md` (decision, alternatives, reason), or the user's description when invoked ad hoc.
+3. Optional: `.workflow/language.md`; when present, read it and use its canonical terms; when absent, proceed without it and skip Glossary grounding.
 
 ## Workflow
 

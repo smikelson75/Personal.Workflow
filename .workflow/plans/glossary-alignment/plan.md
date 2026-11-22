@@ -2,7 +2,7 @@
 
 - Spec: [glossary-alignment-spec.md](../../specs/glossary-alignment-spec.md)
 - Lane: standard
-- Next: P02 S04
+- Next: gate P02
 - Tests locked: `d80c964`
 - Oracle: `tests/glossary-alignment`
 - Phase base: `d80c964`
@@ -26,7 +26,7 @@
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
 | P01 | Glossary, language-addons rename, and walkthrough alignment | completed | R29, R30, R31, Q-zero-workflow-check-errors, Q-zero-stale-language-skills-references | [phase-01](phase-01.md) |
-| P02 | Workflow Core prose and Glossary contracts | in progress | R32, R33, R34, Q-zero-vocabulary-drift, Q-suite-preservation | [phase-02](phase-02.md) |
+| P02 | Workflow Core prose and Glossary contracts | gating | R32, R33, R34, Q-zero-vocabulary-drift, Q-suite-preservation | [phase-02](phase-02.md) |
 
 ## P02 slices
 
@@ -35,5 +35,5 @@
 | S01 | Glossary presence check helper | completed |
 | S02 | Remove vocabulary drift from Workflow Core prose | completed |
 | S03 | Glossary required input for pull-work, test-author, test-reviewer | completed |
-| S04 | Optional Glossary for adr-writer and repo-scout; coder stays closed-world | ready |
+| S04 | Optional Glossary for adr-writer and repo-scout; coder stays closed-world | completed |
 

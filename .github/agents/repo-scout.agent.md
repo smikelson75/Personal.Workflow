@@ -12,6 +12,8 @@ reasoning-effort: low
 
 Asks the Developer: never - stop and report to the caller.
 
+Optional input: `.workflow/language.md`. When present, read it and use its canonical terms; when absent, proceed without it and skip Glossary grounding.
+
 Answer only the questions you are given about the repository. Never modify files. Run only commands that read state or run existing tests; never install, build artifacts outside the usual output folders, or change configuration.
 
 Return a fact sheet, one bullet per question:
