@@ -2,7 +2,7 @@
 
 - Spec: [glossary-alignment-spec.md](../../specs/glossary-alignment-spec.md)
 - Lane: standard
-- Next: running S01
+- Next: P01 S02
 - Tests locked: `0fcc4f8`
 - Oracle: `tests/glossary-alignment`
 - Phase base: `bfd0b22`
@@ -32,6 +32,6 @@
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Rename language-skills to language-addons and verify Glossary | in progress |
+| S01 | Rename language-skills to language-addons and verify Glossary | completed |
 | S02 | Align walkthroughs to canonical vocabulary | ready |
 | S03 | Repair S01 fixture for executable paths with spaces | completed |

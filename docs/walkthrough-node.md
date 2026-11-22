@@ -43,7 +43,7 @@ npm pkg set name="calc-repl" version="0.1.0" type="module" engines.node=">=22.12
 
 ### 1.3 Copy the core workflow and Node.js language skills
 
-This copies the portable workflow pieces (`.github/agents`, `.github/hooks`, `.github/skills`, `.github/tools/workflow-check`, and `.github/user-interaction.md`) along with the Node.js JavaScript skills ([eslint-javascript](../language-skills/node-javascript/eslint-javascript/SKILL.md), [vitest-javascript](../language-skills/node-javascript/vitest-javascript/SKILL.md), [stryker-javascript](../language-skills/node-javascript/stryker-javascript/SKILL.md)) and the shared [mutation-testing](../language-skills/mutation-testing/protocol.md) protocol that `stryker-javascript` links to.
+This copies the portable workflow pieces (`.github/agents`, `.github/hooks`, `.github/skills`, `.github/tools/workflow-check`, and `.github/user-interaction.md`) along with the Node.js JavaScript skills ([eslint-javascript](../language-addons/node-javascript/eslint-javascript/SKILL.md), [vitest-javascript](../language-addons/node-javascript/vitest-javascript/SKILL.md), [stryker-javascript](../language-addons/node-javascript/stryker-javascript/SKILL.md)) and the shared [mutation-testing](../language-addons/mutation-testing/protocol.md) protocol that `stryker-javascript` links to.
 
 ```powershell
 $workflowSrc = "C:\Projects\Personal.Workflow"
@@ -59,10 +59,10 @@ Copy-Item -Recurse "$workflowSrc\.github\tools\workflow-check"  ".github\tools\w
 Copy-Item          "$workflowSrc\.github\user-interaction.md"   ".github\user-interaction.md"
 
 # Copy Node.js JavaScript language skills + shared mutation-testing protocol
-Copy-Item -Recurse "$workflowSrc\language-skills\node-javascript\eslint-javascript"  ".github\skills\eslint-javascript"
-Copy-Item -Recurse "$workflowSrc\language-skills\node-javascript\vitest-javascript"  ".github\skills\vitest-javascript"
-Copy-Item -Recurse "$workflowSrc\language-skills\node-javascript\stryker-javascript" ".github\skills\stryker-javascript"
-Copy-Item -Recurse "$workflowSrc\language-skills\mutation-testing"                   ".github\skills\mutation-testing"
+Copy-Item -Recurse "$workflowSrc\language-addons\node-javascript\eslint-javascript"  ".github\skills\eslint-javascript"
+Copy-Item -Recurse "$workflowSrc\language-addons\node-javascript\vitest-javascript"  ".github\skills\vitest-javascript"
+Copy-Item -Recurse "$workflowSrc\language-addons\node-javascript\stryker-javascript" ".github\skills\stryker-javascript"
+Copy-Item -Recurse "$workflowSrc\language-addons\mutation-testing"                   ".github\skills\mutation-testing"
 ```
 
 ### 1.4 Add `.gitignore` and make the initial commit
@@ -137,7 +137,7 @@ Commit the harness setup in **Copilot Chat**:
 
 ### 2.3 Configure StrykerJS (Mutation Testing)
 
-Per [stryker-javascript/SKILL.md](../language-skills/node-javascript/stryker-javascript/SKILL.md) and [protocol.md](../language-skills/mutation-testing/protocol.md), **wait to run `/stryker-javascript baseline` until at least one unit test exists** (during or right after Phase 1 setup). Running it before any unit tests exist will stop with *"no unit tests"*.
+Per [stryker-javascript/SKILL.md](../language-addons/node-javascript/stryker-javascript/SKILL.md) and [protocol.md](../language-addons/mutation-testing/protocol.md), **wait to run `/stryker-javascript baseline` until at least one unit test exists** (during or right after Phase 1 setup). Running it before any unit tests exist will stop with *"no unit tests"*.
 
 Once your first unit test exists, run in **Copilot Chat**:
 
@@ -151,7 +151,7 @@ It installs `@stryker-mutator/core` and `@stryker-mutator/vitest-runner`, confir
 node .github\skills\stryker-javascript\scripts\mutation-gate.mjs --since <phase-start-ref>
 ```
 
-> **Tip about `mutation-addon.mjs`:** [work-planner](../.github/skills/work-planner/SKILL.md) auto-detects mutation skills via [mutation-addon.mjs](../.github/skills/work-planner/scripts/mutation-addon.mjs), which looks for `- **Mutation stack:**` and `- **Mutation command:**` lines in `.github/skills/*/SKILL.md`. If you want `work-planner` to auto-populate the mutation gate line without copying it manually from [vitest-javascript/SKILL.md](../language-skills/node-javascript/vitest-javascript/SKILL.md), add these two lines to `.github/skills/stryker-javascript/SKILL.md` in your target repo:
+> **Tip about `mutation-addon.mjs`:** [work-planner](../.github/skills/work-planner/SKILL.md) auto-detects mutation skills via [mutation-addon.mjs](../.github/skills/work-planner/scripts/mutation-addon.mjs), which looks for `- **Mutation stack:**` and `- **Mutation command:**` lines in `.github/skills/*/SKILL.md`. If you want `work-planner` to auto-populate the mutation gate line without copying it manually from [vitest-javascript/SKILL.md](../language-addons/node-javascript/vitest-javascript/SKILL.md), add these two lines to `.github/skills/stryker-javascript/SKILL.md` in your target repo:
 >
 > ```markdown
 > - **Mutation stack:** node-javascript
@@ -261,7 +261,7 @@ From here on, `/pull-work` is the **only command you need**. It Reads `Next:` in
 5. **Phase Gate & Critical-Code Review (automatic):**
    - Runs all 4 gate checks:
      1. **Suite:** `npm run lint && npm run format:check && npx vitest run`
-     2. **Traceability:** `node .github/skills/vitest-javascript/scripts/trace.mjs <scenario-IDs>` (from [trace.mjs](../language-skills/node-javascript/vitest-javascript/scripts/trace.mjs))
+     2. **Traceability:** `node .github/skills/vitest-javascript/scripts/trace.mjs <scenario-IDs>` (from [trace.mjs](../language-addons/node-javascript/vitest-javascript/scripts/trace.mjs))
      3. **Lock check:** `git diff --exit-code <Tests locked> -- tests/acceptance`
      4. **Mutation gate:** `node .github/skills/stryker-javascript/scripts/mutation-gate.mjs --since <phase-start-ref>` (or skipped if not yet enabled)
    - Runs the `code-review` agent once on any cards marked `Review: required`.

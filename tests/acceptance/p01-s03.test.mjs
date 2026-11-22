@@ -430,7 +430,7 @@ test('[Q-powershell-copy-pasteability] every Parts 1-4 PowerShell block parses a
   const items = [];
   const slashProblems = [];
   const forwardSlashPath =
-    /(?:^|[\s"'(=])(?:[A-Za-z]:\/|(?:\.github|src|bin|dist|tests|language-skills)\/)|\$\w+\/[\w.]/;
+    /(?:^|[\s"'(=])(?:[A-Za-z]:\/|(?:\.github|src|bin|dist|tests|language-addons)\/)|\$\w+\/[\w.]/;
 
   for (const { file } of ALL) {
     const d = doc(file);

@@ -32,7 +32,7 @@ git --version
 
 ### 1.2 Create the solution, projects, and local `dotnet-stryker` tool manifest
 
-Keeping business logic in `CalcRepl.Core` and thin read-eval-print wiring in `CalcRepl.Cli` matches [stryker-dotnet/SKILL.md](../language-skills/csharp/stryker-dotnet/SKILL.md): Stryker.NET mutates `CalcRepl.Core` using `CalcRepl.UnitTests`, while `CalcRepl.AcceptanceTests` drives the compiled REPL binary as a black box.
+Keeping business logic in `CalcRepl.Core` and thin read-eval-print wiring in `CalcRepl.Cli` matches [stryker-dotnet/SKILL.md](../language-addons/csharp/stryker-dotnet/SKILL.md): Stryker.NET mutates `CalcRepl.Core` using `CalcRepl.UnitTests`, while `CalcRepl.AcceptanceTests` drives the compiled REPL binary as a black box.
 
 ```powershell
 New-Item -ItemType Directory -Path C:\Projects\calc-repl | Out-Null
@@ -68,7 +68,7 @@ dotnet test
 
 ### 1.3 Copy the core workflow and C# language skills
 
-This copies the portable workflow pieces (`.github/agents`, `.github/hooks`, `.github/skills`, `.github/tools/workflow-check`, and `.github/user-interaction.md`) along with the C# skills ([dotnet-editorconfig](../language-skills/csharp/dotnet-editorconfig/SKILL.md), [stryker-dotnet](../language-skills/csharp/stryker-dotnet/SKILL.md)) and the shared [mutation-testing](../language-skills/mutation-testing/protocol.md) protocol.
+This copies the portable workflow pieces (`.github/agents`, `.github/hooks`, `.github/skills`, `.github/tools/workflow-check`, and `.github/user-interaction.md`) along with the C# skills ([dotnet-editorconfig](../language-addons/csharp/dotnet-editorconfig/SKILL.md), [stryker-dotnet](../language-addons/csharp/stryker-dotnet/SKILL.md)) and the shared [mutation-testing](../language-addons/mutation-testing/protocol.md) protocol.
 
 ```powershell
 $workflowSrc = "C:\Projects\Personal.Workflow"
@@ -84,9 +84,9 @@ Copy-Item -Recurse "$workflowSrc\.github\tools\workflow-check"  ".github\tools\w
 Copy-Item          "$workflowSrc\.github\user-interaction.md"   ".github\user-interaction.md"
 
 # Copy C# language skills + shared mutation-testing protocol
-Copy-Item -Recurse "$workflowSrc\language-skills\csharp\dotnet-editorconfig" ".github\skills\dotnet-editorconfig"
-Copy-Item -Recurse "$workflowSrc\language-skills\csharp\stryker-dotnet"      ".github\skills\stryker-dotnet"
-Copy-Item -Recurse "$workflowSrc\language-skills\mutation-testing"           ".github\skills\mutation-testing"
+Copy-Item -Recurse "$workflowSrc\language-addons\csharp\dotnet-editorconfig" ".github\skills\dotnet-editorconfig"
+Copy-Item -Recurse "$workflowSrc\language-addons\csharp\stryker-dotnet"      ".github\skills\stryker-dotnet"
+Copy-Item -Recurse "$workflowSrc\language-addons\mutation-testing"           ".github\skills\mutation-testing"
 ```
 
 ### 1.4 Ignore Stryker output and make the initial commit
@@ -144,7 +144,7 @@ Commit the code-style setup in **Copilot Chat**:
 
 ### 2.2 Configure Stryker.NET (Mutation Testing)
 
-Per [stryker-dotnet/SKILL.md](../language-skills/csharp/stryker-dotnet/SKILL.md) and [protocol.md](../language-skills/mutation-testing/protocol.md), **wait to run `/stryker-dotnet baseline` until `CalcRepl.UnitTests` has at least one real unit test covering `CalcRepl.Core`** (during or right after Phase 1 setup).
+Per [stryker-dotnet/SKILL.md](../language-addons/csharp/stryker-dotnet/SKILL.md) and [protocol.md](../language-addons/mutation-testing/protocol.md), **wait to run `/stryker-dotnet baseline` until `CalcRepl.UnitTests` has at least one real unit test covering `CalcRepl.Core`** (during or right after Phase 1 setup).
 
 Once your first unit test exists, run in **Copilot Chat**:
 

@@ -46,7 +46,7 @@ npm install --save-dev typescript@~6.0.3
 
 ### 1.3 Copy the core workflow and TypeScript language skills
 
-This copies the portable workflow pieces (`.github/agents`, `.github/hooks`, `.github/skills`, `.github/tools/workflow-check`, and `.github/user-interaction.md`) along with the TypeScript skills ([eslint-typescript](../language-skills/node-typescript/eslint-typescript/SKILL.md), [vitest-typescript](../language-skills/node-typescript/vitest-typescript/SKILL.md), [stryker-typescript](../language-skills/node-typescript/stryker-typescript/SKILL.md)) and the shared [mutation-testing](../language-skills/mutation-testing/protocol.md) protocol.
+This copies the portable workflow pieces (`.github/agents`, `.github/hooks`, `.github/skills`, `.github/tools/workflow-check`, and `.github/user-interaction.md`) along with the TypeScript skills ([eslint-typescript](../language-addons/node-typescript/eslint-typescript/SKILL.md), [vitest-typescript](../language-addons/node-typescript/vitest-typescript/SKILL.md), [stryker-typescript](../language-addons/node-typescript/stryker-typescript/SKILL.md)) and the shared [mutation-testing](../language-addons/mutation-testing/protocol.md) protocol.
 
 ```powershell
 $workflowSrc = "C:\Projects\Personal.Workflow"
@@ -62,10 +62,10 @@ Copy-Item -Recurse "$workflowSrc\.github\tools\workflow-check"  ".github\tools\w
 Copy-Item          "$workflowSrc\.github\user-interaction.md"   ".github\user-interaction.md"
 
 # Copy Node.js TypeScript language skills + shared mutation-testing protocol
-Copy-Item -Recurse "$workflowSrc\language-skills\node-typescript\eslint-typescript"  ".github\skills\eslint-typescript"
-Copy-Item -Recurse "$workflowSrc\language-skills\node-typescript\vitest-typescript"  ".github\skills\vitest-typescript"
-Copy-Item -Recurse "$workflowSrc\language-skills\node-typescript\stryker-typescript" ".github\skills\stryker-typescript"
-Copy-Item -Recurse "$workflowSrc\language-skills\mutation-testing"                   ".github\skills\mutation-testing"
+Copy-Item -Recurse "$workflowSrc\language-addons\node-typescript\eslint-typescript"  ".github\skills\eslint-typescript"
+Copy-Item -Recurse "$workflowSrc\language-addons\node-typescript\vitest-typescript"  ".github\skills\vitest-typescript"
+Copy-Item -Recurse "$workflowSrc\language-addons\node-typescript\stryker-typescript" ".github\skills\stryker-typescript"
+Copy-Item -Recurse "$workflowSrc\language-addons\mutation-testing"                   ".github\skills\mutation-testing"
 ```
 
 ### 1.4 Add `.gitignore` and make the initial commit
@@ -144,7 +144,7 @@ Commit the harness setup in **Copilot Chat**:
 
 ### 2.3 Configure StrykerJS with the TypeScript Checker
 
-Per [stryker-typescript/SKILL.md](../language-skills/node-typescript/stryker-typescript/SKILL.md) and [protocol.md](../language-skills/mutation-testing/protocol.md), **wait to run `/stryker-typescript baseline` until at least one unit test exists** (during or right after Phase 1 setup).
+Per [stryker-typescript/SKILL.md](../language-addons/node-typescript/stryker-typescript/SKILL.md) and [protocol.md](../language-addons/mutation-testing/protocol.md), **wait to run `/stryker-typescript baseline` until at least one unit test exists** (during or right after Phase 1 setup).
 
 Once your first unit test exists and `npm run typecheck` passes, run in **Copilot Chat**:
 
