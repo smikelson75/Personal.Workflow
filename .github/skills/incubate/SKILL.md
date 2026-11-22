@@ -7,17 +7,17 @@ user-invocable: true
 
 # Incubate
 
-Question rules: follow `.github/user-interaction.md`.
+Question rules: follow `.github/user-interaction.md` with the incubation rules below.
 
 Work through the meaning, implications, and tradeoffs of an early idea through back-and-forth conversation, visual models, and targeted web research. Unlike `brain-storm`, the goal is understanding—not requirements. Many incubations stay paused or get dropped; only graduate an idea when the user decides it is worth building.
 
-Never write numbered `R#` Requirements, never edit `.workflow/language.md` or `.workflow/sessions/`, and never write implementation code here.
+Never write numbered `R#` Requirements, never edit `.workflow/language.md` or `.workflow/sessions/`, never write implementation code, and do not drift into implementation design (file layouts, generator script specs, exact IDs/naming schemes). Never label unverified external or environment assumptions as "settled" or "solved."
 
 ## 1. Resume or Ground First
 
 Before asking anything:
 
-1. **Resuming an existing incubation:** If the user names a file in `.workflow/incubations/<slug>.md`, read it first. Open with a brief recap of the current mental model (including its latest diagram or table if helpful), open threads, and the "Pick Up Here" prompt, then ask where they want to steer next.
+1. **Resuming an existing incubation:** If the user names a file in `.workflow/incubations/<slug>.md`, read it first. Open with a brief recap of the current mental model (including its latest diagram or table if helpful), open threads, and the "Pick Up Here" note. Ask first whether the previous **Pick Up Here** action or verification probe was completed before stacking new design on top of unverified assumptions.
 2. **External URLs:** If the user shares one or more URLs, fetch them immediately with `web_fetch`. Unpack the source into two distinct buckets:
    - what the source actually proposes (its core idea and its specific mechanics);
    - where it appears to align or collide with the user's current context.
@@ -25,13 +25,13 @@ Before asking anything:
    - Read `.workflow/language.md` (if present, read-only) so you use the repository's existing vocabulary.
    - If the idea touches existing code, skills, or workflows, launch one `explore` subagent (<=250 words) focused on what exists today and what the idea would touch or disrupt.
    - Never auto-scan other files in `.workflow/incubations/`.
-4. **Opening brief:** Share a concise grounding brief plus an initial **visual sketch** (a Mermaid diagram or a side-by-side comparison table) showing your starting read of the idea, any fetched sources, and how it touches the current repo. Invite the user to react, correct, or pull on any thread.
+4. **Opening brief (shown once):** Share a concise grounding brief plus an initial **visual sketch** (a Mermaid diagram or a side-by-side comparison table) showing your starting read of the idea, any fetched sources, and how it touches the current repo. Invite the user to react, correct, or pull on any thread.
 
-Remind the user at the start that they can always say `"draw this"`, `"look up <topic>"`, `"challenge this"`, `"pause"`, `"drop it"`, or `"ready for brain-storm"`.
+Remind the user **once at session start** that they can always say `"draw this"`, `"look up <topic>"`, `"challenge this"`, `"pause"`, `"drop it"`, or `"ready for brain-storm"`. Do not repeat this reminder or re-print the opening brief on later turns.
 
-## 2. Communicate Visually
+## 2. Communicate Visually (Delta-Only After Turn 1)
 
-Do not rely on walls of prose. Proactively use **Mermaid diagrams** and **structured comparison tables** both in chat and inside the incubation note, updating them whenever the mental model shifts:
+Do not rely on walls of prose. Proactively use **Mermaid diagrams** and **structured comparison tables** both in chat and inside the incubation note:
 
 - **`mindmap` or `flowchart`:** map the parts of an idea, system boundaries, or ripple effects across existing skills, repositories, or stacks.
 - **`sequenceDiagram` or `stateDiagram-v2`:** trace how a workflow or lifecycle would feel in practice.
@@ -39,12 +39,17 @@ Do not rely on walls of prose. Proactively use **Mermaid diagrams** and **struct
 
 Keep each diagram focused and scannable (roughly 5–12 nodes; split into two small diagrams rather than one dense graph). Always pair a visual with 1–2 plain-language sentences highlighting the main tension or question it surfaces.
 
+After the opening brief, **share only what shifted** on each turn. Do not re-print unchanged recaps, tables, or diagrams—refresh a visual only when the mental model actually changes.
+
 ## 3. Conversational Sense-Making
 
 This is an unrushed, collaborative exploration—not a decision tree to finish and not an interrogation. Follow what the user is trying to understand.
 
-- Ask one question at a time, following `.github/user-interaction.md` (where we are, why it matters, options with tradeoffs and a recommendation when the answer space is known, in plain language).
-- When the user shares a thought, reflect back what changed in the shared understanding, surface implications or hidden tensions, and refresh a diagram or table when the picture shifts.
+- **Never call `ask_user` in `/incubate`.** Ask all questions directly in plain chat prose, explicitly overriding any default tool preference for structured forms.
+- **Keep every exploratory question open-ended and grounded.** Never present multiple-choice radio menus, numbered *"which thread next?"* routing lists, or `(Recommended)` defaults—in incubation, the answer space is intentionally unsettled. Instead, lay out the relevant context, tensions, or concrete angles in your prose/visuals first (including simpler alternatives), then end with **one** open-ended question inviting the user's own reaction, framing, or real-world constraints.
+- **Answer direct questions in visible chat first.** Whenever the user asks a direct question, answer it in full in visible chat text before asking any follow-up. Never claim an answer, playbook, or artifact was shown if it only exists in reasoning or an unwritten file.
+- **One question at a time & confirm terse replies.** Follow `.github/user-interaction.md`: ask one question per turn in plain language, confirm brief or ambiguous replies before treating them as settled, and never bundle a confirmation with the next question.
+- When the user shares a thought, reflect back what changed in the shared understanding, surface implications or hidden tensions, and refresh a diagram or table only when the picture shifts.
 - Push back constructively when a borrowed pattern looks heavier than its payoff, clashes with existing principles, or hides an unstated assumption.
 - Pull from these exploratory lenses only when they fit the moment:
   - **Essence vs. Implementation:** What is the real insight underneath someone else's implementation? What would we keep, reshape, or throw away?
@@ -68,14 +73,16 @@ Each incubation lives in one editable markdown file:
 - Unlike `brain-storm` sessions, **update this file in place** across sessions so it always reflects current thinking.
 - Do not edit `.workflow/language.md` or `.workflow/sessions/`, and do not run `workflow-check` (it intentionally ignores `.workflow/incubations/`).
 
-The user decides when to stop. Three exit states:
+The user decides when to stop. Before wrapping up as `incubating` or `graduated`, if the emerging model has grown noticeably heavier than the original spark (multiple layers, new scripts, cross-repo mechanics), proactively run one brief **Steelman vs. Simplest 80/20 Version** check in chat rather than waiting for the user to ask `"challenge this"`.
+
+Three exit states:
 
 1. **`incubating` (pause):** Update the note with the latest mental model, visuals, tensions, sources, open threads, and a crisp **Pick Up Here** note so a later session can resume cleanly.
 2. **`dropped`:** Record **Why Dropped** (and what would need to change to revisit it) so future sessions do not re-tread the same ground.
 3. **`graduated`:** Write a crisp **Graduation Framing** (the distilled idea, what is kept vs. rejected, and key tensions to resolve) and give the user the exact handoff prompt:
    `/brain-storm from .workflow/incubations/<slug>.md`
 
-Before writing on exit, briefly summarize what you are about to record and confirm the exit state (`incubating`, `dropped`, or `graduated`).
+Before writing on exit, briefly summarize in plain chat text what you are about to record and invite any corrections before saving as `incubating`, `dropped`, or `graduated` (still without calling `ask_user`).
 
 ## 6. Commit
 

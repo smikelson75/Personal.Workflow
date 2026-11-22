@@ -13,7 +13,7 @@ Updated: YYYY-MM-DD
 - What kicked this off (1-3 sentences) and what we are trying to understand.
 
 ## Current Mental Model
-- Short synthesis of how we currently understand the idea—what it means to us, separated from any external implementation.
+- Short synthesis of our current leanings—what the idea means to us, separated from any external implementation. Keep unverified assumptions explicitly tentative.
 
 ```mermaid
 flowchart LR
@@ -28,6 +28,8 @@ flowchart LR
 
 ## Tensions & Tradeoffs
 - Unresolved frictions, ripple effects on existing workflows/stacks, or competing framings.
+- **Simplest 80/20 baseline:** *(Include when the emerging model has multiple moving parts)* What is the lightest version that captures most of the value, and what does the heavier version actually buy over it?
+- **Assumptions to verify:** Anything not yet tested in practice (avoid labeling unverified points "settled" or "solved").
 
 ## Sources
 - [<Title>](<url>) — 1-line summary of what it claims and what mattered to us. (Write `- none` if no external sources were used.)
@@ -49,6 +51,7 @@ flowchart LR
 
 Rules:
 - Keep it scannable: update sections in place rather than appending a transcript.
+- Use tentative language ("current leanings", "assumptions to verify") for anything not yet validated in practice—never label unverified assumptions "settled" or "solved."
 - Include at least one visual (Mermaid diagram and/or comparison table) whenever the idea has moving parts or tradeoffs.
 - Never add numbered `R#` Requirements here—those belong in `brain-storm`.
 - Never mutate `.workflow/language.md` or `.workflow/sessions/`.
