@@ -2,7 +2,7 @@
 
 - Spec: [calc-repl-walkthroughs-spec.md](../../specs/calc-repl-walkthroughs-spec.md)
 - Lane: standard
-- Next: gate P01
+- Next: done
 - Tests locked: `0567320`
 - Oracle: `tests/acceptance`
 - Phase base: `9a3ff11`
@@ -11,10 +11,10 @@
 ## Current state
 - stack: Markdown walkthrough docs under `docs/`; acceptance tests in Node ES modules (`.mjs`, built-in `node:test`, zero dependencies) under `tests/acceptance/`, reusing `.github/tools/workflow-core/support/harness.mjs` read-only.
 - harness: `node --test --test-reporter=tap "tests/acceptance/*.test.mjs"` - drives markdown files under `docs/`; runs
-- suite baseline: green (174 existing tests across `workflow-check` and `workflow-core`; 0 walkthrough tests yet)
+- suite baseline: green (195 tests: 21 walkthrough acceptance tests + 174 existing tests across `workflow-check` and `workflow-core`)
 - mutation: unsupported for node - no mutation Language Add-on installed
-- in place: three existing five-part walkthroughs (`docs/walkthrough-node.md` on `env-check`, `docs/walkthrough-typescript.md` on `csv-stats`, `docs/walkthrough-csharp.md` on `todo-cli`), each currently copying `AGENTS.md` in Part 1.3
-- gap to spec: R24, R25, R26, R27, R28, Q-cross-stack-consistency, Q-zero-stale-featured-app-leaks, Q-powershell-copy-pasteability
+- in place: all three five-part walkthroughs (`docs/walkthrough-node.md`, `docs/walkthrough-typescript.md`, `docs/walkthrough-csharp.md`) migrated to `calc-repl` with consistent v1 + Day-2 prompts, PowerShell verification, preserved stack conventions, and current Workflow Core setup (no `AGENTS.md` copy), covered by `tests/acceptance/p01-s01.test.mjs`, `p01-s02.test.mjs`, and `p01-s03.test.mjs`
+- gap to spec: none
 
 ## Decisions pinned by the plan
 - acceptance tests live in `tests/acceptance/` at the repo root so `.github/` is untouched (spec External Constraint).
@@ -24,13 +24,4 @@
 
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
-| P01 | Migrate all three walkthroughs to calc-repl | gating | R24, R25, R26, R27, R28, Q-cross-stack-consistency, Q-zero-stale-featured-app-leaks, Q-powershell-copy-pasteability | [phase-01](phase-01.md) |
-
-## P01 slices
-
-| # | Slice | Status |
-|---|-------|--------|
-| S01 | Migrate docs/walkthrough-node.md to calc-repl | completed |
-| S02 | Migrate docs/walkthrough-typescript.md to calc-repl | completed |
-| S03 | Migrate docs/walkthrough-csharp.md to calc-repl and verify cross-stack consistency | completed |
-| S04 | Fix fence-aware section slicing in tests/acceptance/p01-s03.test.mjs | completed |
+| P01 | Migrate all three walkthroughs to calc-repl | completed | R24, R25, R26, R27, R28, Q-cross-stack-consistency, Q-zero-stale-featured-app-leaks, Q-powershell-copy-pasteability | [phase-01](phase-01.md) |
