@@ -2,10 +2,11 @@
 
 - Spec: [glossary-alignment-spec.md](../../specs/glossary-alignment-spec.md)
 - Lane: standard
-- Next: gate P02
+- Next: review P02
 - Tests locked: `d80c964`
 - Oracle: `tests/glossary-alignment`
 - Phase base: `d80c964`
+- Review pending: S01
 - Reconciled: `0344da116135006b9a6e0d8221bded6e1dbbea96`
 
 ## Current state
