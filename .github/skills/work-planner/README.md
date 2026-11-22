@@ -1,6 +1,6 @@
 # Work Planner
 
-Turns the behavior spec into a plan of thin vertical slices. Each slice closes when acceptance tests, written beforehand by a strong model, pass. It writes `.workflow/plans/<artifact-slug>/plan.md` (routing and status) and one `phase-NN.md` per phase (invariants, gate, and slice cards) beside it. See [SKILL.md](./SKILL.md) for the behavior and [references/](./references/) for the formats.
+Turns the behavior spec into a plan of thin vertical slices. Each slice closes when acceptance tests, written beforehand by a strong model, pass. It writes `.workflow/plans/<artifact-slug>/plan.md` (routing and status) and one `phase-NN.md` per phase (invariants, gate, and Cards) beside it. See [SKILL.md](./SKILL.md) for the behavior and [references/](./references/) for the formats.
 
 ## How a Phase Runs
 

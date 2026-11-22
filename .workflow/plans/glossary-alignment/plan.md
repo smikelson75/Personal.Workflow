@@ -2,7 +2,7 @@
 
 - Spec: [glossary-alignment-spec.md](../../specs/glossary-alignment-spec.md)
 - Lane: standard
-- Next: P02 S01, S02
+- Next: P02 S03
 - Tests locked: `d80c964`
 - Oracle: `tests/glossary-alignment`
 - Phase base: `d80c964`
@@ -32,8 +32,8 @@
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Glossary presence check helper | ready |
-| S02 | Remove vocabulary drift from Workflow Core prose | ready |
+| S01 | Glossary presence check helper | completed |
+| S02 | Remove vocabulary drift from Workflow Core prose | completed |
 | S03 | Glossary required input for pull-work, test-author, test-reviewer | ready |
 | S04 | Optional Glossary for adr-writer and repo-scout; coder stays closed-world | ready |
 

@@ -53,7 +53,7 @@ The main session sets every status. Phase and card files carry no status.
 
 `Tests locked` is one plan-wide git ref. The oracle is the union of every card's `Acceptance tests` paths across all phases, including fixtures and test configuration.
 
-At each phase review approval, and after each passed Fixture Repair, the main session:
+At each approved Phase Review, and after each passed Fixture Repair, the main session:
 
 1. confirms `git diff <current lock> -- <oracle>` touches only the paths of the cards just reviewed or repaired
 2. commits those paths, without asking (the approval or the passed repair is the permission)

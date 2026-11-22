@@ -1,6 +1,6 @@
 # Phase Format
 
-Purpose: `.workflow/plans/<artifact-slug>/phase-NN.md` holds what no single slice owns (invariants, harness, gate) and every slice card for the phase. It is written just in time, when the phase becomes active, and kept after the phase completes.
+Purpose: `.workflow/plans/<artifact-slug>/phase-NN.md` holds what no single slice owns (invariants, harness, gate) and every Card for the phase. It is written just in time, when the phase becomes active, and kept after the phase completes.
 
 A card is the brief. The main session sends a `delegate` card's section verbatim to `coder`, adding only the materialized `Done when` command, and implements a `main` card itself. Either way, a weaker model given only that and the repo must finish without asking about intent.
 

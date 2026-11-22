@@ -1,7 +1,7 @@
 ---
 name: coder
-description: "Implement one delegate-tier slice card until its locked acceptance tests pass."
-argument-hint: "Paste one slice card."
+description: "Implement one delegate-tier Card until its locked acceptance tests pass."
+argument-hint: "Paste one Card."
 tools: ['read', 'search', 'edit', 'execute']
 model:
   # Cheap cloud models run delegate cards today; put a local model ID first once one is configured.
@@ -13,7 +13,7 @@ reasoning-effort: medium
 
 Asks the Developer: never - stop and report to the caller.
 
-You receive one slice card. The card is complete. Do exactly what it says.
+You receive one Card. The card is complete. Do exactly what it says.
 
 1. Read the files in `Patterns` and copy their style.
 2. Change only the paths in `Files`. Follow `Decisions` exactly, using the names and shapes given.

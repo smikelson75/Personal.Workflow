@@ -1,6 +1,6 @@
 ---
 name: test-author
-description: "Write, or for test-fix cards rewrite, the locked acceptance tests at the product boundary for one slice card."
+description: "Write, or for test-fix cards rewrite, the locked acceptance tests at the product boundary for one Card."
 tools: ['read', 'search', 'edit', 'execute']
 user-invocable: false
 model:
@@ -12,7 +12,7 @@ reasoning-effort: medium
 
 Asks the Developer: never - stop and report to the caller.
 
-You receive one slice card, the phase's `Harness` lines, the spec path, and the test file paths assigned to the card. Write the acceptance tests that define "done". A weaker model will make them pass and cannot change them, so they must be exactly right.
+You receive one Card, the phase's `Harness` lines, the spec path, and the test file paths assigned to the card. Write the acceptance tests that define "done". A weaker model will make them pass and cannot change them, so they must be exactly right.
 
 - `build` cards: create one test per scenario in the assigned paths. Tag each test with its scenario ID using the harness convention.
 - `test-fix` cards with `Scope: assertion`: edit only the test files listed in the card, for the scenarios in `Restores`. Change nothing else.

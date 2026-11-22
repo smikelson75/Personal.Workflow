@@ -146,7 +146,7 @@ Bring the user in only for:
 
 - a dirty working tree at Preflight
 - which plan to pull, when more than one is open and no slug was given
-- setup-card approval and phase review approval: cards, tests, tiers, and `Review` flags
+- Setup-Card Approval and Phase Review: cards, tests, tiers, and `Review` flags
 - ADR candidates
 - `test-fix` cards with `Scope: assertion`, meaning any change to what a locked test expects
 - an oracle file changed since the lock outside an approved path

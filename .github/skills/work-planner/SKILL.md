@@ -112,7 +112,7 @@ Commit the revision (pull-work's Commits), then hand back to `pull-work`.
 - Classify: built behavior that breaks the spec becomes fix work; spec silent or wrong redirects to `behavior-spec`; new behavior redirects to `brain-storm`; a redirect leaves the plan unchanged.
 - Scenario: the fix card's scenario reproduces the defect and fails before the fix.
 - Place: a `done` plan gets a new phase `PNN+1`, otherwise the fix goes into the active phase.
-- Next: set `Next: phase review PNN` so the reproducing tests reach the Developer at the Phase Review Checkpoint.
+- Next: set `Next: phase review PNN` so the reproducing tests reach the Developer at Phase Review.
 - Card: a `build` card owns the scenario and its Goal is `Defect: <description>` with the description verbatim.
 - Commit: `docs(<slug>): plan fix PNN`.
 
