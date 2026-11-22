@@ -8,16 +8,17 @@ This guide walks through setting up a brand-new C# / .NET repository with the Pe
 
 Each of these cleanly separates a pure-logic class library (`*.Core`, targeted by unit tests and Stryker.NET) from a thin console host (`*.Cli`, targeted by black-box acceptance tests):
 
-1. **`todo-cli`** *(used throughout this walkthrough)* — Local JSON-backed task manager (`add`, `list`, `done`, `remove`, `--file`, `--status`). Great for practicing clean Core/CLI separation, file persistence, corrupted-file error handling, and multi-phase growth.
+1. **`calc-repl`** *(used throughout this walkthrough)* — Interactive integer calculator REPL that reads arithmetic expressions from stdin, evaluates `+`, `-`, `*`, and `/` with standard precedence, and reports clear errors without crashing. Great for practicing clean Core/CLI separation, black-box REPL testing, and multi-phase growth.
 2. **`env-check`** — Validates a `.env` file against a `.env.example` template (missing keys, empty values, extra keys, `--strict`, `--json`, distinct exit codes).
 3. **`csv-stats`** — Reads a CSV file and computes row count plus `min`, `max`, and `avg` for a chosen numeric column (`--column`, `--delimiter`, `--json`).
-4. **`slug-rename`** — Batch-renames files in a folder to lowercase kebab-case (`--dry-run` default, `--apply` to rename, refuses on collisions). Great for practicing destructive-action escalations in [behavior-spec](../.github/skills/behavior-spec/SKILL.md) and `Review: required` cards in [work-planner](../.github/skills/work-planner/SKILL.md).
+4. **`todo-cli`** — Local JSON-backed task manager (`add`, `list`, `done`, `remove`, `--file`, `--status`). Great for practicing clean Core/CLI separation, file persistence, corrupted-file error handling, and multi-phase growth.
+5. **`slug-rename`** — Batch-renames files in a folder to lowercase kebab-case (`--dry-run` default, `--apply` to rename, refuses on collisions). Great for practicing destructive-action escalations in [behavior-spec](../.github/skills/behavior-spec/SKILL.md) and `Review: required` cards in [work-planner](../.github/skills/work-planner/SKILL.md).
 
 ---
 
 ## Part 1: Set Up the New Repository (PowerShell)
 
-Run these commands in **PowerShell** to create `C:\Projects\todo-cli`, scaffold a clean `.NET` solution with separate `Core`, `Cli`, `UnitTests`, and `AcceptanceTests` projects, and copy the core workflow plus the C# language skills.
+Run these commands in **PowerShell** to create `C:\Projects\calc-repl`, scaffold a clean `.NET` solution with separate `Core`, `Cli`, `UnitTests`, and `AcceptanceTests` projects, and copy the core workflow plus the C# language skills.
 
 ### 1.1 Verify prerequisites (.NET SDK, Node.js, and Git)
 
@@ -31,31 +32,31 @@ git --version
 
 ### 1.2 Create the solution, projects, and local `dotnet-stryker` tool manifest
 
-Keeping business logic in `TodoCli.Core` and thin argument/IO wiring in `TodoCli.Cli` matches [stryker-dotnet/SKILL.md](../language-skills/csharp/stryker-dotnet/SKILL.md): Stryker.NET mutates `TodoCli.Core` using `TodoCli.UnitTests`, while `TodoCli.AcceptanceTests` drives the compiled CLI binary as a black box.
+Keeping business logic in `CalcRepl.Core` and thin read-eval-print wiring in `CalcRepl.Cli` matches [stryker-dotnet/SKILL.md](../language-skills/csharp/stryker-dotnet/SKILL.md): Stryker.NET mutates `CalcRepl.Core` using `CalcRepl.UnitTests`, while `CalcRepl.AcceptanceTests` drives the compiled REPL binary as a black box.
 
 ```powershell
-New-Item -ItemType Directory -Path C:\Projects\todo-cli | Out-Null
-Set-Location C:\Projects\todo-cli
+New-Item -ItemType Directory -Path C:\Projects\calc-repl | Out-Null
+Set-Location C:\Projects\calc-repl
 
 git init -b main
 dotnet new gitignore
-dotnet new sln -n TodoCli
+dotnet new sln -n CalcRepl
 
 # Production projects
-dotnet new classlib -n TodoCli.Core -o src\TodoCli.Core
-dotnet new console  -n TodoCli.Cli  -o src\TodoCli.Cli
-dotnet add src\TodoCli.Cli\TodoCli.Cli.csproj reference src\TodoCli.Core\TodoCli.Core.csproj
+dotnet new classlib -n CalcRepl.Core -o src\CalcRepl.Core
+dotnet new console  -n CalcRepl.Cli  -o src\CalcRepl.Cli
+dotnet add src\CalcRepl.Cli\CalcRepl.Cli.csproj reference src\CalcRepl.Core\CalcRepl.Core.csproj
 
 # Test projects (xUnit)
-dotnet new xunit -n TodoCli.UnitTests       -o tests\TodoCli.UnitTests
-dotnet new xunit -n TodoCli.AcceptanceTests -o tests\TodoCli.AcceptanceTests
-dotnet add tests\TodoCli.UnitTests\TodoCli.UnitTests.csproj reference src\TodoCli.Core\TodoCli.Core.csproj
+dotnet new xunit -n CalcRepl.UnitTests       -o tests\CalcRepl.UnitTests
+dotnet new xunit -n CalcRepl.AcceptanceTests -o tests\CalcRepl.AcceptanceTests
+dotnet add tests\CalcRepl.UnitTests\CalcRepl.UnitTests.csproj reference src\CalcRepl.Core\CalcRepl.Core.csproj
 
 # Register all projects in the solution
-dotnet sln add src\TodoCli.Core\TodoCli.Core.csproj
-dotnet sln add src\TodoCli.Cli\TodoCli.Cli.csproj
-dotnet sln add tests\TodoCli.UnitTests\TodoCli.UnitTests.csproj
-dotnet sln add tests\TodoCli.AcceptanceTests\TodoCli.AcceptanceTests.csproj
+dotnet sln add src\CalcRepl.Core\CalcRepl.Core.csproj
+dotnet sln add src\CalcRepl.Cli\CalcRepl.Cli.csproj
+dotnet sln add tests\CalcRepl.UnitTests\CalcRepl.UnitTests.csproj
+dotnet sln add tests\CalcRepl.AcceptanceTests\CalcRepl.AcceptanceTests.csproj
 
 # Pin dotnet-stryker as a local .NET tool
 dotnet new tool-manifest
@@ -67,7 +68,7 @@ dotnet test
 
 ### 1.3 Copy the core workflow and C# language skills
 
-This copies the portable workflow pieces (`.github/agents`, `.github/hooks`, `.github/skills`, `.github/tools/workflow-check`, `.github/user-interaction.md`, and `AGENTS.md`) along with the C# skills ([dotnet-editorconfig](../language-skills/csharp/dotnet-editorconfig/SKILL.md), [stryker-dotnet](../language-skills/csharp/stryker-dotnet/SKILL.md)) and the shared [mutation-testing](../language-skills/mutation-testing/protocol.md) protocol.
+This copies the portable workflow pieces (`.github/agents`, `.github/hooks`, `.github/skills`, `.github/tools/workflow-check`, and `.github/user-interaction.md`) along with the C# skills ([dotnet-editorconfig](../language-skills/csharp/dotnet-editorconfig/SKILL.md), [stryker-dotnet](../language-skills/csharp/stryker-dotnet/SKILL.md)) and the shared [mutation-testing](../language-skills/mutation-testing/protocol.md) protocol.
 
 ```powershell
 $workflowSrc = "C:\Projects\Personal.Workflow"
@@ -81,7 +82,6 @@ Copy-Item -Recurse "$workflowSrc\.github\hooks"                 ".github\hooks"
 Copy-Item -Recurse "$workflowSrc\.github\skills\*"              ".github\skills"
 Copy-Item -Recurse "$workflowSrc\.github\tools\workflow-check"  ".github\tools\workflow-check"
 Copy-Item          "$workflowSrc\.github\user-interaction.md"   ".github\user-interaction.md"
-Copy-Item          "$workflowSrc\AGENTS.md"                     "AGENTS.md"
 
 # Copy C# language skills + shared mutation-testing protocol
 Copy-Item -Recurse "$workflowSrc\language-skills\csharp\dotnet-editorconfig" ".github\skills\dotnet-editorconfig"
@@ -97,21 +97,21 @@ Copy-Item -Recurse "$workflowSrc\language-skills\mutation-testing"           ".g
 Add-Content -Path .gitignore -Value "`nStrykerOutput/"
 
 git add .
-git commit -m "chore: initialize todo-cli .NET solution with personal workflow"
+git commit -m "chore(calc-repl): initialize CalcRepl .NET solution with personal workflow"
 git status --short
 ```
 
 ### 1.5 Open the new repository in VS Code
 
 ```powershell
-code C:\Projects\todo-cli
+code C:\Projects\calc-repl
 ```
 
 ---
 
 ## Part 2: Configure the C# Language Skills (Copilot Chat)
 
-Open Copilot Chat in the `C:\Projects\todo-cli` workspace.
+Open Copilot Chat in the `C:\Projects\calc-repl` workspace.
 
 ### 2.1 Configure `.editorconfig` and `Directory.Build.props`
 
@@ -144,7 +144,7 @@ Commit the code-style setup in **Copilot Chat**:
 
 ### 2.2 Configure Stryker.NET (Mutation Testing)
 
-Per [stryker-dotnet/SKILL.md](../language-skills/csharp/stryker-dotnet/SKILL.md) and [protocol.md](../language-skills/mutation-testing/protocol.md), **wait to run `/stryker-dotnet baseline` until `TodoCli.UnitTests` has at least one real unit test covering `TodoCli.Core`** (during or right after Phase 1 setup).
+Per [stryker-dotnet/SKILL.md](../language-skills/csharp/stryker-dotnet/SKILL.md) and [protocol.md](../language-skills/mutation-testing/protocol.md), **wait to run `/stryker-dotnet baseline` until `CalcRepl.UnitTests` has at least one real unit test covering `CalcRepl.Core`** (during or right after Phase 1 setup).
 
 Once your first unit test exists, run in **Copilot Chat**:
 
@@ -152,20 +152,20 @@ Once your first unit test exists, run in **Copilot Chat**:
 /stryker-dotnet baseline
 ```
 
-It confirms measure-only thresholds (`high: 80`, `low: 60`, `break: 0`) and writes `stryker-config.json` at the repository root targeting `TodoCli.Core.csproj`.
+It confirms measure-only thresholds (`high: 80`, `low: 60`, `break: 0`) and writes `stryker-config.json` at the repository root targeting `CalcRepl.Core.csproj`.
 
-> **Most Important Stryker.NET Rule:** Always run `dotnet stryker` from the **unit-test project folder** (`tests\TodoCli.UnitTests`), **never** from the solution root. Running from the solution root triggers solution mode, which runs acceptance tests against mutants and invalidates the unit-test mutation score.
+> **Most Important Stryker.NET Rule:** Always run `dotnet stryker` from the **unit-test project folder** (`tests\CalcRepl.UnitTests`), **never** from the solution root. Running from the solution root triggers solution mode, which runs acceptance tests against mutants and invalidates the unit-test mutation score.
 >
 > Example command (PowerShell, from the repo root):
 > ```powershell
-> Push-Location tests\TodoCli.UnitTests
+> Push-Location tests\CalcRepl.UnitTests
 > dotnet stryker --config-file ..\..\stryker-config.json --configuration Release --since:<phase-start-ref> --output ..\..\StrykerOutput\p01 2>&1 | Tee-Object ..\..\StrykerOutput\p01-console.log
 > Pop-Location
 > ```
 
 ---
 
-## Part 3: Build `todo-cli` End-to-End with the Workflow
+## Part 3: Build `calc-repl` End-to-End with the Workflow
 
 Verify your working tree is clean before starting:
 
@@ -180,7 +180,7 @@ git status --short
 Type in **Copilot Chat**:
 
 ```text
-/brain-storm I want to build a small C# .NET CLI called todo-cli that manages a local JSON task list. Users can run add, list, done, and remove commands, optionally passing --file to choose the task file path, with clear exit codes and safe handling of missing or corrupted task files.
+/brain-storm I want to build an interactive integer calculator REPL called calc-repl in C# .NET with zero external runtime dependencies. It reads arithmetic expressions from stdin, evaluates binary +, -, *, and / with standard operator precedence (* and / before + and -), uses truncating integer division toward zero (for example, 7 / 2 = 3), reports a clear error on divide-by-zero or invalid expressions and re-prompts without crashing the loop, and exits cleanly on exit, quit, or EOF.
 ```
 
 **What happens:**
@@ -192,8 +192,8 @@ Type in **Copilot Chat**:
 **Outputs created & auto-committed:**
 
 - `.workflow/sessions/context-YYYY-MM-DD-HHmm.md` (`Status: final`)
-- `.workflow/language.md` (canonical terms like *Task*, *Task File*, *Status*)
-- Runs `node .github/tools/workflow-check/bin/workflow-check.mjs` automatically and commits `docs(workflow): session todo-cli`.
+- `.workflow/language.md` (canonical terms like *Expression*, *Operand*, *Operator*, *Result*)
+- Runs `node .github/tools/workflow-check/bin/workflow-check.mjs` automatically and commits `docs(workflow): session calc-repl`.
 
 ---
 
@@ -202,19 +202,19 @@ Type in **Copilot Chat**:
 Start a **new Copilot Chat session** and type:
 
 ```text
-/behavior-spec todo-cli
+/behavior-spec calc-repl
 ```
 
 **What happens:**
 
 - Runs `node .github/tools/workflow-check/bin/workflow-check.mjs` first.
-- Expands every active requirement (`R1`, `R2`, …) into observable CLI rules, failure outcomes (e.g., corrupted JSON leaves the file untouched and exits non-zero), and `Given / When / Then` examples.
-- Escalates only true user decisions (for example, destructive behavior of `remove` or behavior when `--file` points to a missing file); records defensible defaults in `Assumptions`.
+- Expands every active requirement (`R1`, `R2`, …) into observable REPL rules, failure outcomes (e.g., divide-by-zero prints an error, the prompt returns, and the loop keeps running), and `Given / When / Then` examples.
+- Escalates only true user decisions (for example, what a blank line prints or how EOF is reported); records defensible defaults in `Assumptions`.
 
 **Outputs created & auto-committed:**
 
-- `.workflow/specs/todo-cli-spec.md`
-- Auto-commits `docs(todo-cli): specify behavior`.
+- `.workflow/specs/calc-repl-spec.md`
+- Auto-commits `docs(calc-repl): specify behavior`.
 
 ---
 
@@ -226,15 +226,17 @@ Start a **new Copilot Chat session** and type:
 /pull-work
 ```
 
-From here on, `/pull-work` drives the workflow automatically until a **Checkpoint** or phase completion:
+From here on, `/pull-work` drives the workflow automatically until a **Checkpoint** or phase completion.
+
+**Black-box REPL testing:** acceptance tests never import `CalcRepl.Core` internals. Each test drives the REPL from the outside by piping multi-line input over `stdin` (or spawning the built `CalcRepl.Cli` executable with redirected `stdin`/`stdout`/`stderr`) and then asserts on `stdout`, `stderr`, and the process exit code.
 
 1. **Plan Mode (automatic):**
-   - `repo-scout` surveys `TodoCli.sln`, `Directory.Build.props`, `src/`, and `tests/`.
-   - Creates `.workflow/plans/todo-cli/plan.md` and `.workflow/plans/todo-cli/phase-01.md`.
+   - `repo-scout` surveys `CalcRepl.sln`, `Directory.Build.props`, `src\`, and `tests\`.
+   - Creates `.workflow/plans/calc-repl/plan.md` and `.workflow/plans/calc-repl/phase-01.md`.
    - Sets up the .NET test harness conventions (for example, xUnit `[Fact(DisplayName = "[R1-01] ...")]` with `dotnet test --filter "DisplayName~[R1-01]"` and `dotnet build -c Release && dotnet format --verify-no-changes && dotnet test -c Release` in the phase Gate).
-   - Commits `docs(todo-cli): plan P01`.
+   - Commits `docs(calc-repl): plan P01`.
 
-2. **Setup-Card Checkpoint (if the phase needs a CLI process runner helper in `tests/TodoCli.AcceptanceTests/Support/`):**
+2. **Setup-Card Checkpoint (if the phase needs a REPL process-runner helper in `tests/CalcRepl.AcceptanceTests/Support/`):**
    - Reply in **Copilot Chat**:
 
      ```text
@@ -242,7 +244,7 @@ From here on, `/pull-work` drives the workflow automatically until a **Checkpoin
      ```
 
 3. **Phase Review Checkpoint:**
-   - Authors failing black-box acceptance tests in `tests/TodoCli.AcceptanceTests/` tagged with `[R1-01]`, `[R1-02]`, … that spawn the built `TodoCli.Cli` executable against isolated temp directories (never referencing `TodoCli.Core` internals).
+   - Authors failing black-box acceptance tests in `tests/CalcRepl.AcceptanceTests/` tagged with `[R1-01]`, `[R1-02]`, … that pipe expressions into the built `CalcRepl.Cli` executable (spawned with redirected stdin/stdout/stderr) and assert on its output and exit code (never referencing `CalcRepl.Core` internals).
    - Presents all cards, tests, `delegate`/`main` tiers, `Review: required` flags (cards touching file writes/deletes will be flagged `Review: required`), and any ADR candidates in one checkpoint.
    - Reply in **Copilot Chat**:
 
@@ -250,18 +252,18 @@ From here on, `/pull-work` drives the workflow automatically until a **Checkpoin
      approve all
      ```
 
-   - Commits and locks the acceptance tests (`test(todo-cli): lock P01 acceptance tests` + `docs(todo-cli): start P01`). From this point on, the pre-tool hook in [locked-tests.json](../.github/hooks/locked-tests.json) blocks edits to locked acceptance tests.
+   - Commits and locks the acceptance tests (`test(calc-repl): lock P01 acceptance tests` + `docs(calc-repl): start P01`). From this point on, the pre-tool hook in [locked-tests.json](../.github/hooks/locked-tests.json) blocks edits to locked acceptance tests.
 
 4. **Dispatch (automatic):**
-   - `main` cards establish core domain types/storage abstractions in `TodoCli.Core`; `delegate` cards implement individual commands and behaviors (in parallel when files don't overlap).
-   - Each completed slice is verified and committed (`feat(todo-cli): <slice name>`).
+   - `main` cards establish core domain types (tokens, parser, evaluator) in `CalcRepl.Core`; `delegate` cards implement individual behaviors (in parallel when files don't overlap).
+   - Each completed slice is verified and committed (`feat(calc-repl): <slice name>`).
 
 5. **Phase Gate & Critical-Code Review (automatic):**
    - Runs the phase Gate:
      1. **Suite & Style:** `dotnet build -c Release && dotnet format --verify-no-changes && dotnet test -c Release`
      2. **Traceability:** verifies every owned scenario ID has a passing tagged test
-     3. **Lock check:** `git diff --exit-code <Tests locked> -- tests/TodoCli.AcceptanceTests`
-     4. **Mutation gate:** runs `dotnet stryker` from `tests\TodoCli.UnitTests` against `TodoCli.Core.csproj` (once Stryker is configured)
+     3. **Lock check:** `git diff --exit-code <Tests locked> -- tests/CalcRepl.AcceptanceTests`
+     4. **Mutation gate:** runs `dotnet stryker` from `tests\CalcRepl.UnitTests` against `CalcRepl.Core.csproj` (once Stryker is configured)
    - Runs `code-review` once on `Review: required` cards and completes the phase.
 
 6. **Next Phase (until `Next: done`):**
@@ -273,27 +275,29 @@ From here on, `/pull-work` drives the workflow automatically until a **Checkpoin
 
 ### Step 4 — Verify Your Finished CLI (PowerShell)
 
-Once `Next: done` is reached, test the CLI directly in PowerShell:
+Once `Next: done` is reached, pipe a multi-line session into the REPL in PowerShell. Expected output: `14`, `3`, a divide-by-zero error, an invalid-expression error, then a clean exit.
 
 ```powershell
 # Build in Release configuration
 dotnet build -c Release
 
-# Run the CLI against a temporary task file
-$todoFile = Join-Path $env:TEMP "todo-demo.json"
-dotnet run --project src\TodoCli.Cli -c Release -- add "Buy milk" --file $todoFile
-dotnet run --project src\TodoCli.Cli -c Release -- add "Write docs" --file $todoFile
-dotnet run --project src\TodoCli.Cli -c Release -- list --file $todoFile
-dotnet run --project src\TodoCli.Cli -c Release -- done 1 --file $todoFile
-dotnet run --project src\TodoCli.Cli -c Release -- list --file $todoFile
+# Pipe a multi-line session into the REPL (no scratch files needed)
+$expressions = @'
+2 + 3 * 4
+7 / 2
+10 / 0
+2 + * 3
+exit
+'@
+$expressions | dotnet run --project src\CalcRepl.Cli -c Release
+if ($LASTEXITCODE -ne 0) { throw "calc-repl exited with code $LASTEXITCODE" }
 
 # Run the full local verification suite
 dotnet format --verify-no-changes
 dotnet test -c Release
-
-# Clean up the temporary task file
-Remove-Item $todoFile -ErrorAction SilentlyContinue
 ```
+
+Running `dotnet run --project src\CalcRepl.Cli -c Release` without piped input starts an interactive session: type one expression per line and type `exit` (or `quit`, or press Ctrl+Z then Enter) to leave it.
 
 ---
 
@@ -302,13 +306,20 @@ Remove-Item $todoFile -ErrorAction SilentlyContinue
 - **Report a spec bug:** in a new Copilot Chat session, run:
 
   ```text
-  /pull-work todo-cli bug: running done with a non-existent task ID exits 0 instead of non-zero
+  /pull-work calc-repl bug: chained subtraction like 10 - 3 - 2 returns 9 instead of 5
   ```
 
-- **Add a new feature (e.g., `--priority`):**
-  1. New chat: `/brain-storm Add optional task priorities (low, medium, high) to add and list`
-  2. New chat: `/behavior-spec todo-cli`
+- **Add the v1 evolution features (unary negatives, parentheses, and `^` exponents):** run one combined pass:
+  1. New chat: run the brainstorm prompt below:
+
+     ```text
+     /brain-storm Add unary negative numbers (for example, -5 + 2 = -3), parentheses for grouping (for example, (2 + 3) * 4 = 20), and integer exponents using ^ (for example, 2 ^ 3 = 8), reporting negative exponents like 2 ^ -3 as an unsupported error and re-prompting without crashing.
+     ```
+
+  2. New chat: `/behavior-spec calc-repl`
   3. New chat: `/pull-work` *(auto-reconciles the updated spec into a new phase)*
+
+  Note: these three features can alternatively be split into separate smaller passes (one feature per brainstorm → behavior-spec → pull-work cycle) if you prefer smaller phases.
 
 ---
 

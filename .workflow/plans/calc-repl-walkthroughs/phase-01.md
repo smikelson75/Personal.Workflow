@@ -82,7 +82,7 @@
 - **Goal:** `docs/walkthrough-csharp.md` guides a Developer end-to-end on `calc-repl` in C# / .NET with zero stale `todo-cli`/`TodoCli` references, and all three walkthroughs satisfy cross-stack consistency, zero stale leaks, and PowerShell copy-pasteability.
 - **Depends on:** S01, S02, S04
 - **Tier:** delegate - mirrors `S01` for C# / .NET with all solution/project names, prompts, paths, and commands pinned below
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:**
   - R24-05: Given `docs/walkthrough-csharp.md`, when `## Simple CLI Ideas` and Parts 1–4 are inspected, then `#1` is `calc-repl` (marked as used throughout), `#2`–`#5` are `env-check`, `csv-stats`, `todo-cli`, `slug-rename` in order, and Parts 1–4 use `C:\Projects\calc-repl`, solution `CalcRepl`, projects `CalcRepl.Core`, `CalcRepl.Cli`, `CalcRepl.UnitTests`, `CalcRepl.AcceptanceTests`, paths `src\CalcRepl.Core`, `src\CalcRepl.Cli`, `tests\CalcRepl.UnitTests`, `tests\CalcRepl.AcceptanceTests`, `dotnet run --project src\CalcRepl.Cli -c Release`, `.workflow/specs/calc-repl-spec.md`, `.workflow/plans/calc-repl/`, and `calc-repl` commit examples.
   - R24-06: Given `docs/walkthrough-csharp.md`, when Parts 1–4 and `## Quick Reference` are searched for `env-check`, `csv-stats`, `todo-cli`, `TodoCli`, `.env.example`, `sample.csv`, and `todo-demo.json`, then zero matches exist.

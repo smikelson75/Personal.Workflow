@@ -2,7 +2,7 @@
 
 - Spec: [calc-repl-walkthroughs-spec.md](../../specs/calc-repl-walkthroughs-spec.md)
 - Lane: standard
-- Next: P01 S03
+- Next: gate P01
 - Tests locked: `0567320`
 - Oracle: `tests/acceptance`
 - Phase base: `9a3ff11`
@@ -24,7 +24,7 @@
 
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
-| P01 | Migrate all three walkthroughs to calc-repl | in progress | R24, R25, R26, R27, R28, Q-cross-stack-consistency, Q-zero-stale-featured-app-leaks, Q-powershell-copy-pasteability | [phase-01](phase-01.md) |
+| P01 | Migrate all three walkthroughs to calc-repl | gating | R24, R25, R26, R27, R28, Q-cross-stack-consistency, Q-zero-stale-featured-app-leaks, Q-powershell-copy-pasteability | [phase-01](phase-01.md) |
 
 ## P01 slices
 
@@ -32,5 +32,5 @@
 |---|-------|--------|
 | S01 | Migrate docs/walkthrough-node.md to calc-repl | completed |
 | S02 | Migrate docs/walkthrough-typescript.md to calc-repl | completed |
-| S03 | Migrate docs/walkthrough-csharp.md to calc-repl and verify cross-stack consistency | ready |
+| S03 | Migrate docs/walkthrough-csharp.md to calc-repl and verify cross-stack consistency | completed |
 | S04 | Fix fence-aware section slicing in tests/acceptance/p01-s03.test.mjs | completed |
