@@ -177,7 +177,7 @@ test('[R30-02] active docs, Glossary, and acceptance test reference language-add
     assert.doesNotMatch(content, /language-skills/, `${rel} must not reference language-skills`);
   }
 
-  const res = spawnSync(process.execPath, ['--test', 'tests/acceptance/*.test.mjs'], {
+  const res = spawnSync(`"${process.execPath}"`, ['--test', 'tests/acceptance/*.test.mjs'], {
     cwd: REPO,
     encoding: 'utf8',
     shell: true,
