@@ -51,6 +51,7 @@ Optionally copy the **Language Add-ons** for your stack from [`language-addons/`
 
 ### 3. Run the Workflow
 
+- *(Optional)* **`/incubate`** — explore an early idea, external pattern, or hunch through conversation, web research, and Mermaid visuals in a living note (`.workflow/incubations/<slug>.md`) before deciding whether it is worth building.
 1. **`/brain-storm`** — refine your idea one question at a time into a finalized Session and Glossary in `.workflow/`.
 2. **`/behavior-spec`** — turn the Session Chain into a black-box Behavior Spec at `.workflow/specs/<slug>-spec.md`.
 3. **`/pull-work`** — plan the Phase, author failing acceptance tests, review once at the Phase Review Checkpoint, and let the workflow build, commit, gate, and review each Slice. Start a fresh session and run `/pull-work` again for the next Phase.
@@ -66,16 +67,16 @@ Follow a complete, step-by-step setup and worked CLI build (`calc-repl`) for you
 ## How the Workflow Flows
 
 ```text
-Idea ──▶ /brain-storm ──▶ /behavior-spec ──▶ /pull-work (loads work-planner)
-              │                 │                  │
-              ▼                 ▼                  ├─ Plan & Setup Cards (optional: planner agent)
-      .workflow/sessions/  .workflow/specs/        ├─ Write failing acceptance tests (test-author)
-      .workflow/language.md                        ├─ Phase Review Checkpoint (approve Cards & ADRs)
-              │                                    ├─ Lock tests & write ADRs (adr-writer)
-              └── checked by workflow-check        ├─ Build Slices (coder for delegate / main for main)
-                                                   ├─ Commit each Slice (conventional-commit rules)
-                                                   └─ Phase Gate (suite, traceability, lock, mutation)
-                                                      └─ code-review (Review: required Cards only)
+Hunch ──▶ (optional) /incubate ──▶ /brain-storm ──▶ /behavior-spec ──▶ /pull-work (loads work-planner)
+               │                        │                 │                  │
+               ▼                        ▼                 ▼                  ├─ Plan & Setup Cards (optional: planner agent)
+     .workflow/incubations/     .workflow/sessions/  .workflow/specs/        ├─ Write failing acceptance tests (test-author)
+       (graduated only,         .workflow/language.md                        ├─ Phase Review Checkpoint (approve Cards & ADRs)
+        explicit handoff)               │                                    ├─ Lock tests & write ADRs (adr-writer)
+                                        └── checked by workflow-check        ├─ Build Slices (coder for delegate / main for main)
+                                                                             ├─ Commit each Slice (conventional-commit rules)
+                                                                             └─ Phase Gate (suite, traceability, lock, mutation)
+                                                                                └─ code-review (Review: required Cards only)
 ```
 
 ## Recommended Models and Effort Settings
@@ -86,6 +87,7 @@ Every skill below lists recommended models from **Anthropic**, **OpenAI**, and *
 
 | Skill | Anthropic | OpenAI | Google | Default Effort | Raise Effort When |
 | --- | --- | --- | --- | --- | --- |
+| [`incubate`](./.github/skills/incubate/README.md) | `claude-opus-5.5` | `gpt-6.2-sol` | `gemini-4-neon` | `medium` | Cross-cutting architectural shifts or multi-stack workflow redesigns (`high`) |
 | [`brain-storm`](./.github/skills/brain-storm/README.md) | `claude-opus-5.5` | `gpt-6.2-sol` | `gemini-4-neon` | `medium` | `large` ideas, deeper pushback, or conflict resolution (`high`) |
 | [`behavior-spec`](./.github/skills/behavior-spec/README.md) | `claude-opus-5.5` | `gpt-6.2-sol` | `gemini-4-neon` | `medium` | Many requirements, security/destructive rules, or long Session Chains (`high`) |
 | [`work-planner`](./.github/skills/work-planner/README.md) | `claude-sonnet-5.5` | `gpt-6.1-terra` | `gemini-4-neon` | `medium` | Large or architecture-heavy first plan — use the `planner` agent (`claude-opus-5.5` / `gpt-6.1-sol` / `gemini-4-neon`) at `high` |
@@ -112,6 +114,7 @@ See [`language-addons/README.md`](./language-addons/README.md) for stack details
 
 ### Core Skills
 
+- **[Incubate](./.github/skills/incubate/README.md)** — exploratory sense-making with Mermaid visuals, comparison tables, web research, and living notes.
 - **[Brain Storm](./.github/skills/brain-storm/README.md)** — guided requirements discovery, Session Chain, and Glossary maintenance.
 - **[Behavior Spec](./.github/skills/behavior-spec/README.md)** — black-box behavioral contract generation and assumption review.
 - **[Work Planner](./.github/skills/work-planner/README.md)** — Phase planning, vertical Slices, Cards, Tiers, Lanes, and Gate structure.

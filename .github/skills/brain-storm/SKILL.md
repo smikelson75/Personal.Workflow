@@ -15,7 +15,7 @@ Fill in the missing pieces of the user's idea until it is a workable set of requ
 
 Before asking anything:
 
-1. Read `.workflow/language.md` and the newest `.workflow/sessions/context-*.md` (if any). Note settled truth, parked items, and terms.
+1. Read `.workflow/language.md` and the newest `.workflow/sessions/context-*.md` (if any). Note settled truth, parked items, and terms. If the user explicitly references a note in `.workflow/incubations/<slug>.md`, read it as background context (never auto-scan `.workflow/incubations/`—unrelated or abandoned incubations must stay out of scope).
 2. If the workspace contains an existing solution (source code, manifests, docs), launch one `explore` subagent before discussion. Ask it to return a summary (<=300 words) of:
    - purpose and users the code implies
    - languages, frameworks, and project structure
