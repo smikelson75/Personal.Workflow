@@ -2,10 +2,10 @@
 
 - Spec: [glossary-alignment-spec.md](../../specs/glossary-alignment-spec.md)
 - Lane: standard
-- Next: phase review P01
-- Tests locked: none
+- Next: P01 S01
+- Tests locked: `bfd0b22`
 - Oracle: `tests/glossary-alignment`
-- Phase base: none
+- Phase base: `bfd0b22`
 - Reconciled: `0344da116135006b9a6e0d8221bded6e1dbbea96`
 
 ## Current state
@@ -25,12 +25,12 @@
 
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
-| P01 | Glossary, language-addons rename, and walkthrough alignment | planned | R29, R30, R31, Q-zero-workflow-check-errors, Q-zero-stale-language-skills-references | [phase-01](phase-01.md) |
+| P01 | Glossary, language-addons rename, and walkthrough alignment | in progress | R29, R30, R31, Q-zero-workflow-check-errors, Q-zero-stale-language-skills-references | [phase-01](phase-01.md) |
 | P02 | Workflow Core prose and Glossary contracts | planned | R32, R33, R34, Q-zero-vocabulary-drift, Q-suite-preservation | |
 
 ## P01 slices
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Rename language-skills to language-addons and verify Glossary | planned |
-| S02 | Align walkthroughs to canonical vocabulary | planned |
+| S01 | Rename language-skills to language-addons and verify Glossary | ready |
+| S02 | Align walkthroughs to canonical vocabulary | ready |
