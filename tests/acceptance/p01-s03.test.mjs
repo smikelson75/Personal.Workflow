@@ -30,10 +30,27 @@ function headingLevel(l) {
 
 // Lines from the heading matching `re` up to (excluding) the next heading of the same or higher level.
 function section(ls, re, level) {
-  const start = ls.findIndex((l) => headingLevel(l) === level && re.test(l));
+  let start = -1;
+  let inFence = false;
+  for (let i = 0; i < ls.length; i++) {
+    if (/^[\s>]*```/.test(ls[i])) {
+      inFence = !inFence;
+      continue;
+    }
+    if (!inFence && headingLevel(ls[i]) === level && re.test(ls[i])) {
+      start = i;
+      break;
+    }
+  }
   assert.notEqual(start, -1, `heading matching ${re} must exist`);
   let end = ls.length;
+  inFence = false;
   for (let i = start + 1; i < ls.length; i++) {
+    if (/^[\s>]*```/.test(ls[i])) {
+      inFence = !inFence;
+      continue;
+    }
+    if (inFence) continue;
     const lv = headingLevel(ls[i]);
     if (lv > 0 && lv <= level) {
       end = i;
