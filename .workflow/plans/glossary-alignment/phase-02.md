@@ -29,7 +29,7 @@
 - **Goal:** `node .github/skills/pull-work/scripts/glossary-check.mjs` exits 0 silently when `.workflow/language.md` exists in the current directory and otherwise exits 2 with the redirect message on stderr.
 - **Depends on:** none
 - **Tier:** delegate - small script mirroring `parse-args.mjs`
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:**
   - R33-01: Given a temp directory containing `.workflow/language.md`, when `glossary-check.mjs` runs with that directory as cwd, then exit code is 0 and stdout and stderr are empty.
   - R33-02: Given a temp directory with no `.workflow/language.md`, when `glossary-check.mjs` runs there, then exit code is 2, stderr is exactly `Missing required Glossary at .workflow/language.md. Run /brain-storm to establish it before continuing with /pull-work.` plus a newline, stdout is empty, and the directory still has no files (failure).
@@ -61,7 +61,7 @@
 - **Files:** edit `.github/agents/planner.agent.md`, `.github/agents/coder.agent.md`, `.github/agents/test-author.agent.md`, `.github/skills/work-planner/SKILL.md`, `.github/skills/work-planner/README.md`, `.github/skills/work-planner/references/PHASE-FORMAT.md`, `.github/skills/work-planner/references/PLAN-FORMAT.md`, `.github/skills/pull-work/SKILL.md`
 - **Patterns:** `.workflow/language.md:14 - canonical spelling of Card, Slice, Setup-Card Approval, Phase Review`
 - **Decisions:**
-  - `planner.agent.md:23`: `run the setup-card Checkpoint when` becomes `run Setup-Card Approval when`.
+  - `planner.agent.md:23`: `run the setup-card Checkpoint when the phase opens with setup cards` becomes `run Setup-Card Approval when the phase opens with setup-card Cards`, so the lowercase `setup-card` literal that locked `[R13-06]` checks stays on the line.
   - `coder.agent.md:3,4,16` and `test-author.agent.md:3,15`: every `slice card` becomes `Card` (`one delegate-tier Card`, `Paste one Card.`, `You receive one Card.`, `for one Card`, `one Card, the phase's`).
   - `work-planner/SKILL.md:115`: `at the Phase Review Checkpoint` becomes `at Phase Review`.
   - `pull-work/SKILL.md:149`: `setup-card approval and phase review approval:` becomes `Setup-Card Approval and Phase Review:`.
