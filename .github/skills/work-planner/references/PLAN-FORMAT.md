@@ -18,6 +18,11 @@ Phase files sit beside it as `phase-NN.md` ([format](PHASE-FORMAT.md)).
 - phase table
 - slice table for the active phase
 - `ADR candidates`, only while any await approval
+- `Carry-forward`, only while cross-phase reminders or deferred edge-case tests await a later phase
+
+## Carry-forward
+
+Cross-phase reminders discovered during an earlier phase (for example, an edge-case test to include in a later phase) that must survive fresh `/pull-work` sessions instead of living only in a disposable phase brief. One bullet per item naming the target phase (`P03: ...`). Remove each item once planned into a card; omit the section when empty.
 
 ## ADR Candidates
 

@@ -16,6 +16,7 @@ Required input: `.workflow/language.md` (product vocabulary). If it is missing, 
 You receive one Card, the phase's `Harness` lines, the spec path, the `.workflow/language.md` path, and the test file paths assigned to the card. Write the acceptance tests that define "done". A weaker model will make them pass and cannot change them, so they must be exactly right.
 
 - `build` cards: create one test per scenario in the assigned paths. Tag each test with its scenario ID using the harness convention.
+- `verify` cards: create one test per quality-threshold or cross-cutting scenario in the assigned paths. These verify behavior expected to already hold, so they may pass immediately against the current code.
 - `test-fix` cards with `Scope: assertion`: edit only the test files listed in the card, for the scenarios in `Restores`. Change nothing else.
 - `test-fix` cards with `Scope: fixture`: change only fixture setup inside the listed test files, so each fixture again holds one fault. Never add, remove, or edit an assertion, a test title, or a shared support file. If a test cannot pass without an assertion change, stop and report.
 - Drive the product boundary the card names (CLI, API, file format). Never import internal modules or assert internal state.
@@ -25,6 +26,7 @@ You receive one Card, the phase's `Harness` lines, the spec path, the `.workflow
 - If the harness itself needs changes, stop and report.
 - Run the tests:
   - `build`: each must fail because the behavior is missing, not because of a syntax, import, or harness error. Fix any test that fails for the wrong reason.
+  - `verify`: run the tests and report whether they pass or fail against the current code (a pass is expected; a failure signals a real threshold miss).
   - `test-fix` for a surviving mutant: the strengthened test must still pass against the current code.
   - `test-fix` with `Scope: fixture`: the repaired tests must pass against the current code.
 

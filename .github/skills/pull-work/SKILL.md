@@ -99,7 +99,7 @@ This step repairs a fixture and never changes what a test expects. It does not i
 
 ## Gate (`Next: gate PNN`)
 
-Run the phase header's `Gate` commands. The `small` lane runs only the first:
+Run every step of the phase header's `Gate` commands on every Gate pass (including after a review-driven `fix` card; never skip traceability or lock checks). The `small` lane runs only the first:
 
 1. full suite passes, excluding only the `Known failures` listed with an owning phase
 2. traceability: every scenario ID owned by this phase's cards has a tagged test that ran and passed; every failing test is a `Known failures` entry of this phase whose owner is a later phase
@@ -115,7 +115,7 @@ Pass sets `Next: review PNN`. Any failure or survivor sets `Next: triage PNN`.
 Reviews only critical code, once per phase, after the gate passes. Critical cards carry `Review: required` (PHASE-FORMAT defines the criteria).
 
 1. Without a `Review pending` line in `plan.md`, this is the phase's first pass: write `Review pending:` with every `Review: required` card ID. If the list is empty, complete the phase (last paragraph). Collect the pending cards' `Files`.
-2. Dispatch the `code-review` agent with `git diff <Phase base>..HEAD -- <those files>`, the spec path, and each card's `Decisions`. Ask only for high-confidence defects: bugs, security and trust-boundary flaws, resource or data loss, and shared structures that later cards will misuse.
+2. Dispatch the `code-review` agent with `git diff <Phase base>..HEAD -- <those files>`, the spec path, and each card's `Decisions`. On a re-review pass (when `Review pending` holds only review-driven `fix` cards), also pass the current file contents at `HEAD` so the reviewer verifies the fixed state rather than re-flagging resolved findings. Ask only for high-confidence defects: bugs, security and trust-boundary flaws, resource or data loss, and shared structures that later cards will misuse.
 3. Classify each finding:
 
 | Finding | Action |
@@ -125,7 +125,7 @@ Reviews only critical code, once per phase, after the gate passes. Critical card
 | code is right but the spec is wrong or silent | redirect to `behavior-spec` |
 | style, naming, or preference | drop it |
 
-After classifying, replace `Review pending` with only the review-driven `fix` cards, so the next pass after the gate reviews just those. With no actionable finding, remove the `Review pending` line, set the phase `completed`, set `Next: plan PNN+1` (or `Next: done` once every requirement and quality threshold in the spec has a passing scenario), and commit. Before the completion commit, run `node .github/skills/pull-work/scripts/plan-check.mjs <slug> PNN` and fix every line it prints; it checks that `plan.md` shows PNN completed, has no PNN slice table or `Review pending` line, and lists exactly the uncovered IDs in its gap (`none` when `Next: done`).
+After classifying, replace `Review pending` with only the review-driven `fix` cards, so the next pass after the gate reviews just those. With no actionable finding, remove the `Review pending` line, record any cross-phase reminders under `Carry-forward` in `plan.md` (not only in the brief), set the phase `completed`, set `Next: plan PNN+1` (or `Next: done` once every requirement and quality threshold in the spec has a passing scenario), and commit. Before the completion commit, run `node .github/skills/pull-work/scripts/plan-check.mjs <slug> PNN` and fix every line it prints; it checks that `plan.md` shows PNN completed, has no PNN slice table or `Review pending` line, and lists exactly the uncovered IDs in its gap (`none` when `Next: done`).
 
 ## Triage (`Next: triage PNN`)
 

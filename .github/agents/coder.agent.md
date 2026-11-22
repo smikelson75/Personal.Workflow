@@ -22,7 +22,7 @@ You receive one Card. The card is complete. Do exactly what it says.
 5. Implement the behavior the scenarios describe, not the fixtures. Never branch on a test's literal values (file names, dates, sample text) unless the card's `Decisions` name them; a check flags test literals found in product code.
 6. If a `Stop and report if` condition happens, stop immediately and report. Do not work around it. A tool call denied as a locked acceptance test is always a stop.
 
-You may add unit tests inside the listed files' folders if they help you. They are not required.
+When `Files` includes unit-test paths, write focused unit tests there covering the card's logic and edge cases (never edit locked `Acceptance tests`). Otherwise, unit tests are optional and may only be added inside `Files`.
 
 Report:
 

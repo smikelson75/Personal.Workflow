@@ -15,7 +15,10 @@ This is the C#/.NET adapter for [`mutation-testing/protocol.md`](../mutation-tes
 This adapter owns two things in the target repository:
 
 1. `stryker-config.json` at the repository root.
-2. The mutation step inside each phase's final integration slice verification command.
+2. The phase Gate's `mutation` line, which runs [`scripts/mutation-gate.mjs`](scripts/mutation-gate.mjs).
+
+- **Mutation stack:** dotnet, csharp
+- **Mutation command:** node .github/skills/stryker-dotnet/scripts/mutation-gate.mjs --since <phase-base>
 
 ## 1. Before You Start
 
@@ -120,7 +123,7 @@ Do these steps every time. Do not report a score until step 4 passes.
 
 5. Report the result using section 10.
 
-Reference implementation in this repository: [`eng/Measure-Phase.ps1`](../../../eng/Measure-Phase.ps1) runs Stryker and saves the log; [`eng/Test-MutationReport.ps1`](../../../eng/Test-MutationReport.ps1) applies this table to the JSON report and prints the score. The script passes `--break-at 0` to Stryker so a non-zero Stryker exit always means the tool failed. The evaluator then enforces the configured `break` only on a complete run (exit code 2 = below threshold, exit code 1 = incomplete).
+Use [`scripts/mutation-gate.mjs`](scripts/mutation-gate.mjs) to automate steps 1–4. It builds the solution, runs Stryker from the unit-test project folder with `--break-at 0`, saves the console log, applies the Run Completeness table above to `mutation-report.json`, and enforces `thresholds.break` only on a complete run (exit 0 = complete and at/above `break`, exit 1 = incomplete or tool failure, exit 2 = complete run below `break`).
 
 ## 7. Known-Invalid Mutations (Report Only, Do Not Fix)
 
@@ -153,7 +156,7 @@ Log signal:
 
 **Usual cause:** CS0165, "use of unassigned local variable". A mutant removed a branch, `continue`, `return`, or condition that the compiler needed to prove a local variable was assigned. It is a code-shape problem, not a bug.
 
-**Fix:** rewrite the method so every local variable is assigned before any branch that could skip the assignment. Before/after examples: [`tdd-csharp/docs/stack.md` → Mutation-Safe Code Shapes](../tdd-csharp/docs/stack.md#mutation-safe-code-shapes).
+**Fix:** rewrite the method so every local variable is initialized before any branch that could skip assignment (for example, `var result = default(T);` instead of `T result;` assigned inside `if`/`else` branches, or return directly from each branch).
 
 Report each dropped method as `<file>::<Method>` with the proposed rewrite. The method name in the log is the enclosing member, not always the exact line.
 

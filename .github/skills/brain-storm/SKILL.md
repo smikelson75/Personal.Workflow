@@ -115,7 +115,7 @@ If the user ends early, still write the session file with `Status: draft` and th
 
 After writing the Session and Glossary, run `node .github/tools/workflow-check/bin/workflow-check.mjs` from the repo root, so the whole Workflow Folder is checked.
 
-- Fix every `error` Finding anchored at the new Session or the Glossary, and rerun until none remain there.
+- Fix every `error` Finding anchored at the new Session or the Glossary, and rerun until none remain there. If fixing a Finding changes an already-approved Glossary term or `Avoid` list, confirm the adjustment with the Developer before committing rather than editing approved vocabulary silently.
 - Weigh each `warning` anchored at the new Session or the Glossary: fix it, or leave it deliberately and name it in the brief. Ignore warnings anchored at prior Sessions.
 - Never edit a prior Session to clear a Finding. When an `error` Finding is anchored at a prior Session, once your own errors are cleared, show each such Finding line to the Developer instead of finishing.
 

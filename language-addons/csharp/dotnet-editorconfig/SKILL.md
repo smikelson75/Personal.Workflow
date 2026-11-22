@@ -8,12 +8,19 @@ disable-model-invocation: false
 
 # .NET EditorConfig Adapter
 
-The C#/.NET adapter for [`code-style/protocol.md`](../code-style/protocol.md). Load the protocol first; it owns the enforcement rules, repository maturity paths, and the `agent-instructions` handoff. This file supplies only what is specific to .NET.
+Sets up a root, build-enforced `.editorconfig` and `Directory.Build.props` for C#/.NET repositories.
 
 Owns two durable outputs in the target repository:
 
 - `.editorconfig` at the repository root (style and analyzer severities).
 - `Directory.Build.props` at the repository root (build-time enforcement inherited by every project, including projects created later).
+
+## Repository Maturity Paths
+
+Pick the enforcement level based on how mature the repository is:
+
+- **New or freshly scaffolded repo:** strict enforcement (`TreatWarningsAsErrors=true`, `AnalysisMode=All`, `EnforceCodeStyleInBuild=true`).
+- **Existing repo with code:** start with warnings (`TreatWarningsAsErrors=false`, `AnalysisMode=Recommended` or `All`) so existing debt is visible without blocking builds; tighten to errors once cleaned up.
 
 ## Mode
 
@@ -25,7 +32,7 @@ Owns two durable outputs in the target repository:
 
 Chosen when the user accepts industry best practices.
 
-1. Confirm three inputs only: target framework(s), indent size (default 4 / 2 for markup), and enforcement level, chosen per the protocol's maturity paths.
+1. Confirm three inputs only: target framework(s), indent size (default 4 / 2 for markup), and enforcement level (per Repository Maturity Paths above).
 2. Write `.editorconfig` from [references/BASELINE.md](references/BASELINE.md).
 3. Write or amend `Directory.Build.props` from [references/ENFORCEMENT.md](references/ENFORCEMENT.md).
 4. Verify and report.
@@ -61,13 +68,14 @@ How the protocol's non-negotiables map to MSBuild, per [references/ENFORCEMENT.m
 
 ## Verification
 
-Run and report both:
+Run and report all three:
 
+- Check every `.csproj` file in the repository and confirm none retains forbidden properties (`EnforceCodeStyleInBuild`, `EnableNETAnalyzers`, `AnalysisLevel`, `AnalysisMode`, `Nullable`, `LangVersion`, `TreatWarningsAsErrors`); strip any emitted by project templates.
 - `dotnet build -c Release` — proves style violations surface at compile time.
 - `dotnet format --verify-no-changes` — proves the existing tree already satisfies the config.
 
-If either fails, report the top violation codes and counts, and ask whether to fix the code or change the standard. Do not silently downgrade a severity to make the build pass.
+If either build or format fails, report the top violation codes and counts, and ask whether to fix the code or change the standard. Do not silently downgrade a severity to make the build pass.
 
 ## Exit Conditions
 
-Done when `.editorconfig` and `Directory.Build.props` exist at the root, both verification commands were run, their results were reported, and the protocol's `/agent-instructions` handoff text was emitted. Return a short brief: files written, deviations from baseline, verification output, unresolved violations, and the handoff instruction.
+Done when `.editorconfig` and `Directory.Build.props` exist at the root, forbidden properties are stripped from individual `.csproj` files, and both `dotnet build` and `dotnet format` were run and reported. Return a short brief: files written, deviations from baseline, verification output, and any unresolved violations.

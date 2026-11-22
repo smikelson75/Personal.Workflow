@@ -18,6 +18,9 @@ This adapter owns three things in the target repository:
 2. The phase Gate's `mutation` line, which runs [`scripts/mutation-gate.mjs`](scripts/mutation-gate.mjs).
 3. The `reports/` and `.stryker-tmp/` entries in `.gitignore`.
 
+- **Mutation stack:** javascript, node-javascript, node
+- **Mutation command:** node .github/skills/stryker-javascript/scripts/mutation-gate.mjs --since <phase-base>
+
 ## 1. Before You Start
 
 - `vitest-javascript` is set up. `vitest.unit.config.js` exists and `npm run test:unit` passes. If there are no unit tests, stop. Follow the protocol's "Mature code, no tests" path.

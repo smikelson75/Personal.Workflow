@@ -162,20 +162,18 @@ dotnet_analyzer_diagnostic.category-Reliability.severity = warning
 dotnet_analyzer_diagnostic.category-Security.severity = error
 dotnet_analyzer_diagnostic.category-Performance.severity = suggestion
 
+# Test projects: keep strict rules on src/** while allowing scenario-ID test names
+# (R1_01_...), public test helpers, and omitting XML doc boilerplate on test methods.
+[tests/**/*.cs]
+dotnet_diagnostic.CA1707.severity = none   # underscores in test method names
+dotnet_diagnostic.CA1515.severity = none   # public types in test projects
+dotnet_diagnostic.CS1591.severity = none   # XML doc comments on test classes/methods
+dotnet_diagnostic.CA1861.severity = none   # constant arrays as arguments
+
 # Generated code
 [*.{Designer,g,generated}.cs]
 generated_code = true
 dotnet_analyzer_diagnostic.severity = none
-```
-
-## Optional Test Relaxation
-
-Add only when the user asks for relaxed test projects.
-
-```ini
-[tests/**/*.cs]
-dotnet_diagnostic.CA1707.severity = none   # underscores in test method names
-dotnet_diagnostic.CA1861.severity = none   # constant arrays as arguments
 ```
 
 ## Notes
