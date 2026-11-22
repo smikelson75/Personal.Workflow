@@ -2,10 +2,10 @@
 
 - Spec: [calc-repl-walkthroughs-spec.md](../../specs/calc-repl-walkthroughs-spec.md)
 - Lane: standard
-- Next: phase review P01
-- Tests locked: none (not yet locked)
+- Next: P01 S01, S02
+- Tests locked: `9a3ff11`
 - Oracle: `tests/acceptance`
-- Phase base: none (not yet started)
+- Phase base: `9a3ff11`
 - Reconciled: `20ce4a5a45239004533bd4e58785cc9f664302a5`
 
 ## Current state
@@ -24,12 +24,12 @@
 
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
-| P01 | Migrate all three walkthroughs to calc-repl | planned | R24, R25, R26, R27, R28, Q-cross-stack-consistency, Q-zero-stale-featured-app-leaks, Q-powershell-copy-pasteability | [phase-01](phase-01.md) |
+| P01 | Migrate all three walkthroughs to calc-repl | in progress | R24, R25, R26, R27, R28, Q-cross-stack-consistency, Q-zero-stale-featured-app-leaks, Q-powershell-copy-pasteability | [phase-01](phase-01.md) |
 
 ## P01 slices
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Migrate docs/walkthrough-node.md to calc-repl | planned |
-| S02 | Migrate docs/walkthrough-typescript.md to calc-repl | planned |
-| S03 | Migrate docs/walkthrough-csharp.md to calc-repl and verify cross-stack consistency | planned |
+| S01 | Migrate docs/walkthrough-node.md to calc-repl | ready |
+| S02 | Migrate docs/walkthrough-typescript.md to calc-repl | ready |
+| S03 | Migrate docs/walkthrough-csharp.md to calc-repl and verify cross-stack consistency | ready |
