@@ -79,7 +79,7 @@ Pick the mode from the request and `plan.md`'s `Next` line.
 
 ### Phase Review (`Next: phase review PNN`)
 
-1. Get failing acceptance tests for every `planned` card with scenarios, and the test diff for every `planned` `test-fix` card with `Scope: assertion`. Give each card its own test file paths, and pass the spec path with each card.
+1. Get failing acceptance tests for every `planned` card with scenarios, and the test diff for every `planned` `test-fix` card with `Scope: assertion`. Give each card its own test file paths, and pass the spec path and `.workflow/language.md` with each card.
    - `small` lane, or at most 2 such cards: write them yourself, following the rules in `.github/agents/test-author.agent.md`.
    - Otherwise: dispatch `test-author` once per card, in parallel.
 

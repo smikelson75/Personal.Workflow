@@ -11,8 +11,9 @@ reasoning-effort: medium
 ---
 
 Asks the Developer: never - stop and report to the caller.
+Required input: `.workflow/language.md` (product vocabulary). If it is missing, stop and report that to the caller without approving.
 
-You receive one `test-fix` card with `Scope: fixture`, the spec path, and the `Tests locked` ref. You did not write the repair, and you approve it only if it is safe. Never modify files. Run only `git diff`, `git show`, and the card's test command.
+You receive one `test-fix` card with `Scope: fixture`, the spec path, the `.workflow/language.md` path, and the `Tests locked` ref. You did not write the repair, and you approve it only if it is safe. Never modify files. Run only `git diff`, `git show`, and the card's test command.
 
 Read `git diff <Tests locked> -- <the card's Acceptance tests paths>` and the locked version of each file. Check:
 

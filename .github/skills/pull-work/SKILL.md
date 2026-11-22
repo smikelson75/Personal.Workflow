@@ -13,19 +13,22 @@ The single entry point for moving a plan forward. Each run checks the working tr
 
 Formats live with `work-planner`: [PLAN-FORMAT](../work-planner/references/PLAN-FORMAT.md) and [PHASE-FORMAT](../work-planner/references/PHASE-FORMAT.md). Planning modes (Plan, Phase Review, Revise) live in [work-planner](../work-planner/SKILL.md); load that skill when `Next` routes there, then continue here.
 
+Required input: `.workflow/language.md` (product vocabulary).
+
 ## Preflight
+
+Arguments are parsed first by `node .github/skills/pull-work/scripts/parse-args.mjs <arguments>`, which prints JSON with `slug` and `bug`; exit 2 shows the usage line `/pull-work [<slug>] bug: <description>` and stops with no question and no change. With `bug` set, Preflight and the spec reconcile run first, then load `work-planner` and run Defect mode. With `bug` set and no plan for the slug, or no plan at all, report that and change nothing.
 
 Run these as commands, not reasoning.
 
-1. Find `.workflow/plans/*/plan.md` files whose `Next` is not `done`. Use the argument's slug, the only open plan, or ask which one (one question, listing each plan's `Next`). With no plan: no spec in `.workflow/specs/` means redirect to `brain-storm`; a spec without a plan means load `work-planner` for Plan mode.
-2. `git status --porcelain` lists only work the selected plan expects in flight:
+1. Run `node .github/skills/pull-work/scripts/glossary-check.mjs`. Exit 2 stops with its message, `Missing required Glossary at .workflow/language.md. Run /brain-storm to establish it before continuing with /pull-work.`, and changes nothing.
+2. Find `.workflow/plans/*/plan.md` files whose `Next` is not `done`. Use the argument's slug, the only open plan, or ask which one (one question, listing each plan's `Next`). With no plan: no spec in `.workflow/specs/` means redirect to `brain-storm`; a spec without a plan means load `work-planner` for Plan mode.
+3. `git status --porcelain` lists only work the selected plan expects in flight:
    - `Next: phase review PNN`: the `Acceptance tests` paths of the active phase's `planned` cards, which are tests awaiting approval. Resume Phase Review by presenting their existing diff; don't author them again.
    - `Next` includes `running SNN`: `plan.md` and the `Files` of those slices, which are partial work from an interrupted run. Resume Dispatch.
    - Anything else was made outside the workflow, because the workflow commits everything it writes. Stop and show the files grouped by folder, then recommend `/conventional-commit` for finished work or `git stash` for experiments. Never commit, stash, or discard them yourself.
 
 Plan candidates come from `node .github/skills/pull-work/scripts/reconcile-check.mjs candidates`: open plans, `done` plans whose spec changed, and specs with no plan. After selecting a plan, run `node .github/skills/pull-work/scripts/reconcile-check.mjs status <slug>`; on `changed`, load `work-planner` and run Reconcile mode before routing on `Next`.
-Arguments are parsed by `node .github/skills/pull-work/scripts/parse-args.mjs <arguments>`, which prints JSON with `slug` and `bug`; exit 2 shows the usage line `/pull-work [<slug>] bug: <description>` and stops with no question and no change. With `bug` set, Preflight and the spec reconcile run first, then load `work-planner` and run Defect mode.
-With `bug` set and no plan for the slug, or no plan at all, report that and change nothing.
 
 ## Route
 
@@ -87,9 +90,9 @@ When a `Scope: fixture` card is `planned`, set `Next: fixture repair SNN` for th
 
 This step repairs a fixture and never changes what a test expects. It does not involve the user.
 
-1. Restore the card's `Acceptance tests` paths to `Tests locked`, then dispatch `test-author` with the card, the `Harness` lines, and the spec path.
+1. Restore the card's `Acceptance tests` paths to `Tests locked`, then dispatch `test-author` with the card, the `Harness` lines, the spec path, and `.workflow/language.md`.
 2. Run the Fixture Repair Check (PHASE-FORMAT).
-3. Dispatch `test-reviewer` with the card, the spec path, and the `Tests locked` ref.
+3. Dispatch `test-reviewer` with the card, the spec path, `.workflow/language.md`, and the `Tests locked` ref.
 4. If both pass, commit the card's paths, then set `Tests locked` to that commit, the card `completed`, the slices it unblocks `ready`, recompute `Next` (the next pending `Scope: fixture` card first), and commit. If either fails, restore the paths to `Tests locked`, set the card's `Scope` to `assertion`, put the reviewer's report on the card, set `Next: phase review PNN`, and commit.
 
 `small` lane: you write the repair, there is no lock to diff or move, and `test-reviewer` reviews the change against `HEAD`.
