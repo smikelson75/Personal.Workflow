@@ -2,8 +2,8 @@
 
 - Spec: [calc-repl-walkthroughs-spec.md](../../specs/calc-repl-walkthroughs-spec.md)
 - Lane: standard
-- Next: phase review P01
-- Tests locked: `9a3ff11`
+- Next: P01 S03
+- Tests locked: `0567320`
 - Oracle: `tests/acceptance`
 - Phase base: `9a3ff11`
 - Reconciled: `20ce4a5a45239004533bd4e58785cc9f664302a5`
@@ -32,5 +32,5 @@
 |---|-------|--------|
 | S01 | Migrate docs/walkthrough-node.md to calc-repl | completed |
 | S02 | Migrate docs/walkthrough-typescript.md to calc-repl | completed |
-| S03 | Migrate docs/walkthrough-csharp.md to calc-repl and verify cross-stack consistency | blocked |
-| S04 | Fix fence-aware section slicing in tests/acceptance/p01-s03.test.mjs | planned |
+| S03 | Migrate docs/walkthrough-csharp.md to calc-repl and verify cross-stack consistency | ready |
+| S04 | Fix fence-aware section slicing in tests/acceptance/p01-s03.test.mjs | completed |
