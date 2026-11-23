@@ -1,11 +1,12 @@
 # Incubate Skill Session Review & Recommended Changes
 
-**Purpose:** Combined retrospective of the first two real `/incubate` sessions, synthesizing independent reviews from two review sessions (`9cc1e41f` and `39449498` on `claude-opus-5.5`), with concrete conclusions for refining the `incubate` skill, its format, harness usage, and developer habits.
+**Purpose:** Running retrospective of real `/incubate` sessions. Sections 1–5 are the baseline review of Sessions 1–2 (synthesized from review sessions `9cc1e41f` and `39449498` on `claude-opus-5.5`). Section 6 is the **running signal tracker** used to measure whether skill changes actually improve sessions over time; Sections 7+ log each later session against it.
 
 **Sessions reviewed:**
 - **Session 1 (`bc4d62d8`):** ~71 min (`2026-11-22 15:44–16:56 UTC`), `gemini-4-neon` (high effort) + `explore` (`gpt-6-luna`) + `research` (`claude-sonnet-5.5`), 13 `ask_user` turns, ~87K chars parent assistant prose (~92K total output tokens). Created [home-repo-workflow.md](../../.workflow/incubations/home-repo-workflow.md) (`7687b01`).
 - **Session 2 (`8dcf5bf8`):** ~30 min (`2026-11-22 17:28–17:58 UTC`), `gemini-4-neon` (high effort), 9 `ask_user` calls (1 schema error, 1 user-aborted `ask_user` followed by `"1"`), ~55K chars parent assistant prose (~52.5K total output tokens). Updated [home-repo-workflow.md](../../.workflow/incubations/home-repo-workflow.md) in place (`12e1548`).
-
+- **Session 3 (`8a1dfca9`):** ~29 min (`2026-11-23 00:41–01:10 UTC`), `gemini-4-neon` (medium), first session after `c6fcbb3`. Note saved late after a network error (`e85c697`). See [Section 7](#7-session-3-8a1dfca9--first-run-after-c6fcbb3).
+- **Session 4 (`303d1328`):** ~47 min (`2026-11-23 03:50–04:37 UTC`), `gemini-4-neon` (medium) + 1 `explore` (`gpt-6-luna`), first session after `5bba79e` + `7bd3f28`. Updated the note (`b0f69dc`). See [Section 8](#8-session-4-303d1328--first-run-after-5bba79e--7bd3f28).
 **Related workflow files:**
 - [incubate SKILL.md](../../.github/skills/incubate/SKILL.md)
 - [INCUBATION-FORMAT.md](../../.github/skills/incubate/references/INCUBATION-FORMAT.md)
@@ -112,3 +113,107 @@ Both sides reinforced one another:
 ### E. Immediate Next Step for `home-repo-workflow.md`
 - **Do not add more architecture before running the 4-step work-machine pressure test** recorded in [home-repo-workflow.md](../../.workflow/incubations/home-repo-workflow.md).
 - On the next resume, bring back the probe results and explicitly compare the dual-manifest + generator model against a **simplest 80/20 baseline** (e.g., local clone + minimal sync script without dual-manifest complexity) before deciding whether to graduate into `/brain-storm`.
+
+---
+
+## 6. Signal Tracker (Running)
+
+Add one column per reviewed session. Sources are the session's `events.jsonl` (`session.usage_record`, `tool.execution_start`, `assistant.message`) and its turns. **Hard** signals should hit their target every session; a miss is a regression. **Variable** signals depend on the model, the topic, and the session's length, so judge them by trend over 3+ sessions, not by a single session.
+
+### Skill changes in effect
+
+| Commit | Change | First session under it |
+|---|---|---|
+| `c6fcbb3` | Ban `ask_user`; open-ended questions; answer direct questions first; delta-only; Pick Up Here check; 80/20 exit check; tentative language | S3 |
+| `5bba79e` | Ban `"—and …?"` and prose routing menus; delegate large docs to `research`; immediate save on explicit pause | S4 |
+| `7bd3f28` | Shared end-of-turn rule in `user-interaction.md` (mainly targets `brain-storm`) | S4 |
+
+### A. Hard signals (rule compliance)
+
+| Signal | Target | S1 | S2 | S3 | S4 |
+|---|---|---|---|---|---|
+| `ask_user` calls | 0 | 13 | 9 | 0 | 0 |
+| Steering reminder shown | 1 | ~11 | ~9 | 1 | 1 |
+| Re-printed unchanged recaps/diagrams | 0 | many | many | 0 | 0 |
+| Direct user questions answered visibly first | 100% | ✗ (1 dropped) | ~ | 4/4 | 4/4 |
+| Pick Up Here probe checked before new design | yes | n/a | ✗ | ✓ | ✓ (asked T7, probe **run** in-session) |
+| Note saved + committed in-session on exit | yes | ✓ | ✓ | ✗ (net error; saved later) | ✓ |
+| Unverified claims labelled "settled/verified" | 0 | several | several | 0 | 3 (see §8) |
+
+### B. Variable signals (watch the trend)
+
+| Signal | Better is | S1 | S2 | S3 | S4 |
+|---|---|---|---|---|---|
+| Duration (min) | — | 71 | 30 | 29 | 47 |
+| User turns (typed / one-click or bare) | more typed | few / ~16 | few / ~5 | 5 / 1 | 11 / 0 (+2 screenshot-only) |
+| Main output tokens (reasoning share) | ↓ | ~92K | ~52.5K | ~14K (63%) | ~29.5K (49%) |
+| Output tokens per assistant reply | ↓ | — | — | ~2.3K | ~2.1K |
+| Visible assistant prose (chars) | ↓ | ~87K | ~55K | ~15.6K | ~27.3K (~6.5K is probe steps) |
+| Main input tokens (cache-read share) | ↓ | — | — | ~1.57M | ~1.89M (87%) |
+| `web_fetch` calls | low | — | — | 8 | 0 |
+| Turns ending in 2 questions (`"…, and …?"`) | 0 | — | — | 3 | 1 |
+| Prose routing menus (`"A, or B/pause?"`) | 0 | n/a | n/a | 1 | 1 (borderline; pre-exit fork) |
+| Either/or closing questions (one question, two options) | low | n/a | n/a | — | 2 |
+| Mermaid diagrams that failed to render | 0 | — | — | 0 | 1 |
+| User used a steering command (`"challenge this"`, `"pause"`, …) | ≥1 | 0 | 0 | 0 | 0 (exited with plain "before we quit") |
+| Assistant steelman/80-20 run unprompted | ≥1 when model grows | 0 | 0 | 1 | ✓ (simplified hooks; avoided detour) |
+| Model / effort | — | `gemini-4-neon` high | `gemini-4-neon` high | `gemini-4-neon` med | `gemini-4-neon` med |
+
+---
+
+## 7. Session 3 (`8a1dfca9`) — First Run After `c6fcbb3`
+
+Reviewed in `5a8b0a63` and `e7e1fa49`; recorded here so the tracker has a baseline.
+
+- **Improved:** All four Section 1 breakdowns were gone on the same model. The session used no forms, showed the reminder once, answered every direct question, flagged unverified items as **Unverified**, and offered the 80/20 option in turn 0. The user typed every reply and pushed back (*"What is plugin's suppose to solve?"*), which collapsed the plugin design.
+- **Still weak:** Three turns ended with two questions joined by `"—and"`, and one ended with a prose routing menu that drew a bare `"Sure."`. One recommendation (delete `CLAUDE.md`) contradicted its own caveats. Fetching a large docs page in 8 chunks pushed input to ~1.57M tokens. The note was not written in-session.
+- **Led to:** `5bba79e`.
+
+---
+
+## 8. Session 4 (`303d1328`) — First Run After `5bba79e` + `7bd3f28`
+
+**Topic:** Whether to split multi-stack work out of the Home Repo incubation. **Outcome:** Kept it in. Most work repos are single-stack, so the real bottleneck is a many-to-many sibling graph (3 APIs sharing 1 transactional DB, plus 1 read-only reporting DB) and the dual-harness layout. The long-pending layout probe was finally run live and broke two assumptions.
+
+### Did it improve?
+
+**Yes. The skill fixes held, and this is the first session that turned an assumption into evidence.** Every hard signal from Sections 1–5 stayed fixed for a second straight session. The new failure modes are smaller and of a different kind: over-confidence while reading results, not conversation breakdown.
+
+| Area | vs. S3 | Evidence |
+|---|---|---|
+| Pick Up Here probe | **Big win** | At T7 the assistant asked *"did you get a chance to run the quick VS Code probe?"* before adding more design. It then wrote a throwaway probe and walked through the results over 3 rounds. Found: `.vscode/settings.json` Claude-isolation flags are Local-harness-only, and `.github/hooks/` + `.claude/settings.json` double-fire in Agent Host. This was the open item from S1. |
+| Note saved on exit | **Fixed** | Summarized planned edits, got *"Yes. Go ahead"*, edited, committed `b0f69dc`, clean tree. |
+| Double-barreled endings | **Better** (3 → 1) | Only T2: *"how do you actually open and work across them…, and where does the current workflow first get in your way?"* The user replied *"My answer is kinda vague"*, a sign the question was too abstract. |
+| Prose routing menu | **Same** (1 → 1) | 04:27: *"Would you like to pause here and save…, or do you want to try `chat.useClaudeHooks: false` quickly before we wrap up?"* `5bba79e` bans this explicitly. It recurred anyway, at the same spot (just before exit). |
+| `web_fetch` bloat | **Fixed** (8 → 0) | No external docs were needed; the probe replaced research. |
+| Per-reply output | Flat (~2.3K → ~2.1K) | Total output doubled only because the session was longer and included probe instructions. |
+
+### New or recurring weaknesses
+
+| Issue | Evidence | Kind |
+|---|---|---|
+| **Over-confident reads of partial results** | 04:23: *"No accidental Claude hook double-firing by default"*, based on a UI hint. The next result showed double-firing. 04:27: `chat.agentFilesLocations` marked **Passed** and said to *"prove… zero collision"*. 6 min later it was found to be ignored, and the single picker entry came from name precedence. Both were corrected by evidence in-session. | New |
+| **Over-claimed scope in the note** | Heading: *"Verified zero-duplicate synced layout (Copilot Agent Host + Claude Code)"*. No part of the probe ran in Claude Code, and the "only `.claude/settings.json`" hook setup was inferred, not run. The deny-payload caveat is recorded; the Claude-side gap is not. | Regression vs. S3 |
+| **Broken Mermaid** | T3 `sequenceDiagram` `Note` contained `;`, which caused a parse error. The user reported it; fixed in T4. | New (variable) |
+| **PowerShell UTF-8 BOM habit** | T8 probe script used `Set-Content ... -Encoding UTF8` (can emit a BOM on PowerShell 5.1, right after `f7a4c7f` fixed that in the pressure-test doc). Did not break this run. | Minor |
+| **Hype tone** | *"Whoa—…saved us from a huge trap!"*, *"paid off big time"*, *"Good thing we tested!"* | Minor |
+| **Input cost is mostly harness overhead** | ~1.89M input tokens over 22 main calls. Each call carried **142 tool schemas (~50K tokens)**, so ~1.1M was tool definitions, not conversation. 87% was cache-read. | Harness |
+
+### User side
+
+- **Strong:** The user opened with a framed question and a stated hesitation, and typed all 11 replies with no one-click answers. T6 (the real 3-API/2-DB topology) was again the turn that set direction. The user reported the broken diagram right away and flagged their own vague answer. They ran the probe live, sent screenshots, and closed the session cleanly.
+- **Still missing:** No `"challenge this"` in any of the 4 sessions. When the assistant reversed its T0 position, no one argued for the abandoned option. The user also kept `gemini-4-neon`, even though `3a2bf82a` recommended trying Claude Sonnet/GPT/Gemini Pro for this decision. Section C.2's model test is still open.
+- **Minor:** One screenshot was dropped by the 10-image request limit (`session.warning`). Pasting `hook.log` as text avoids that.
+
+---
+
+## 9. Open Recommendations (Carry Forward)
+
+| # | Recommendation | Target | Signal it moves | Status |
+|---|---|---|---|---|
+| 1 | Under the existing "never label unverified … settled" rule, add: name **what was observed and where** (harness, config) before calling something *passed/verified*; inferences stay labelled as inferences. | `incubate` SKILL §Intro / FORMAT | Unverified claims labelled verified | Watching (hold skill edits for a few sessions) |
+| 2 | Keep Mermaid labels plain: no `;`, `<br/>` inside `Note`, or unquoted special characters. | `incubate` SKILL §2 | Mermaid render failures | Watching |
+| 3 | Pre-exit routing menu recurred despite `5bba79e` (borderline binary fork in S4): **watch, don't add rules yet.** If it shows up in S5 on a different model, fix the exit wording in §5. If not, it is a `gemini-4-neon` habit. | — | Prose routing menus | Watching |
+| 4 | Run the next `/incubate` on a non-Gemini model (C.2) to separate skill effects from model effects. | Developer habit | All variable signals | Open since S2 |
+| 5 | Trim enabled MCP servers/tools for incubate sessions (142 tools ≈ 50K tokens per call). | Harness | Input tokens | Proposed |
+| 6 | Use `"challenge this"` once per session when an idea starts accumulating layers. | Developer habit | Steering command used | Open since S2 |
