@@ -14,16 +14,6 @@ Transparently communicate the workflow's state, decisions, and reasoning to the 
 4. Keep the workflow portable and easy to integrate with new and existing projects and repositories.
 5. Prioritize allowing agents agency and autonomy within the workflow, enabling them to make informed decisions and take appropriate actions without constant user intervention. Bubble up critical issues to the user only when necessary.
 
-
-# User Interaction
-
-Every skill or agent that asks the user questions must:
-- give context with each question: where we are, why it matters, and options with tradeoffs plus a recommendation when the answer space is known;
-- ask one question at a time in plain language, defining unfamiliar terms;
-- keep a conversational, unrushed pace: discuss when the user is unsure or pushes back, and confirm brief answers before treating them as settled.
-
-Token efficiency comes from not repeating settled work, never from shortening what the user reads.
-
 # Memory files
 
 Do not use memory files for storing information. All necessary data should be managed within the unified workflow itself.

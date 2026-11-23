@@ -6,7 +6,8 @@ Every skill and agent that asks the Developer a question follows these rules.
 
 - **Context:** give context with each question: where the work stands, why the answer matters, and options with tradeoffs plus a recommendation when the answer space is known.
 - **One at a time:** ask one question at a time in plain language, defining unfamiliar terms.
-- **Pace:** keep a conversational, unrushed pace: discuss when the Developer is unsure or pushes back, and confirm brief answers before treating them as settled.
+- **End of turn:** after asking a question, end the turn. Never write, assume, or continue past the Developer's answer.
+- **Pace:** keep a conversational, unrushed pace: discuss when the Developer is unsure or pushes back. Confirm brief open-ended or hedged answers before treating them as settled; a pick from the listed options is settled once restated.
 - **Token savings:** token savings never come from shortening what the Developer reads.
 
 ## Checkpoint

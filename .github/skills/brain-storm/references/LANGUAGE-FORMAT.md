@@ -11,7 +11,7 @@ Purpose: the single durable glossary at `.workflow/language.md`, shared by every
 - when the code name differs from the canonical term, record it as `Code:` so discussion and code stay aligned
 - merge synonyms; split only when rules or lifecycle differ
 - ban generic drift terms like `item`, `thing`, `data`, `process`, `service` when a domain term exists
-- do not put generic multi-purpose words (`input`, `output`, `value`, `code`, `line`, `column`) into `Avoid` lists when they appear in ordinary phrases (such as `exit code` or `end of input`), because `workflow-check` flags every non-backticked occurrence; use only genuine synonyms that could confuse readers
+- do not put generic multi-purpose words (`input`, `output`, `value`, `code`, `line`, `column`) into `Avoid` lists when they appear in ordinary phrases (such as `exit code` or `end of input`), because `workflow-check` flags every non-backticked occurrence; use only genuine synonyms that could confuse readers. Apply this check before presenting terms for approval, so approved `Avoid` lists never need changing afterward
 - only stable v1-shaping concepts; if a term is unresolved, ask; do not invent
 - capture only domain meaning; no field names, types, or mappings (user-visible fields go to `behavior-spec`, physical schema to `work-planner`)
 - retired terms move to `Retired` with their replacement; delete them once no session or code uses them

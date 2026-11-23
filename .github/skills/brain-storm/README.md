@@ -10,7 +10,9 @@ This skill needs reasoning more than raw output. Each turn is short, but the mod
 | --------- | ------------------- | -------------- | ----------------------------------------------------- |
 | Anthropic | `claude-opus-5.5`   | `medium`       | `large` ideas, or the user wants deeper pushback |
 | OpenAI    | `gpt-6.2-sol`       | `medium`       | `large` ideas, or the conversation turns into conflict resolution |
-| Google    | `gemini-4-neon`     | `medium`       | `large` ideas, or a big existing codebase to ground against |
+| Google    | `gemini-4-neon`     | not recommended | — see note below                                     |
+
+> **Don't use `gemini-4-neon` for brain-storm.** In three of three sessions it broke turn discipline. It asked several questions in one reply and wrote the user's answers itself, and one of those sessions was committed with decisions the user never made. In another it re-printed the same long review before nearly every question. It does fine on single-turn work such as reviews and analysis; the problem is long, one-question-at-a-time conversations. Retest it before you list it again.
 
 ### Effort Guidance
 

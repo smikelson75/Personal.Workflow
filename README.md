@@ -130,6 +130,6 @@ See [`language-addons/README.md`](./language-addons/README.md) for stack details
 
 ### Core Reference Files
 
-- **[AGENTS.md](./AGENTS.md)** — repository Purpose, Development Contract, Mission, and interaction rules.
+- **[AGENTS.md](./AGENTS.md)** — repository Purpose, Development Contract, and Mission.
 - **[.workflow/language.md](./.workflow/language.md)** — canonical Glossary of workflow terms.
-- **[.github/user-interaction.md](./.github/user-interaction.md)** — question formatting and Checkpoint bundling rules.
+- **[.github/user-interaction.md](./.github/user-interaction.md)** — user-interaction rules: question formatting, turn discipline, and Checkpoint bundling.

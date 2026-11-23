@@ -92,7 +92,7 @@ Resolve findings yourself. Never turn them into confirmation questions.
 
 - Ask only escalations. Never ask the user to confirm a drafted requirement, a sourced detail, or an assumption.
 - One question at a time, numbered (`Q1`, `Q2`, ...). Plain, full sentences; define unfamiliar terms. Each question gives which requirement it serves, which escalation case it is, why it matters (how behavior differs by answer), and 2-3 options with tradeoffs and a recommendation.
-- If the user is unsure or pushes back, discuss before moving on; confirm brief answers before treating them as settled.
+- If the user is unsure or pushes back, discuss before moving on; confirm brief open-ended or hedged answers before treating them as settled (a pick from the listed options is settled once restated).
 - Push back on vague answers ("handles errors gracefully") by asking for a concrete example.
 
 ## Stop Rule
