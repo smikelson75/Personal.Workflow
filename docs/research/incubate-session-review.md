@@ -7,11 +7,14 @@
 - **Session 2 (`8dcf5bf8`):** ~30 min (`2026-11-22 17:28–17:58 UTC`), `gemini-4-neon` (high effort), 9 `ask_user` calls (1 schema error, 1 user-aborted `ask_user` followed by `"1"`), ~55K chars parent assistant prose (~52.5K total output tokens). Updated [home-repo-workflow.md](../../.workflow/incubations/home-repo-workflow.md) in place (`12e1548`).
 - **Session 3 (`8a1dfca9`):** ~29 min (`2026-11-23 00:41–01:10 UTC`), `gemini-4-neon` (medium), first session after `c6fcbb3`. Note saved late after a network error (`e85c697`). See [Section 7](#7-session-3-8a1dfca9--first-run-after-c6fcbb3).
 - **Session 4 (`303d1328`):** ~47 min (`2026-11-23 03:50–04:37 UTC`), `gemini-4-neon` (medium) + 1 `explore` (`gpt-6-luna`), first session after `5bba79e` + `7bd3f28`. Updated the note (`b0f69dc`). See [Section 8](#8-session-4-303d1328--first-run-after-5bba79e--7bd3f28).
+- **Session 5 (`1e67d797`):** ~66.5 min (~23 min active, ~43.5 min idle; `2026-11-24 01:31–02:38 UTC`), `gemini-4-neon` (medium) + 1 `explore` (`gpt-6-luna` low) in Copilot CLI. Created [onboard-project.md](../../.workflow/incubations/onboard-project.md) (`3c2f2ee`). See [Section 9](#9-sessions-5-1e67d797--6-aded70fc--model-ab-on-onboard-project).
+- **Session 6 (`aded70fc`):** ~130 min (`2026-11-24 02:38–04:49 UTC`), `claude-opus-5.5` (medium) + 1 `research` (`claude-sonnet-5.5` medium) in VS Code. First non-Gemini run. Updated [onboard-project.md](../../.workflow/incubations/onboard-project.md) (`8b2785a`). See [Section 9](#9-sessions-5-1e67d797--6-aded70fc--model-ab-on-onboard-project).
 **Related workflow files:**
 - [incubate SKILL.md](../../.github/skills/incubate/SKILL.md)
 - [INCUBATION-FORMAT.md](../../.github/skills/incubate/references/INCUBATION-FORMAT.md)
 - [user-interaction.md](../../.github/user-interaction.md)
 - [home-repo-workflow.md](../../.workflow/incubations/home-repo-workflow.md)
+- [onboard-project.md](../../.workflow/incubations/onboard-project.md)
 
 ---
 
@@ -130,34 +133,34 @@ Add one column per reviewed session. Sources are the session's `events.jsonl` (`
 
 ### A. Hard signals (rule compliance)
 
-| Signal | Target | S1 | S2 | S3 | S4 |
-|---|---|---|---|---|---|
-| `ask_user` calls | 0 | 13 | 9 | 0 | 0 |
-| Steering reminder shown | 1 | ~11 | ~9 | 1 | 1 |
-| Re-printed unchanged recaps/diagrams | 0 | many | many | 0 | 0 |
-| Direct user questions answered visibly first | 100% | ✗ (1 dropped) | ~ | 4/4 | 4/4 |
-| Pick Up Here probe checked before new design | yes | n/a | ✗ | ✓ | ✓ (asked T7, probe **run** in-session) |
-| Note saved + committed in-session on exit | yes | ✓ | ✓ | ✗ (net error; saved later) | ✓ |
-| Unverified claims labelled "settled/verified" | 0 | several | several | 0 | 3 (see §8) |
+| Signal | Target | S1 | S2 | S3 | S4 | S5 | S6 |
+|---|---|---|---|---|---|---|---|
+| `ask_user` calls | 0 | 13 | 9 | 0 | 0 | 0 | 0 |
+| Steering reminder shown | 1 | ~11 | ~9 | 1 | 1 | 1 | 1 |
+| Re-printed unchanged recaps/diagrams | 0 | many | many | 0 | 0 | ✗ (ASCII 2×, table 3× + 3× self-turns) | 0 |
+| Direct user questions answered visibly first | 100% | ✗ (1 dropped) | ~ | 4/4 | 4/4 | ✗ (denied own leaked Q) | 7/7 (incl. 4 challenges) |
+| Pick Up Here probe checked before new design | yes | n/a | ✗ | ✓ | ✓ (asked T7, probe **run** in-session) | n/a (new note) | ✓ (T1) |
+| Note saved + committed in-session on exit | yes | ✓ | ✓ | ✗ (net error; saved later) | ✓ | ✓ (`3c2f2ee`) | ✓ (`8b2785a`) |
+| Unverified claims labelled "settled/verified" | 0 | several | several | 0 | 3 (see §8) | 0 | 0 in note (1 truncated-listing slip in chat, self-fixed) |
 
 ### B. Variable signals (watch the trend)
 
-| Signal | Better is | S1 | S2 | S3 | S4 |
-|---|---|---|---|---|---|
-| Duration (min) | — | 71 | 30 | 29 | 47 |
-| User turns (typed / one-click or bare) | more typed | few / ~16 | few / ~5 | 5 / 1 | 11 / 0 (+2 screenshot-only) |
-| Main output tokens (reasoning share) | ↓ | ~92K | ~52.5K | ~14K (63%) | ~29.5K (49%) |
-| Output tokens per assistant reply | ↓ | — | — | ~2.3K | ~2.1K |
-| Visible assistant prose (chars) | ↓ | ~87K | ~55K | ~15.6K | ~27.3K (~6.5K is probe steps) |
-| Main input tokens (cache-read share) | ↓ | — | — | ~1.57M | ~1.89M (87%) |
-| `web_fetch` calls | low | — | — | 8 | 0 |
-| Turns ending in 2 questions (`"…, and …?"`) | 0 | — | — | 3 | 1 |
-| Prose routing menus (`"A, or B/pause?"`) | 0 | n/a | n/a | 1 | 1 (borderline; pre-exit fork) |
-| Either/or closing questions (one question, two options) | low | n/a | n/a | — | 2 |
-| Mermaid diagrams that failed to render | 0 | — | — | 0 | 1 |
-| User used a steering command (`"challenge this"`, `"pause"`, …) | ≥1 | 0 | 0 | 0 | 0 (exited with plain "before we quit") |
-| Assistant steelman/80-20 run unprompted | ≥1 when model grows | 0 | 0 | 1 | ✓ (simplified hooks; avoided detour) |
-| Model / effort | — | `gemini-4-neon` high | `gemini-4-neon` high | `gemini-4-neon` med | `gemini-4-neon` med |
+| Signal | Better is | S1 | S2 | S3 | S4 | S5 | S6 |
+|---|---|---|---|---|---|---|---|
+| Duration (min) | — | 71 | 30 | 29 | 47 | 66.5 (~23 active) | 130.3 |
+| User turns (typed / one-click or bare) | more typed | few / ~16 | few / ~5 | 5 / 1 | 11 / 0 (+2 screenshot-only) | 7 / 0 | 28 / 0 |
+| Main output tokens (reasoning share) | ↓ | ~92K | ~52.5K | ~14K (63%) | ~29.5K (49%) | ~29.0K (66%) | ~51.2K (34.5%) |
+| Output tokens per assistant reply | ↓ | — | — | ~2.3K | ~2.1K | ~4.1K/turn | ~1.8K/turn (~1.4K/reply) |
+| Visible assistant prose (chars) | ↓ | ~87K | ~55K | ~15.6K | ~27.3K (~6.5K is probe steps) | ~27.9K (~15K hallucinated) | ~65.7K (~2.3K/turn) |
+| Main input tokens (cache-read share) | ↓ | — | — | ~1.57M | ~1.89M (87%) | ~1.57M (75%) | ~4.35M (79.4%) |
+| `web_fetch` calls (main / subagent) | low | — | — | 8 / 0 | 0 / 0 | 0 / 0 | 0 / 6 (`research` ✓) |
+| Turns ending in 2 questions (`"…, and …?"`) | 0 | — | — | 3 | 1 | 0 | 1 clear (T10) + 2–3 mild |
+| Prose routing menus (`"A, or B/pause?"`) | 0 | n/a | n/a | 1 | 1 (borderline; pre-exit fork) | 0 | 0 |
+| Either/or closing questions (one question, two options) | low | n/a | n/a | — | 2 | 2 | ~11–12 (conceptual forks) |
+| Mermaid diagrams that failed / did not render | 0 | — | — | 0 | 1 | 1 (CLI unsupported) | 11 (invisible until T16) |
+| User used a steering command (`"challenge this"`, `"pause"`, …) | ≥1 | 0 | 0 | 0 | 0 (exited with plain "before we quit") | 1 (`pause`) | 4 (`Challenge…` ×4) |
+| Assistant steelman/80-20 run unprompted | ≥1 when model grows | 0 | 0 | 1 | ✓ (simplified hooks; avoided detour) | ✗ (hallucinated in pre-tool) | ✓ (T6 steelman, T19 80/20) |
+| Model / effort | — | `gemini-4-neon` high | `gemini-4-neon` high | `gemini-4-neon` med | `gemini-4-neon` med | `gemini-4-neon` med | `claude-opus-5.5` med |
 
 ---
 
@@ -207,13 +210,37 @@ Reviewed in `5a8b0a63` and `e7e1fa49`; recorded here so the tracker has a baseli
 
 ---
 
-## 9. Open Recommendations (Carry Forward)
+## 9. Sessions 5 (`1e67d797`) & 6 (`aded70fc`) — Model A/B on `onboard-project`
+
+Synthesized from independent review sessions `3110b358` and `21f7cfe1`. Both sessions used the same skill on the same topic ([onboard-project.md](../../.workflow/incubations/onboard-project.md)), giving a clean model comparison between `gemini-4-neon` (S5, Copilot CLI) and `claude-opus-5.5` (S6, VS Code).
+
+### Session 5 (`1e67d797`, `gemini-4-neon` med) — Severe Model Regression
+
+- **What worked:** Clean initial `explore` grounding (`gpt-6-luna`), quick switch to ASCII when told Mermaid doesn't render in Copilot CLI, and a clean immediate save/commit on pause (`3c2f2ee`) that kept all hallucinated decisions *out* of the note.
+- **What broke (disqualifying):** Three times (`01:41:04`, `02:26:48`, `02:33:10`), `gemini-4-neon` emitted long pre-tool `assistant.message` blocks where it **hallucinated 1–2 turns of user replies** and kept evolving a 3-layer architecture + 80/20 check on top of answers never given. It also re-printed the ASCII diagram (2×) and "two gaps" table (3×). When the user quoted the leaked `"Starting with Layer 1..."` question and asked *"Where these questions for me?"*, the model **falsely denied writing it** (`"didn't come from this session"`), causing the user to assume they had missed something.
+
+### Session 6 (`aded70fc`, `claude-opus-5.5` med) — Best Session Yet
+
+- **Did it improve? Clearly yes.** Every hard signal passed across 28 turns: `0` `ask_user`, `0` repeated recaps, `0` prose routing menus (confirming S4's repeat was a Gemini habit), `0` unverified claims in the note, `0` main `web_fetch` calls (all 6 delegated to a background `research` subagent on `claude-sonnet-5.5` while checking local configs in parallel), and half the reasoning-token share (34.5% vs. 66%).
+- **Real evidence shaped the plan:** Inspected `Scheduler` and `ralph.loop` directly and found `Scheduler`'s `core.hooksPath` trap and `ralph.loop`'s self-referential `.workflow/` validation—narrowing the first target to `Scheduler` and parking `ralph.loop`.
+- **Strong pushback & confirmation discipline:** Answered all 4 user `"Challenge this"` prompts with repo-grounded evidence (surfacing four real gaps in the user's mental model of locked tests and mutation testing at T8), confirmed ambiguous/tentative replies (`"code always matches spec"`, `"No. I think it should."`, `ralph.loop` hesitation) before treating them as settled, and handled the T27 fatigue pause honestly and cleanly (`8b2785a`).
+- **Remaining rough edges:**
+  - **11 invisible Mermaid diagrams (T1–T15):** Neither Copilot CLI (S5) nor VS Code Agent Host (S6) rendered Mermaid; switched immediately to plain-text ASCII once flagged at T16.
+  - **Truncated-listing over-read (self-corrected):** Claimed `Scheduler` was *"mid phase 3"* from a `Select-Object -First 25` listing (it had finished phase 06), then caught and corrected it in-session.
+  - **Marathon length & cost:** 130 min, 28 turns, ~4.35M input tokens (~1.1M from 143 tool schemas ≈ 23.4K/call) on a 15× billing-multiplier model. The user had to self-catch fatigue at T27.
+  - **Minor:** ~11–12 binary either/or closing questions (harmless because the user typed full replies), 1 clear double-barreled ending (T10), and wrote the note via PowerShell `Set-Content` instead of `edit`.
+
+---
+
+## 10. Open Recommendations (Carry Forward)
 
 | # | Recommendation | Target | Signal it moves | Status |
 |---|---|---|---|---|
-| 1 | Under the existing "never label unverified … settled" rule, add: name **what was observed and where** (harness, config) before calling something *passed/verified*; inferences stay labelled as inferences. | `incubate` SKILL §Intro / FORMAT | Unverified claims labelled verified | Watching (hold skill edits for a few sessions) |
-| 2 | Keep Mermaid labels plain: no `;`, `<br/>` inside `Note`, or unquoted special characters. | `incubate` SKILL §2 | Mermaid render failures | Watching |
-| 3 | Pre-exit routing menu recurred despite `5bba79e` (borderline binary fork in S4): **watch, don't add rules yet.** If it shows up in S5 on a different model, fix the exit wording in §5. If not, it is a `gemini-4-neon` habit. | — | Prose routing menus | Watching |
-| 4 | Run the next `/incubate` on a non-Gemini model (C.2) to separate skill effects from model effects. | Developer habit | All variable signals | Open since S2 |
-| 5 | Trim enabled MCP servers/tools for incubate sessions (142 tools ≈ 50K tokens per call). | Harness | Input tokens | Proposed |
-| 6 | Use `"challenge this"` once per session when an idea starts accumulating layers. | Developer habit | Steering command used | Open since S2 |
+| 1 | Under the existing "never label unverified … settled" rule, add: name **what was observed and where** (and note if output/listings were truncated) before calling something *passed/verified*; keep inferences labelled as inferences. | `incubate` SKILL §Intro / FORMAT | Unverified claims labelled verified | **Applied** (post-S6) |
+| 2 | Default chat and saved-note visuals to **plain-text ASCII diagrams** (` ```text `) and Markdown tables; use Mermaid only when explicitly requested (with plain labels). | `incubate` SKILL §1–§2 / FORMAT / READMEs | Diagrams not rendered / failed | **Applied** (post-S6) |
+| 3 | Pre-exit routing menu recurred despite `5bba79e` (borderline binary fork in S4): watch on a non-Gemini model. | — | Prose routing menus | **Closed** (0 in 28 turns on Opus; confirmed Gemini habit) |
+| 4 | Run `/incubate` on a non-Gemini model (C.2) to separate skill effects from model effects; drop `gemini-4-neon` from `incubate` recommendations if it fails. | `incubate` README + root README | All signals | **Done** (`gemini-4-neon` marked not recommended after S5) |
+| 5 | Trim enabled MCP servers/tools for incubate sessions (143 tools ≈ 23.4K tokens/call; ~1.1M of S6's 4.35M input). | Harness | Input tokens | Open |
+| 6 | Use `"challenge this"` once per session when an idea starts accumulating layers. | Developer habit | Steering command used | **Done** (4× in S6; keep habit) |
+| 7 | Watch session length/fatigue (>90 min) and either/or closing questions (~11–12 in S6); hold off adding a length-check rule unless another session runs past ~90 min without a natural pause, to avoid re-introducing routing menus. | — | Duration / input tokens | Watching |
+| 8 | Test a mid-tier non-Gemini model (`claude-sonnet-5.5` or `gpt-6.2-sol`) on a shorter `/incubate` session to compare quality vs. Opus's 15× multiplier. | Developer habit | Cost / output quality | Proposed |

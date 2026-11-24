@@ -11,7 +11,7 @@ Question rules: follow `.github/user-interaction.md` with the incubation rules b
 
 Work through the meaning, implications, and tradeoffs of an early idea through back-and-forth conversation, visual models, and targeted web research. Unlike `brain-storm`, the goal is understanding—not requirements. Many incubations stay paused or get dropped; only graduate an idea when the user decides it is worth building.
 
-Never write numbered `R#` Requirements, never edit `.workflow/language.md` or `.workflow/sessions/`, never write implementation code, and do not drift into implementation design (file layouts, generator script specs, exact IDs/naming schemes). Never label unverified external or environment assumptions as "settled" or "solved."
+Never write numbered `R#` Requirements, never edit `.workflow/language.md` or `.workflow/sessions/`, never write implementation code, and do not drift into implementation design (file layouts, generator script specs, exact IDs/naming schemes). Never label unverified external or environment assumptions as "settled" or "solved." Before stating a fact as verified, name what was observed and where—and note if a listing or command output was truncated; keep inferences labelled as inferences.
 
 ## 1. Resume or Ground First
 
@@ -25,17 +25,17 @@ Before asking anything:
    - Read `.workflow/language.md` (if present, read-only) so you use the repository's existing vocabulary.
    - If the idea touches existing code, skills, or workflows, launch one `explore` subagent (<=250 words) focused on what exists today and what the idea would touch or disrupt.
    - Never auto-scan other files in `.workflow/incubations/`.
-4. **Opening brief (shown once):** Share a concise grounding brief plus an initial **visual sketch** (a Mermaid diagram or a side-by-side comparison table) showing your starting read of the idea, any fetched sources, and how it touches the current repo. Invite the user to react, correct, or pull on any thread.
+4. **Opening brief (shown once):** Share a concise grounding brief plus an initial **visual sketch** (a plain-text ASCII diagram or a side-by-side comparison table) showing your starting read of the idea, any fetched sources, and how it touches the current repo. Invite the user to react, correct, or pull on any thread.
 
 Remind the user **once at session start** that they can always say `"draw this"`, `"look up <topic>"`, `"challenge this"`, `"pause"`, `"drop it"`, or `"ready for brain-storm"`. Do not repeat this reminder or re-print the opening brief on later turns.
 
 ## 2. Communicate Visually (Delta-Only After Turn 1)
 
-Do not rely on walls of prose. Proactively use **Mermaid diagrams** and **structured comparison tables** both in chat and inside the incubation note:
+Do not rely on walls of prose. Proactively use **plain-text ASCII diagrams** (in ` ```text ` blocks) and **structured comparison tables** both in chat and inside the incubation note—they render reliably across terminals, VS Code, and git diffs:
 
-- **`mindmap` or `flowchart`:** map the parts of an idea, system boundaries, or ripple effects across existing skills, repositories, or stacks.
-- **`sequenceDiagram` or `stateDiagram-v2`:** trace how a workflow or lifecycle would feel in practice.
+- **Flow / boundary sketches (`text`):** map the parts of an idea, system boundaries, lifecycle steps, or ripple effects across existing skills, repositories, or stacks.
 - **Comparison tables:** contrast *Source Pattern vs. What Fits vs. What Clashes*, or compare competing framings and tradeoffs side by side.
+- **Mermaid diagrams:** use only when the user explicitly requests Mermaid; keep labels plain (no `;`, `<br/>` inside `Note`, or unquoted special characters).
 
 Keep each diagram focused and scannable (roughly 5–12 nodes; split into two small diagrams rather than one dense graph). Always pair a visual with 1–2 plain-language sentences highlighting the main tension or question it surfaces.
 

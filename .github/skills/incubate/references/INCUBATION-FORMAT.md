@@ -15,9 +15,8 @@ Updated: YYYY-MM-DD
 ## Current Mental Model
 - Short synthesis of our current leanings—what the idea means to us, separated from any external implementation. Keep unverified assumptions explicitly tentative.
 
-```mermaid
-flowchart LR
-  %% Keep focused (5-12 nodes); replace or add diagrams as thinking evolves
+```text
+# Plain-text ASCII sketch (keep focused, ~5-12 nodes; replace as thinking evolves)
 ```
 
 ## What Fits vs. What Clashes
@@ -51,7 +50,7 @@ flowchart LR
 
 Rules:
 - Keep it scannable: update sections in place rather than appending a transcript.
-- Use tentative language ("current leanings", "assumptions to verify") for anything not yet validated in practice—never label unverified assumptions "settled" or "solved."
-- Include at least one visual (Mermaid diagram and/or comparison table) whenever the idea has moving parts or tradeoffs.
+- Use tentative language ("current leanings", "assumptions to verify") for anything not yet validated in practice—never label unverified assumptions "settled" or "solved." Name what was observed and where before calling something verified.
+- Include at least one visual (plain-text ASCII diagram and/or comparison table) whenever the idea has moving parts or tradeoffs; use Mermaid only if explicitly requested.
 - Never add numbered `R#` Requirements here—those belong in `brain-storm`.
 - Never mutate `.workflow/language.md` or `.workflow/sessions/`.
