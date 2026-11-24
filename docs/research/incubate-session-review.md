@@ -162,6 +162,20 @@ Add one column per reviewed session. Sources are the session's `events.jsonl` (`
 | Assistant steelman/80-20 run unprompted | ≥1 when model grows | 0 | 0 | 1 | ✓ (simplified hooks; avoided detour) | ✗ (hallucinated in pre-tool) | ✓ (T6 steelman, T19 80/20) |
 | Model / effort | — | `gemini-4-neon` high | `gemini-4-neon` high | `gemini-4-neon` med | `gemini-4-neon` med | `gemini-4-neon` med | `claude-opus-5.5` med |
 
+### C. Topic rollup (convergence & anti-paralysis)
+
+Tracks whether each incubation is making real progress toward a terminal state (`graduated` or `dropped`) rather than spinning. Size and decision yield are assessed together during post-session review (no extra ceremony during `/incubate` itself):
+
+- **`small`:** 1 skill, convention, or localized question; mostly local judgment, 0 external probes *(rough budget: 1 session, ~15–30 active min)*.
+- **`medium`:** 2–3 skills or one workflow boundary; 1–2 targeted lookups or repo checks *(rough budget: 1–2 sessions, ~30–75 active min)*.
+- **`large`:** Cross-cutting across `Workflow Core`, `Language Add-ons`, and/or external repos/harnesses; unverified external assumptions *(rough budget: 2–3 sessions, ~90–180 active min, often paused for probes)*.
+- **Paralysis signal:** ≥30–45 active min with 0–1 decisions settled and no probe or new evidence produced.
+
+| Incubation | Size | Sessions | Active min | Decisions settled | Outcome | Resolution note |
+|---|---|---|---|---|---|---|
+| [home-repo-workflow.md](../../.workflow/incubations/home-repo-workflow.md) | `large` | 4 (S1–S4) | ~177 | ~5 (+1 local probe) | `incubating` | Paused on work-machine probe |
+| [onboard-project.md](../../.workflow/incubations/onboard-project.md) | `large` | 2 (S5–S6) | ~153 | 7 (+1 tool-research check) | `incubating` | 1 fork left before `/brain-storm` |
+
 ---
 
 ## 7. Session 3 (`8a1dfca9`) — First Run After `c6fcbb3`
