@@ -8,7 +8,7 @@ This repository consolidates skills, agents, hooks, and tooling into a single re
 
 1. **Consistent delivery:** one structured process for building and evolving personal projects.
 2. **Proportional rigor:** adapts automatically to the size and risk of a change (a lightweight `small` lane for 1–2 slice changes; a `standard` lane with locked tests and mutation gates for everything else).
-3. **Token efficiency:** spends frontier-model reasoning on requirements, specs, and architecture, while delegating well-pinned implementation Slices to cheaper (or local) models.
+3. **Token efficiency:** maximizes value delivered to production by spending tokens on decisions that land in kept artifacts, avoiding evidence no decision uses, and catching wrong decisions before they reach specs, tests, and code. Frontier-model reasoning goes to requirements, specs, and architecture; well-pinned implementation Slices go to cheaper (or local) models.
 4. **Portability:** copy `.github/` (the **Workflow Core**) into any new or existing repository, and add only the stack-specific **Language Add-ons** you need.
 5. **Agent autonomy with clear escalation:** agents advance the Plan on their own and stop only at planned Checkpoints or genuine Stalls, communicating state and reasoning transparently.
 
