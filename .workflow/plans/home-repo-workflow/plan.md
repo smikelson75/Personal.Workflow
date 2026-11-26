@@ -2,7 +2,7 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: P03 S03
+- Next: P03 S04
 - Tests locked: `a088cd8`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `a088cd8`
@@ -38,7 +38,7 @@
 |---|-------|--------|
 | S01 | Launch Script by path: version option and install-state checks | completed |
 | S02 | Harness selection, argument passthrough, and exit code | completed |
-| S03 | Stack statement, add-on selection, output lines, and warnings | ready |
+| S03 | Stack statement, add-on selection, output lines, and warnings | completed |
 | S04 | Session plugin: add-on skills and the locked-tests guard in the Home layout | ready |
 | S05 | Offline and seamless relay across the whole launcher | ready |
 
