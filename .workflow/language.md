@@ -11,7 +11,7 @@
 - `Requirement` - a numbered `R#` observable behavior with an Accept signal; ID unique across the Session Chain. States: active -> retired.
 - `Glossary` - the single shared list of canonical terms. Avoid: dictionary, language file. Code: `.workflow/language.md`
 - `Workflow Folder` - the `.workflow/` directory a run reads. Code: `.workflow/`
-- `Workflow Core` - the `.github/` skills, agents, hooks, and tools copied into a target repository; workflow-check is one tool inside it. Excludes this repository's AGENTS.md and Language Add-ons. Avoid: toolkit. Code: `.github/`
+- `Workflow Core` - the `.github/` skills, agents, hooks, and tools copied into a Project Repo or a Home Repo; workflow-check is one tool inside it. Excludes this repository's AGENTS.md and Language Add-ons. Avoid: toolkit, target repository. Code: `.github/`
 - `Language Add-on` - an optional stack-specific skill (harness, lint, mutation) the Developer copies into `.github/skills/` per project. Avoid: language skill, adapter. Code: `language-addons/`
 - `Stall` - an unplanned stop that needs a hand fix to workflow files before the run can continue. Avoid: blocker, hang.
 - `Checkpoint` - a planned stop where the Developer reviews or approves, answered as one bundled question; distinct from the Gate, which runs without the Developer. Avoid: approval step.
@@ -28,6 +28,13 @@
 - `Setup-Card Approval` - the Checkpoint in Plan mode where the Developer approves setup Cards and any ADR candidates before acceptance authoring begins.
 - `Oracle` - the union of paths holding acceptance suites, fixtures, and harness configuration, frozen at the `Tests locked` reference between reviews.
 - `Traceability` - the Gate verification that every Scenario owned by the Phase has a tagged acceptance case that ran and passed.
+- `Home Repo` - the one folder per machine, attached to every session, holding copied Workflow Core, all Language Add-ons (loaded only by stack), and Project Pointers; copied workflow files stay out of its git history. Avoid: hub, home directory.
+- `Project Repo` - a repository where the Developer builds or changes one stack of an application; its own AGENTS.md names its stack and it owns its Workflow Folder. Avoid: sibling repo, child repo.
+- `Project Pointer` - one entry in the Home Repo's AGENTS.md naming a Project Repo and its role: `co-changed`, `read-only reference`, or `peer-impact`. Avoid: sibling pointer.
+- `Harness` - an agent CLI that runs the workflow: Copilot CLI or Claude Code. Avoid: client.
+- `Launch Script` - the Home Repo script that starts a Harness in a Project Repo with the Home Repo and the stack's Language Add-on, or prints the workflow version. Avoid: wrapper, start script.
+- `Update Script` - the script shipped in `Personal.Workflow` that copies Workflow Core and Language Add-ons into a Home Repo and prints the version. Avoid: sync script, installer.
+- `Coordination Playbook` - the Workflow Core document describing needs-first ordering of changes across Project Repos with existing skills. Avoid: runbook.
 - `ADR` - a point-in-time record of an approved, hard-to-reverse build decision and its trade-offs (`ADR candidate` before approval). Code: `.workflow/adr/`
 
 ## Retired
