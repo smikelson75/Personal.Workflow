@@ -32,7 +32,7 @@
 - **Goal:** `guard-locked-tests.mjs` resolves each edited path to the git repository containing it, consults that repository's plans, and denies with output both Claude Code and Copilot CLI honor.
 - **Depends on:** none
 - **Tier:** delegate - one existing script; repository lookup and output shape are pinned
-- **Review:** required - permissions guard that parses untrusted hook input and spawns git
+- **Review:** required - permissions guard that parses untrusted hook input and spawns git; test literal in product code
 - **Scenarios:** fixture: a git repo with plan `calc` (`- Next: P01 S02`, `` - Tests locked: `<lock>` ``, `` - Oracle: `tests/acceptance/` ``) where `tests/acceptance/add.test.mjs` is tracked at `<lock>`
   - R35-01: Given the fixture, when the guard receives `{"tool_name":"Edit","tool_input":{"file_path":"<absolute add.test.mjs>"},"cwd":"<repo>"}`, then exit is 0 and stdout parses to an object whose `permissionDecision` is `deny`, `hookSpecificOutput.hookEventName` is `PreToolUse`, and `hookSpecificOutput.permissionDecision` is `deny` (failure)
   - R35-02: Given the same edit, when the output is read, then `permissionDecisionReason` equals `hookSpecificOutput.permissionDecisionReason` and is `tests/acceptance/add.test.mjs is a locked acceptance test (plan calc, Tests locked <lock>). Only Fixture Repair or Phase Review may change it. Stop and report instead of editing it.` (failure)

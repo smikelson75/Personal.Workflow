@@ -3,8 +3,8 @@
 // Any internal error allows the call: command preToolUse hooks fail closed,
 // and a broken guard must not block every edit.
 import { execFileSync } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { isAbsolute, join, relative, resolve } from 'node:path';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 
 const PHASE_REVIEW = /^phase review\b/;
 const FIXTURE_REPAIR = /^fixture repair (S\d+)/;
@@ -19,7 +19,7 @@ function targetPaths(toolArgs) {
   const paths = [];
   const visit = (value, key) => {
     if (typeof value === 'string') {
-      if (/^(path|filePath|file_path)$/.test(key ?? '')) paths.push(value);
+      if (/^(path|filePath|file_path|notebook_path)$/.test(key ?? '')) paths.push(value);
       if (key === 'input') {
         for (const m of value.matchAll(/^\*\*\* (?:Update|Delete|Add) File: (.+)$/gm)) paths.push(m[1].trim());
       }
@@ -62,18 +62,33 @@ function repairPaths(planDir, cardId) {
 
 const under = (rel, roots) => roots.some((o) => rel === o || rel.startsWith(`${o}/`));
 
-try {
-  const event = JSON.parse(readFileSync(0, 'utf8'));
-  const toolName = event.toolName ?? event.tool_name ?? '';
-  if (!EDIT_TOOL.test(toolName)) allow();
-  let toolArgs = event.toolArgs ?? event.tool_input ?? {};
-  if (typeof toolArgs === 'string') toolArgs = JSON.parse(toolArgs);
+function isDirectory(p) {
+  try {
+    return statSync(p).isDirectory();
+  } catch {
+    return false;
+  }
+}
 
-  const cwd = event.cwd ?? process.cwd();
-  const root = git(cwd, ['rev-parse', '--show-toplevel']);
+// Repository containing abs, found from its nearest existing ancestor folder.
+// Null means the path is outside any repository.
+function repoRootOf(abs) {
+  let dir = abs;
+  while (!isDirectory(dir)) {
+    const parent = dirname(dir);
+    if (parent === dir) return null;
+    dir = parent;
+  }
+  try {
+    return git(dir, ['rev-parse', '--show-toplevel']);
+  } catch {
+    return null;
+  }
+}
+
+function readLocks(root) {
   const plansDir = join(root, '.workflow', 'plans');
-  if (!existsSync(plansDir)) allow();
-
+  if (!existsSync(plansDir)) return [];
   const locks = [];
   for (const slug of readdirSync(plansDir)) {
     const planPath = join(plansDir, slug, 'plan.md');
@@ -87,23 +102,51 @@ try {
     const allowed = repair ? repairPaths(join(plansDir, slug), repair) : [];
     locks.push({ slug, ref, oracle, allowed, repair });
   }
-  if (locks.length === 0) allow();
+  return locks;
+}
 
+const locksByRoot = new Map();
+function locksFor(root) {
+  if (!locksByRoot.has(root)) locksByRoot.set(root, readLocks(root));
+  return locksByRoot.get(root);
+}
+
+function deny(rel, slug, ref, repair) {
+  const scope = repair
+    ? `Fixture Repair ${repair} may change only its own Acceptance tests.`
+    : 'Only Fixture Repair or Phase Review may change it.';
+  const reason =
+    `${rel} is a locked acceptance test (plan ${slug}, Tests locked ${ref}). ` +
+    `${scope} Stop and report instead of editing it.`;
+  process.stdout.write(JSON.stringify({
+    permissionDecision: 'deny',
+    permissionDecisionReason: reason,
+    hookSpecificOutput: {
+      hookEventName: 'PreToolUse',
+      permissionDecision: 'deny',
+      permissionDecisionReason: reason,
+    },
+  }));
+  process.exit(0);
+}
+
+try {
+  const event = JSON.parse(readFileSync(0, 'utf8'));
+  const toolName = event.toolName ?? event.tool_name ?? '';
+  if (!EDIT_TOOL.test(toolName)) allow();
+  let toolArgs = event.toolArgs ?? event.tool_input ?? {};
+  if (typeof toolArgs === 'string') toolArgs = JSON.parse(toolArgs);
+
+  const cwd = event.cwd ?? process.cwd();
   for (const p of targetPaths(toolArgs)) {
-    const rel = relative(root, isAbsolute(p) ? p : resolve(cwd, p)).split('\\').join('/');
-    if (rel.startsWith('..')) continue;
-    for (const { slug, ref, oracle, allowed, repair } of locks) {
+    const abs = isAbsolute(p) ? p : resolve(cwd, p);
+    const root = repoRootOf(abs);
+    if (!root) continue;
+    const rel = relative(root, abs).split(sep).join('/');
+    if (rel === '' || rel === '..' || rel.startsWith('../')) continue;
+    for (const { slug, ref, oracle, allowed, repair } of locksFor(root)) {
       if (under(rel, oracle) && !under(rel, allowed) && isTrackedAt(root, ref, rel)) {
-        const scope = repair
-          ? `Fixture Repair ${repair} may change only its own Acceptance tests.`
-          : 'Only Fixture Repair or Phase Review may change it.';
-        process.stdout.write(JSON.stringify({
-          permissionDecision: 'deny',
-          permissionDecisionReason:
-            `${rel} is a locked acceptance test (plan ${slug}, Tests locked ${ref}). ` +
-            `${scope} Stop and report instead of editing it.`,
-        }));
-        process.exit(0);
+        deny(rel, slug, ref, repair);
       }
     }
   }

@@ -2,7 +2,7 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: P01 S01
+- Next: P01 S02
 - Tests locked: `67787b5`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `67787b5`
@@ -35,7 +35,7 @@
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Guard finds the edited file's repository and denies in both Harness formats | ready |
+| S01 | Guard finds the edited file's repository and denies in both Harness formats | completed |
 | S02 | Register the guard for Claude Code in the copy layout | ready |
 
 ## Carry-forward
