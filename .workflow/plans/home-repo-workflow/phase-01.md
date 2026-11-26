@@ -1,0 +1,85 @@
+# P01 - Guard both Harnesses in the copy layout
+
+- **Outcome:** with Workflow Core copied into a Project Repo per `README.md`, Claude Code and Copilot CLI (trusted folder) both deny edit-tool writes to locked Oracle paths, the guard consults the repository that contains the edited file, and this repository is itself guarded in Claude Code while the rest of v1 is built.
+- **Covers:** R35, Q-ordering
+- **Invariants:**
+  - ES modules (`.mjs`), Node built-ins only, no dependencies.
+  - The guard reads one JSON payload on stdin, writes one JSON object on stdout, and always exits 0. Allow is exactly `{}`. Any internal error allows.
+  - Tests read markdown and JSON through stable markers only: paths, commands, headings, JSON keys, and the exact reason sentences pinned in S01. Never whole paragraphs.
+  - Edits to existing files change only the lines a card names.
+- **Harness:**
+  - run: `node --test --test-reporter=tap --test-name-pattern="<regex of IDs>" "tests/home-repo-workflow/*.test.mjs"`; exclude with `--test-skip-pattern="<regex>"`
+  - tag: test title starts with `[R35-01]`
+  - count: the `# pass N` line of the tap output
+  - assert: `^\s*assert|\btest\(`
+- **Known failures:**
+  - `[R22-03] no file under skills, agents, or hooks names AGENTS.md` - owner P05
+  - `[R29-01] Glossary defines all 28 canonical terms with Slice and Card separate` - owner P05
+  - `[R30-03] prior Session files in .workflow/sessions/ remain untouched` - owner P05
+- **Not expressible:**
+  - R35 @ Claude Code, Copilot CLI: a live Harness session denies the edit and leaves the file byte-identical - needs a signed-in Harness; S01 tests the guard's verdict and output format, S02 tests the registrations and runs the registered command, and S02's implementer runs a live probe in both Harnesses
+  - R35 failure (untrusted Copilot folder skips hooks) - accepted risk; the Gate's lock verification catches it
+  - Q-ordering: R35 lands before any other requirement - a plan property; P01 covers R35 alone
+- **Gate:**
+  - suite: `node --test --test-reporter=tap --test-skip-pattern="<node .github/tools/workflow-core/scripts/trace.mjs --phase-file .workflow/plans/home-repo-workflow/phase-01.md --skip-pattern output>" "tests/home-repo-workflow/*.test.mjs" "tests/glossary-alignment/*.test.mjs" "tests/acceptance/*.test.mjs" "tests/mutation-addon.test.mjs" ".github/tools/workflow-check/tests/acceptance/*.test.mjs" ".github/tools/workflow-core/tests/acceptance/*.test.mjs"`
+  - traceability: `node --test --test-reporter=tap "tests/home-repo-workflow/*.test.mjs" "tests/glossary-alignment/*.test.mjs" "tests/acceptance/*.test.mjs" "tests/mutation-addon.test.mjs" ".github/tools/workflow-check/tests/acceptance/*.test.mjs" ".github/tools/workflow-core/tests/acceptance/*.test.mjs" | node .github/tools/workflow-core/scripts/trace.mjs --phase-file .workflow/plans/home-repo-workflow/phase-01.md R35-01 R35-02 R35-03 R35-04 R35-05 R35-06 R35-07 R35-08 R35-09 R35-10 R35-11 R35-12 R35-13 R35-14 R35-15 R35-16 R35-17 R35-18`
+  - lock: `git diff --exit-code <Tests locked> -- tests/home-repo-workflow`
+  - mutation: unsupported for node - no mutation Language Add-on installed
+
+## S01 - Guard finds the edited file's repository and denies in both Harness formats
+
+- **Kind:** build
+- **Goal:** `guard-locked-tests.mjs` resolves each edited path to the git repository containing it, consults that repository's plans, and denies with output both Claude Code and Copilot CLI honor.
+- **Depends on:** none
+- **Tier:** delegate - one existing script; repository lookup and output shape are pinned
+- **Review:** required - permissions guard that parses untrusted hook input and spawns git
+- **Scenarios:** fixture: a git repo with plan `calc` (`- Next: P01 S02`, `` - Tests locked: `<lock>` ``, `` - Oracle: `tests/acceptance/` ``) where `tests/acceptance/add.test.mjs` is tracked at `<lock>`
+  - R35-01: Given the fixture, when the guard receives `{"tool_name":"Edit","tool_input":{"file_path":"<absolute add.test.mjs>"},"cwd":"<repo>"}`, then exit is 0 and stdout parses to an object whose `permissionDecision` is `deny`, `hookSpecificOutput.hookEventName` is `PreToolUse`, and `hookSpecificOutput.permissionDecision` is `deny` (failure)
+  - R35-02: Given the same edit, when the output is read, then `permissionDecisionReason` equals `hookSpecificOutput.permissionDecisionReason` and is `tests/acceptance/add.test.mjs is a locked acceptance test (plan calc, Tests locked <lock>). Only Fixture Repair or Phase Review may change it. Stop and report instead of editing it.` (failure)
+  - R35-03: Given the fixture, when the guard receives `{"tool_name":"Write","tool_input":{"file_path":"<absolute add.test.mjs>","content":"x"},"cwd":"<repo>"}`, then the output denies as in R35-01 (failure)
+  - R35-04: Given the fixture, when the guard receives `{"toolName":"edit","toolArgs":"{\"path\":\"tests/acceptance/add.test.mjs\"}","cwd":"<repo>"}`, then the output denies as in R35-01 (failure)
+  - R35-05: Given the fixture, when the guard receives an `Edit` of `<repo>/src/add.mjs`, then stdout is `{}` and exit is 0
+  - R35-06: Given `- Next: fixture repair S03`, `.workflow/plans/calc/phase-01.md` whose `## S03 - x` card has ``- **Acceptance tests:** `tests/acceptance/s03.test.mjs` ``, and `s03.test.mjs` and `s04.test.mjs` tracked at `<lock>`, when the guard receives an `Edit` of `s04.test.mjs`, then it denies and the reason contains `Fixture Repair S03 may change only its own Acceptance tests.` (failure)
+  - R35-07: Given the R35-06 fixture, when the guard receives an `Edit` of `s03.test.mjs`, then stdout is `{}`
+  - R35-08: Given `- Next: phase review P02`, when the guard receives an `Edit` of `add.test.mjs`, then stdout is `{}`
+  - R35-09: Given the plan without its `Tests locked` line, when the guard receives an `Edit` of `add.test.mjs`, then stdout is `{}`
+  - R35-10: Given the plan without its `Oracle` line, when the guard receives an `Edit` of `add.test.mjs`, then stdout is `{}`
+  - R35-11: Given `tests/acceptance/new.test.mjs` committed after `<lock>`, when the guard receives an `Edit` of it, then stdout is `{}`
+  - R35-12: Given a second git repo `home` with no `.workflow/`, when the guard receives an `Edit` of `<absolute add.test.mjs>` with `"cwd":"<home>"` and runs in `<home>`, then it denies and the reason contains `plan calc` (failure)
+  - R35-13: Given a temp folder outside any git repo, when the guard receives an `Edit` of a file in it with `"cwd":"<repo>"`, then stdout is `{}`
+  - R35-14: Given stdin `not json`, when the guard runs, then stdout is `{}` and exit is 0
+- **Acceptance tests:** `tests/home-repo-workflow/p01-s01.test.mjs`
+- **Files:** edit `.github/hooks/scripts/guard-locked-tests.mjs`
+- **Patterns:** `.github/hooks/scripts/guard-locked-tests.mjs:72 - current cwd-based root lookup to replace`; `.github/hooks/scripts/guard-locked-tests.mjs:100 - current deny output to extend`
+- **Decisions:**
+  - Per target path: `abs = isAbsolute(p) ? p : resolve(cwd, p)` with `cwd = event.cwd ?? process.cwd()`. The repository root is `git -C <dir> rev-parse --show-toplevel`, where `<dir>` is the nearest existing ancestor folder of `abs`. A failing lookup means the path is outside any repository: skip it.
+  - Locks are read per repository root (`<root>/.workflow/plans/*/plan.md`, same parsing as today) and cached by root within one run. A root without `.workflow/plans` locks nothing.
+  - Deny stdout is exactly `JSON.stringify({ permissionDecision: 'deny', permissionDecisionReason: R, hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: R } })`, where `R` keeps today's text: `` `${rel} is a locked acceptance test (plan ${slug}, Tests locked ${ref}). ${scope} Stop and report instead of editing it.` `` and `scope` keeps today's two sentences.
+  - Path keys become `/^(path|filePath|file_path|notebook_path)$/`; the tool-name regex and `*** ... File:` parsing stay.
+  - `rel` uses `/` separators, relative to the repository root that contains the file.
+- **Do not:** edit `tests/home-repo-workflow/**`; edit `.github/hooks/locked-tests.json`; add dependencies; change the allow output or exit code.
+- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/home-repo-workflow/*.test.mjs"` exits 0; targets R35-01 to R35-14; 14 target tests run
+- **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.
+
+## S02 - Register the guard for Claude Code in the copy layout
+
+- **Kind:** build
+- **Goal:** `.claude/settings.json` registers the guard for Claude Code, the Copilot CLI registration stays, and `README.md`'s copy steps install both.
+- **Depends on:** S01
+- **Tier:** main - needs a live probe in both Harnesses that a card cannot pin
+- **Review:** required - permissions guard registration; no mutation gate
+- **Scenarios:**
+  - R35-15: Given `.claude/settings.json`, when it is parsed, then `hooks.PreToolUse` has an entry whose `hooks` array holds an object with `type` `command` and a `command` containing `.github/hooks/scripts/guard-locked-tests.mjs`
+  - R35-16: Given `.github/hooks/locked-tests.json`, when it is parsed, then `hooks.preToolUse` has an entry whose `bash` and `powershell` both contain `.github/hooks/scripts/guard-locked-tests.mjs`
+  - R35-17: Given this repository's root and an absolute path to a file under the `Oracle` of a plan in `.workflow/plans/` whose `Tests locked` ref tracks that file, when the `command` from R35-15 runs through the default shell in the root with `{"tool_name":"Edit","tool_input":{"file_path":"<that path>"},"cwd":"<root>"}` on stdin, then stdout's `hookSpecificOutput.permissionDecision` is `deny` (failure)
+  - R35-18: Given `README.md`, when the lines between `### 2. Copy the Workflow Core into Your Repository` and the next `### ` heading are read, then one line contains `.claude\settings.json` and `Copy-Item`, one line contains `hooks.PreToolUse`, and one line contains `trusted`
+- **Acceptance tests:** `tests/home-repo-workflow/p01-s02.test.mjs`
+- **Files:** create `.claude/settings.json`; edit `README.md`
+- **Patterns:** `.github/hooks/locked-tests.json:1 - the Copilot registration to mirror`; `README.md:36 - the copy-layout PowerShell block`
+- **Decisions:**
+  - `.claude/settings.json` is exactly `{"hooks":{"PreToolUse":[{"hooks":[{"type":"command","command":"node .github/hooks/scripts/guard-locked-tests.mjs","timeout":10}]}]}}`, pretty-printed with 2 spaces. No `matcher`, so every tool reaches the guard, which filters by tool name. The command has no shell-specific syntax.
+  - README block: add `.claude` to the `New-Item` paths and add `Copy-Item "$workflowSrc\.claude\settings.json" ".claude\settings.json"`. After the block add: `If the repository already has .claude\settings.json, merge the hooks.PreToolUse entry into it instead of overwriting.` and `Copilot CLI runs the locked-tests guard only in a trusted folder; trust the repository when asked. The Gate still verifies locked tests.`
+  - Live probe after the tests pass: in a temp copy-layout repo with one locked test, ask `claude -p` and then `copilot -p` (trusted) to edit it; both must report a denial and leave the file unchanged. Record the result in this card's `Outcome`.
+- **Do not:** edit `tests/home-repo-workflow/**`; edit `.github/hooks/**`; change README lines outside the copy section.
+- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/home-repo-workflow/*.test.mjs"` exits 0; targets R35-15 to R35-18; 4 target tests run
+- **Stop and report if:** a file outside Files must change; a locked test looks wrong; either Harness fails the live probe; the same failure after 3 attempts.
