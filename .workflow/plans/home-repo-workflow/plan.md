@@ -2,11 +2,12 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: gate P01
+- Next: review P01
 - Tests locked: `67787b5`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `67787b5`
 - Reconciled: `96cf5699d5c914ca684a96621759c3aaf1eed4bb`
+- Review pending: S01, S02
 
 ## Current state
 - stack: Node ES modules (`.mjs`, built-in `node:test`, zero dependencies, ADR 0001); the product is Workflow Core under `.github/`, `language-addons/`, `README.md`, and small Node scripts.
