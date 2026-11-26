@@ -15,6 +15,8 @@ const CASE_INSENSITIVE = process.platform === 'win32';
 // the Claude form replaces both with `model: <alias>` and `effort: <level>`.
 const KNOWN_FAMILIES = new Set(['opus', 'sonnet', 'haiku', 'fable']);
 const EFFORTS = new Set(['low', 'medium', 'high', 'xhigh', 'max']);
+const DEFAULT_MODEL = 'sonnet';
+const DEFAULT_EFFORT = 'medium';
 const TOP_LEVEL_KEY = /^([A-Za-z][A-Za-z0-9_-]*):(?:\s(.*))?$/;
 
 function unquote(value) {
@@ -72,30 +74,41 @@ function pickAlias(entries) {
   return null;
 }
 
+// Returns { level, raw }: the Claude effort level (null when unusable) and the value as read, quotes removed.
 function pickEffort(front) {
   const line = front.find((l) => /^reasoning-effort:/.test(l));
-  if (line === undefined) return null;
-  const value = unquote(line.slice('reasoning-effort:'.length)).toLowerCase();
-  if (value === 'none' || value === 'minimal') return 'low';
-  return EFFORTS.has(value) ? value : null;
+  if (line === undefined) return { level: null, raw: '' };
+  const raw = unquote(line.slice('reasoning-effort:'.length));
+  const value = raw.toLowerCase();
+  if (value === 'none' || value === 'minimal') return { level: 'low', raw };
+  return { level: EFFORTS.has(value) ? value : null, raw };
 }
 
-// Returns the Claude Code form of an agent file plus one notice per Claude entry with an unknown family, in list order.
+// Returns the Claude Code form of an agent file plus its notices in print order: skip notices in list order,
+// then the model default, then the effort default. Both pins are always written, falling back to sonnet and medium.
 function renderClaudeForm(text, agent) {
   const parts = splitFrontmatter(text);
   if (!parts) return { text, notices: [] };
 
   const { entries, start, end } = readModelEntries(parts.front);
   const alias = pickAlias(entries);
-  const effort = pickEffort(parts.front);
+  const { level, raw } = pickEffort(parts.front);
 
   const notices = entries
     .filter((entry) => /^claude\b/i.test(entry) && !KNOWN_FAMILIES.has(claudeFamily(entry)))
     .map((entry) => `Agent pin: ${agent}: skipped "${entry.replace(/"/g, '')}" (not a Claude Code model family)`);
 
+  const model = alias ?? DEFAULT_MODEL;
+  if (alias === null) notices.push(`Agent default: ${agent}: model ${DEFAULT_MODEL} (no Claude model in list)`);
+
+  const effort = level ?? DEFAULT_EFFORT;
+  if (level === null) {
+    const reason = raw === '' ? 'no reasoning-effort' : `unrecognized reasoning-effort "${raw}"`;
+    notices.push(`Agent default: ${agent}: effort ${DEFAULT_EFFORT} (${reason})`);
+  }
+
   const kept = parts.front.filter((line, i) => !(i >= start && i < end && start >= 0) && !/^reasoning-effort:/.test(line));
-  if (alias) kept.push(`model: ${alias}`);
-  if (effort) kept.push(`effort: ${effort}`);
+  kept.push(`model: ${model}`, `effort: ${effort}`);
 
   const body = ['---', ...kept].map((line) => line + parts.eol).join('') + parts.rest;
   return { text: body, notices };

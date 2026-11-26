@@ -104,7 +104,7 @@
 - **Goal:** a missing or unusable model or effort pin falls back to `sonnet` and `medium`, each fallback named in the output.
 - **Depends on:** S03
 - **Tier:** delegate - extends the same function with pinned strings
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:** fixture: as S02
   - R50-01: Given `coder` with no Claude entry and `reasoning-effort: medium`, when the Update Script runs, then output includes `Agent default: coder: model sonnet (no Claude model in list)`, no effort line for `coder`, and the Claude form has `model: sonnet` and `effort: medium`
   - R50-02: Given `repo-scout` listing `Claude Haiku 5.5 (copilot)` with `reasoning-effort: fast`, when it runs, then output includes `Agent default: repo-scout: effort medium (unrecognized reasoning-effort "fast")` and the Claude form has `model: haiku` and `effort: medium`
