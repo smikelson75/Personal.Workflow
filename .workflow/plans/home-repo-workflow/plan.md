@@ -2,8 +2,8 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: fixture repair S06
-- Tests locked: `d6846dd`
+- Next: P02 S04
+- Tests locked: `fd4ab6e`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `d6846dd`
 - Reconciled: `96cf5699d5c914ca684a96621759c3aaf1eed4bb`
@@ -38,9 +38,9 @@
 | S01 | Update installs and mirrors Workflow Core with a content version | completed |
 | S02 | Update rejects unsafe or invalid targets before writing | completed |
 | S03 | A failed write leaves an incomplete marker | completed |
-| S04 | Installed files stay out of git status | blocked |
+| S04 | Installed files stay out of git status | ready |
 | S05 | Version identity and offline operation hold on this repository | ready |
-| S06 | R37-03 fixture keeps a tracked file under .claude/skills | planned |
+| S06 | R37-03 fixture keeps a tracked file under .claude/skills | completed |
 
 ## Carry-forward
 - P03: `.claude/settings.json` runs `node .github/hooks/scripts/guard-locked-tests.mjs` relative to the session folder (Claude Code resets Bash to the project root, so the copy layout is safe); in the Home layout the Project Repo has no guard script, so the Home-layout registration must resolve the guard from the Home Repo.
