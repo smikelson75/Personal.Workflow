@@ -2,7 +2,7 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: plan P03
+- Next: phase review P03
 - Tests locked: `fd4ab6e`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `d6846dd`
@@ -15,6 +15,7 @@
 - mutation: unsupported for node - no mutation Language Add-on installed
 - in place: locked-tests guard `.github/hooks/scripts/guard-locked-tests.mjs` finds the repository from the edited file (on-disk spelling) and denies with top-level and `hookSpecificOutput` fields; registered for Copilot CLI (`.github/hooks/locked-tests.json`) and Claude Code (`.claude/settings.json`, command `node .github/hooks/scripts/guard-locked-tests.mjs`, no matcher); `README.md` copy steps install both and note the trusted-folder rule; live-probed in both Harnesses (copy layout); Update Script `scripts/update-home.mjs` (install map, `manifest.json` under `git rev-parse --git-path personal-workflow`, `.git/info/exclude` managed block, no network); no Launch Script, no `code-review` agent; skills reference Workflow Core as `.github/...` relative to the working folder
 - gap to spec: R38, R39, R40, R41, R42, R43, R44, R45, R46, R47, Q-seamless-relay, Q-offline partial
+- live-probed in both Harnesses (`-p` mode, Claude Code and Copilot CLI 1.0.116): `--add-dir <home>` lists the Home Repo's `.claude/skills` unprefixed; `--plugin-dir <dir>` (Claude plugin layout) lists plugin skills; Claude Code runs plugin `hooks/hooks.json` hooks; Copilot CLI plugin hooks and trusted-folder behavior are unconfirmed (untrusted folders skip repository hooks)
 
 ## Decisions pinned by the plan
 - acceptance tests live in `tests/home-repo-workflow/` so the Oracle is disjoint from every other plan and nothing under it is installed into a Home Repo.
@@ -27,12 +28,20 @@
 |---|-------|--------|--------|--------|
 | P01 | Guard both Harnesses in the copy layout | completed | R35, Q-ordering | [phase-01](phase-01.md) |
 | P02 | Update Script fills a Home Repo offline | completed | R36, R37, Q-version-identity, Q-offline (update) | [phase-02](phase-02.md) |
-| P03 | Launch Script with stack add-ons and Home-layout guard | planned | R38, R39, R40, R41, Q-offline (launch), Q-seamless-relay | |
+| P03 | Launch Script with stack add-ons and Home-layout guard | planned | R38, R39, R40, R41, Q-offline (launch), Q-seamless-relay | [phase-03](phase-03.md) |
 | P04 | Workflow Core parity across layouts and Harnesses | planned | R42, R43 | |
 | P05 | Authoring skills, Coordination Playbook, README | planned | R44, R45, R46, R47 | |
 
+## P03 slices
+
+| # | Slice | Status |
+|---|-------|--------|
+| S01 | Launch Script by path: version option and install-state checks | planned |
+| S02 | Harness selection, argument passthrough, and exit code | planned |
+| S03 | Stack statement, add-on selection, output lines, and warnings | planned |
+| S04 | Session plugin: add-on skills and the locked-tests guard in the Home layout | planned |
+| S05 | Offline and seamless relay across the whole launcher | planned |
+
 ## Carry-forward
-- P03: `.claude/settings.json` runs `node .github/hooks/scripts/guard-locked-tests.mjs` relative to the session folder (Claude Code resets Bash to the project root, so the copy layout is safe); in the Home layout the Project Repo has no guard script, so the Home-layout registration must resolve the guard from the Home Repo.
 - P05: R44's `agents-md` skill (and the existing `onboard-project` skill) must name `AGENTS.md`, contradicting workflow-core R22 ("No file under `.github/` refers to `AGENTS.md`"); route to `behavior-spec` to amend R22 before planning P05. `[R22-03]` is a Known failure owned by P05.
 - P05: `[R29-01]` (Glossary term count 28) and `[R30-03]` (prior Sessions untouched) are stale against the grown Glossary and Session Chain; route the glossary-alignment spec to `behavior-spec` so its plan reconciles before P05's gate. Both are Known failures owned by P05.
-- P03: the Launch Script reads the Update Script manifest ({version, status: complete|incomplete, files}); home/** sources are installed to the Home Repo root and scripts/update-home.mjs already maps them. Symlink or junction targets inside a Home Repo are not guarded by the Update Script (accepted at P02 Review).
