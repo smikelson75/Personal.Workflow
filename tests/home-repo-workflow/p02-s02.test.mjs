@@ -21,6 +21,7 @@ const USAGE = 'usage: node scripts/update-home.mjs <home-repo-path>';
 const INSTALLED = [
   '.claude/skills/demo/SKILL.md',
   '.claude/agents/demo.agent.md',
+  '.github/agents/demo.agent.md',
   '.workflow-core/hooks/h.mjs',
   '.workflow-core/tools/t/run.mjs',
   '.workflow-core/user-interaction.md',
@@ -44,7 +45,7 @@ function makeSource({ omit = [] } = {}) {
   }
   const content = {
     '.github/skills/demo/SKILL.md': '# demo skill\n',
-    '.github/agents/demo.agent.md': '# demo agent\n',
+    '.github/agents/demo.agent.md': '---\nname: demo\n---\nDemo agent\n',
     '.github/agents/README.md': '# agents readme\n',
     '.github/hooks/h.mjs': 'export const h = 1;\n',
     '.github/tools/t/run.mjs': 'export const run = 1;\n',
@@ -236,7 +237,7 @@ test('[R36-14] a Home AGENTS.md with a Stack line prints home-is-project; withou
     clean.repo.commit('notes');
     const ok = update(src, [clean.dir], clean.dir);
     assert.equal(ok.status, 0, ok.stdout);
-    assert.ok(outLines(ok).includes('Files: 7 installed, 0 replaced, 0 removed'), ok.stdout);
+    assert.ok(outLines(ok).includes('Files: 8 installed, 0 replaced, 0 removed'), ok.stdout);
     for (const rel of INSTALLED) assert.equal(existsSync(join(clean.dir, rel)), true, `${rel} must exist`);
   } finally {
     repo.cleanup();

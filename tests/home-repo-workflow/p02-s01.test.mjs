@@ -33,12 +33,26 @@ const SOURCE_FILES = {
 const INSTALLED = {
   '.claude/skills/demo/SKILL.md': '.github/skills/demo/SKILL.md',
   '.claude/agents/demo.agent.md': '.github/agents/demo.agent.md',
+  '.github/agents/demo.agent.md': '.github/agents/demo.agent.md',
   '.workflow-core/hooks/h.mjs': '.github/hooks/h.mjs',
   '.workflow-core/tools/t/run.mjs': '.github/tools/t/run.mjs',
   '.workflow-core/user-interaction.md': '.github/user-interaction.md',
   '.workflow-core/language-addons/stk/ad/SKILL.md': 'language-addons/stk/ad/SKILL.md',
   'launch.mjs': 'home/launch.mjs',
 };
+
+const CLAUDE_FORM = '---\nname: demo\nmodel: sonnet\neffort: medium\n---\nDemo agent\n';
+
+const NOTICES = [
+  'Agent default: demo: model sonnet (no Claude model in list)',
+  'Agent default: demo: effort medium (no reasoning-effort)',
+];
+
+// What the Update Script installs at a Home Repo path: the source, except the Claude form of an agent.
+function installedContent(homeRel) {
+  if (homeRel === '.claude/agents/demo.agent.md') return CLAUDE_FORM;
+  return SOURCE_FILES[INSTALLED[homeRel]];
+}
 
 const AGENTS = '# Home\n\n- Pointer: see notes\n';
 
@@ -99,10 +113,11 @@ test('[R36-01] update prints the Home Repo, the version change, and the file cou
   scenario(({ src, home }) => {
     const res = update(src, home);
     assert.equal(res.status, 0, res.stdout);
-    assert.equal(res.lines.length, 3, res.stdout);
+    assert.equal(res.lines.length, 5, res.stdout);
     assert.equal(res.lines[0], `Home Repo: ${home}`);
     assert.match(res.lines[1], /^Workflow version: none -> [0-9a-f]{7}$/);
-    assert.equal(res.lines[2], 'Files: 7 installed, 0 replaced, 0 removed');
+    assert.equal(res.lines[2], 'Files: 8 installed, 0 replaced, 0 removed');
+    assert.deepEqual(res.lines.slice(3), NOTICES);
   });
 });
 
@@ -110,10 +125,10 @@ test('[R36-02] update installs the mapped files with source content and skips ex
   scenario(({ src, home }) => {
     const res = update(src, home);
     assert.equal(res.status, 0, res.stdout);
-    for (const [homeRel, srcRel] of Object.entries(INSTALLED)) {
+    for (const homeRel of Object.keys(INSTALLED)) {
       const target = join(home, homeRel);
       assert.ok(existsSync(target), `${homeRel} missing`);
-      assert.equal(readFileSync(target, 'utf8'), SOURCE_FILES[srcRel], homeRel);
+      assert.equal(readFileSync(target, 'utf8'), installedContent(homeRel), homeRel);
     }
     assert.equal(existsSync(join(home, '.claude/agents/README.md')), false);
     assert.equal(existsSync(join(home, '.workflow-core/tools/t/tests/x.test.mjs')), false);
@@ -137,7 +152,7 @@ test('[R36-04] the printed version is the first 7 hex of the SHA-256 content fin
     assert.equal(res.status, 0, res.stdout);
     const hash = createHash('sha256');
     for (const homeRel of Object.keys(INSTALLED).sort()) {
-      const content = SOURCE_FILES[INSTALLED[homeRel]].replace(/\r\n/g, '\n');
+      const content = installedContent(homeRel).replace(/\r\n/g, '\n');
       hash.update(Buffer.concat([Buffer.from(homeRel, 'utf8'), Buffer.from([0]), Buffer.from(content, 'utf8'), Buffer.from([0])]));
     }
     const expected = hash.digest('hex').slice(0, 7);
@@ -186,7 +201,8 @@ test('[R36-07] a file the source dropped is deleted and a user file stays', () =
     const second = update(src, home);
     assert.equal(second.status, 0, second.stdout);
     assert.equal(existsSync(join(home, '.claude/agents/demo.agent.md')), false);
-    assert.match(second.lines[2], /^Files: .*, 1 removed$/);
+    assert.equal(existsSync(join(home, '.github/agents/demo.agent.md')), false);
+    assert.match(second.lines[2], /^Files: .*, 2 removed$/);
     assert.equal(readFileSync(join(home, '.claude/skills/my-own/SKILL.md'), 'utf8'), mine);
   });
 });
@@ -216,12 +232,13 @@ test('[R36-09] the script finds its source itself when run from another working 
   scenario(({ src, home, other }) => {
     const res = update(src, home, other);
     assert.equal(res.status, 0, res.stdout);
-    assert.equal(res.lines.length, 3, res.stdout);
+    assert.equal(res.lines.length, 5, res.stdout);
     assert.equal(res.lines[0], `Home Repo: ${home}`);
     assert.match(res.lines[1], /^Workflow version: none -> [0-9a-f]{7}$/);
-    assert.equal(res.lines[2], 'Files: 7 installed, 0 replaced, 0 removed');
-    for (const [homeRel, srcRel] of Object.entries(INSTALLED)) {
-      assert.equal(readFileSync(join(home, homeRel), 'utf8'), SOURCE_FILES[srcRel], homeRel);
+    assert.equal(res.lines[2], 'Files: 8 installed, 0 replaced, 0 removed');
+    assert.deepEqual(res.lines.slice(3), NOTICES);
+    for (const homeRel of Object.keys(INSTALLED)) {
+      assert.equal(readFileSync(join(home, homeRel), 'utf8'), installedContent(homeRel), homeRel);
     }
   });
 });

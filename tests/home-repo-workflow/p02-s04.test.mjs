@@ -8,7 +8,7 @@ import { repoRoot, tempRepo } from '../../.github/tools/workflow-core/support/ha
 
 const SOURCE_FILES = {
   '.github/skills/demo/SKILL.md': '# demo skill\n',
-  '.github/agents/demo.agent.md': '# demo agent\n',
+  '.github/agents/demo.agent.md': '---\nname: demo\n---\nDemo agent\n',
   '.github/agents/README.md': '# agents readme\n',
   '.github/hooks/h.mjs': 'export const h = 1;\n',
   '.github/tools/t/run.mjs': 'export const run = 1;\n',
@@ -21,6 +21,7 @@ const SOURCE_FILES = {
 const INSTALLED = [
   '.claude/agents/demo.agent.md',
   '.claude/skills/demo/SKILL.md',
+  '.github/agents/demo.agent.md',
   '.workflow-core/hooks/h.mjs',
   '.workflow-core/language-addons/stk/ad/SKILL.md',
   '.workflow-core/tools/t/run.mjs',

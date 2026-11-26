@@ -23,7 +23,7 @@ function makeSource() {
     copyFileSync(script, join(src, 'scripts', 'update-home.mjs'));
   }
   put(src, '.github/skills/demo/SKILL.md', '# demo skill\n');
-  put(src, '.github/agents/demo.agent.md', '# demo agent\n');
+  put(src, '.github/agents/demo.agent.md', '---\nname: demo\n---\nDemo agent\n');
   put(src, '.github/agents/README.md', '# agents readme\n');
   put(src, '.github/hooks/h.mjs', 'export const h = 1;\n');
   put(src, '.github/tools/t/run.mjs', 'export const run = 1;\n');
