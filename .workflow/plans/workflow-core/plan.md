@@ -2,10 +2,10 @@
 
 - Spec: [workflow-core-spec.md](../../specs/workflow-core-spec.md)
 - Lane: standard
-- Next: phase review P04
-- Tests locked: `37ff2d5`
+- Next: gate P04
+- Tests locked: `51c28d9`
 - Oracle: `.github/tools/workflow-core/tests`
-- Phase base: `37ff2d5`
+- Phase base: `51c28d9`
 - Reconciled: `f820ac1`
 
 ## Current state
@@ -14,7 +14,7 @@
 - suite baseline: green
 - mutation: unsupported for node - no mutation Language Add-on installed
 - in place: six skills (adr-writer, behavior-spec, brain-storm, conventional-commit, pull-work, work-planner), five agents, locked-tests hook, `.github/user-interaction.md`, `workflow-check`, `pull-work/scripts/fixture-leak.mjs`, `pull-work/scripts/plan-check.mjs`, `work-planner/scripts/mutation-addon.mjs`; `C/scripts/trace.mjs` honors Known Failures (`--tap`, `--phase-file`, `--skip-pattern`); planner, brain-storm, and behavior-spec commit their output; pull-work/scripts/reconcile-check.mjs (spec change detection), parse-args.mjs (ug: arguments), and plan-check.mjs pair gate; pull-work, work-planner, and the plan and phase formats carry Reconcile, Defect, and pair-coverage rules; clean-handoff and Checkpoint-cost lines
-- gap to spec: R22 allow-list - `[R22-03]` still bans `AGENTS.md` everywhere, but the spec now allows `onboard-project` and `agents-md`; the suite has 1 failure (R22-03)
+- gap to spec: none
 
 ## Decisions pinned by the plan
 - tests read skill and agent text only through stable markers: paths, commands, commit templates, `- **Label:**` or `Label:` line starts, headings. Never whole sentences.
@@ -30,10 +30,10 @@
 | P01 | Interaction rules and stage commits | completed | R22, R23 (rules file and references), R13, R19 | [phase-01](phase-01.md) |
 | P02 | Gate and plan scripts | completed | R14, R15, R17 | [phase-02](phase-02.md) |
 | P03 | Reconcile, defects, pair coverage | completed | R20, R21, R16, R23, Q-clean-handoff, Q-checkpoint-cost | [phase-03](phase-03.md) |
-| P04 | AGENTS.md allow-list (spec reconcile) | planned | R22 (allow-list only) | [phase-04](phase-04.md) |
+| P04 | AGENTS.md allow-list (spec reconcile) | gating | R22 (allow-list only) | [phase-04](phase-04.md) |
 
 ## P04 slices
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Allow-list test for AGENTS.md | planned |
+| S01 | Allow-list test for AGENTS.md | completed |
