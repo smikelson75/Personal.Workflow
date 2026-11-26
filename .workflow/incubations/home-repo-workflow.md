@@ -1,137 +1,102 @@
 # Incubation - Home Repo Workflow
 
-Status: incubating
+Status: graduated
 Started: 2026-11-22
-Updated: 2026-11-22
+Updated: 2026-11-25
 
 ## Spark
-- Explored adopting Matt Pocock's Home Repo Pattern so `Workflow Core` skills and agents stay put in one place while project repositories swap in and out, without breaking multi-stack `Language Add-on` support or creating nested-repo git chaos.
-- Added three real-world constraints during exploration: multi-repo sessions from one hub are a definite goal; the setup must stay portable across personal and work machines; and at work we actively **relay back and forth between Claude Code and VS Code Copilot on the same work** (primarily by role/phase due to quotas, rate limits, and model preferences, with occasional mid-Card or mid-conversation quota hits).
-- Considered breaking off multi-stack (polyglot single-repo) ahead of Home Repo, but decided **against** splitting it out: the majority of work repos are single-stack, and the real bottleneck is coordinating changes across a **many-to-many sibling repo graph** (e.g., 3 separate API repos sharing 1 writable transactional DB repo, plus an API reading from a 2nd read-only reporting DB repo) alongside dual-harness layout (Copilot + Claude Code).
+- Explored adopting Matt Pocock's Home Repo Pattern so `Workflow Core` skills, agents, and hooks live in one place while project repositories swap in and out, without nested-repo git chaos or breaking `Language Add-on` support.
+- Real-world constraints: multi-repo work from one hub is a definite goal; the setup must stay portable across personal and work machines; and at work we relay the same work back and forth between Claude Code and Copilot (mostly by role/phase due to quotas and model preferences, occasionally mid-Card).
+- Most work repos are single-stack; the real pressure is a many-to-many sibling graph (3 API repos sharing 1 writable transactional DB repo, plus an API reading a read-only reporting DB repo).
 
 ## Current Mental Model
-- Separate the **reusable Workflow Engine** from **environment-specific Home Repos** and **sibling project repos** in a 3-layer architecture, using a **conservative 80/20 Home Repo Sync model** (no agent plugin loader) designed for **cross-harness relay**:
-  1. **Layer 1 — `Personal.Workflow` (Single Local Clone + Lightweight Sync):**
-     - Keep `Personal.Workflow` as one local clone per machine—the single source of truth for `Workflow Core` (`skills/`, harness-specific `agents/`, shared `hooks/`, scripts, and on-demand `Language Add-on` packs).
-     - Instead of packaging as an Agent Plugin, a small local sync script copies/links the right files into each Home Repo (`work-home` / `personal-home`) after `git pull`. This avoids plugin caching in VS Code, `/<plugin>:` command prefixes in Claude Code, and rewriting existing `.github/` script paths.
-     - Keep the harness-agnostic agent prompt bodies once plus a small per-harness frontmatter config (`model`, `tools`, filename) so cheap-tier delegation works in both harnesses without prompt drift.
-     - Keep `Language Add-on` stack packs outside the always-loaded `skills/` catalog and route to them via hybrid detection (marker files by default + explicit `AGENTS.md` override for greenfield or polyglot repos) plus a single thin router skill.
-  2. **Layer 2 — Thin Environment Home Repos (`personal-home`, `work-home`):**
-     - Separate small git repos holding sibling repo pointers in `AGENTS.md` (including each sibling's role: co-changed repo, read-only reference repo, or peer-impact repo), shared environment docs, and cross-repo ideation/contracts—keeping private work pointers completely separate from personal repos.
-     - **Instruction files (`AGENTS.md` + 1-line `CLAUDE.md`):** Use `AGENTS.md` as the single source of truth plus a 1-line `CLAUDE.md` containing `@AGENTS.md`. Even though Claude Code v2.1.277+ natively reads `AGENTS.md` as a fallback, keeping the 1-line `CLAUDE.md` (`@AGENTS.md`) is deduplicated by Claude Code (never loaded twice), works with `--add-dir` + `CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1` (where native `AGENTS.md` does *not* load), and prevents `CLAUDE.local.md` from silently shadowing `AGENTS.md`. *(Note: VS Code's `chat.useClaudeMdFile: false` only applies to the legacy Local agent harness, not Copilot CLI / Agent Host, so keeping `CLAUDE.md` to 1 line minimizes any overlap.)*
-     - **Verified zero-duplicate synced layout (Copilot Agent Host + Claude Code):**
-       - **1 shared `skills/` folder (`.claude/skills/`):** Verified natively discovered in both harnesses, including `/` autocomplete in VS Code Copilot.
-       - **1 shared hooks config (`.claude/settings.json`):** Verified that VS Code Copilot Agent Host runs `.claude/settings.json` hooks natively (and ignores `chat.useClaudeHooks: false`, which is Local-harness-only). Do **not** also ship `.github/hooks/` in the Home Repo or Copilot will double-fire; use one shared `.claude/settings.json` hook for both harnesses *(pending deny-payload verification for `guard-locked-tests.mjs`)*.
-       - **Separate `agents/` (`.github/agents/*.agent.md` + `.claude/agents/*.md`):** Verified that same-name `.github/agents/*.agent.md` takes precedence over `.claude/agents/*.md` in VS Code Copilot Agent Host *(caveat: `chat.agentFilesLocations: { ".claude/agents": false }` is Local-harness-only, so any Claude-only agent name not shadowed in `.github/agents/` would also appear in Copilot)*.
-       - Gitignore all synced workflow folders inside the Home Repo.
-  3. **Layer 3 — Sibling Project Repos:** Normal independent git repositories sitting beside the Home Repo on disk (no nested `.git` folders inside the Home Repo). Each writable repo owns its own `Workflow Folder` (`.workflow/`), repo-specific `AGENTS.md`, git history, branches, and PRs; read-only repos (e.g., reporting DBs) are referenced purely for schema/contract inspection without running `Plan` or `Card`s against them.
-- **Cross-repo & cross-harness execution model ("Coordinate in Home, Execute per Repo, Relay via `.workflow/`"):**
-  - Use the Home Repo session to incubate, brain-storm, and agree cross-repo contracts across a **many-to-many sibling graph** (e.g., 1 feature touching `Transactional DB` + `API 1`, reading `Reporting DB` as read-only context, and checking impact on peer `API 2` / `API 3`); execute `Plan`, `Phase`, `Card`, `Oracle`, `Tests locked`, and `Gate` inside each affected writable repo's own `.workflow/` so repos remain independently testable and mergeable.
-  - Treat `.workflow/` + git commits as the **relay baton** between Claude Code and VS Code Copilot—no chat history needs to cross harnesses and **zero new handoff files** are needed.
-  - For occasional mid-task quota hits: conversations already pause cleanly (`"pause"` in `incubate`, `draft` `Session` in `brain-storm`), and [pull-work](../../.github/skills/pull-work/SKILL.md) already supports interrupted mid-Card resume (`Next: running SNN` accepts dirty `plan.md` + that slice's `Files` and resumes Dispatch via `Done when`, or `git restore` gives a clean rerun).
+- **Three layers, CLIs only.** Targets are Claude Code CLI and Copilot CLI. VS Code is only an optional viewer (`/diff` in either CLI covers "see what changed"); the VS Code Agent Host is out of scope.
+  1. **`Personal.Workflow`** — one local clone per machine; source of truth for `Workflow Core` and `Language Add-on` packs. A small sync script copies the right files into each Home Repo (no Agent Plugins).
+  2. **Home Repos (`work-home`, `personal-home`)** — thin git repos holding `AGENTS.md` (+ 1-line `CLAUDE.md` with `@AGENTS.md`), sibling pointers with roles (co-changed, read-only reference, peer-impact), shared environment docs including the coordination playbook, and the synced (gitignored) workflow files.
+  3. **Sibling project repos** — normal independent repos beside the Home Repo. Each writable repo owns its `.workflow/`, `Plan`, `Oracle`, `Tests locked`, and `Gate`. Every `Card` runs inside its own repo.
+- **Execution shape (verified in both CLIs on the personal machine):** launch the CLI *in the sibling repo* with the Home Repo attached, so existing `cwd` assumptions keep working while skills, agents, and the hook come from Home.
+- **Relay baton:** `.workflow/` + git commits; no new handoff files. `pull-work` already resumes an interrupted `Card`.
+- **Coordination is a playbook, not tooling:** needs-first ordering using existing skills (API `brain-storm` -> `behavior-spec` -> DB `brain-storm` from the API spec + a targeted read-only grep of peer APIs for shared/cross-schema tables -> per-repo `work-planner`/`pull-work`). Confirmed: DB changes at work are always driven by an API need.
+- **Oracle backstop:** the `Gate`'s lock verification is the accepted backstop when the hook does not run (e.g. an untrusted Copilot folder). No trust detection.
 
-```mermaid
-flowchart TB
-    subgraph Engine["Layer 1: Personal.Workflow (Single Local Clone)"]
-        Src["skills/ + agents-src/ + shared hook<br/>+ on-demand Language Add-on packs"]
-        Sync["Tiny local sync script<br/>(no plugin loader or cache)"]
-        Src --> Sync
-    end
+```text
+ cd <sibling repo>
+   claude  --add-dir <home> --settings <home>\.claude\settings.json
+   copilot --add-dir <home>                 (folder must be trusted)
 
-    subgraph Home["Layer 2: work-home / personal-home"]
-        Docs["AGENTS.md + 1-line CLAUDE.md (@AGENTS.md)"]
-        Shared[".claude/skills/ + .claude/settings.json<br/>(1 shared copy for both harnesses)"]
-        CopilotAgents[".github/agents/*.agent.md<br/>(wins on same-name in Copilot)"]
-        ClaudeAgents[".claude/agents/*.md"]
-    end
-
-    subgraph Harnesses["Active Relay on Same Machine"]
-        VSC["VS Code Copilot (Agent Host)"]
-        CC["Claude Code"]
-    end
-
-    subgraph Siblings["Layer 3: Many-to-Many Sibling Repos"]
-        API["API 1 / 2 / 3 Repos<br/>.git + .workflow/ baton"]
-        DB1["Transactional DB Repo<br/>.git + .workflow/ baton"]
-        DB2["Reporting DB Repo<br/>(read-only context)"]
-    end
-
-    Sync --> Shared
-    Sync --> CopilotAgents
-    Sync --> ClaudeAgents
-    VSC --> Home
-    CC --> Home
-    Home -. "sibling pointers" .-> API
-    Home -. "sibling pointers" .-> DB1
-    Home -. "read-only pointer" .-> DB2
+ <home>\.claude\skills\        shared by both CLIs
+ <home>\.claude\settings.json  one shared PreToolUse hook
+                               - deny = top-level fields + hookSpecificOutput
+                               - git root from the edited file, not cwd
+ <home>\.github\agents\        Copilot copy (wins on same name)
+ <home>\.claude\agents\        Claude copy (+ code-review, Claude only)
+ <sibling>\.workflow\          Plan / Oracle / Gate per repo
 ```
 
-```mermaid
-flowchart LR
-    A["Harness A (e.g. Claude Code)<br/>plan / spec / Card N"] --> Baton[".workflow/ + git commit<br/>(or Next: running SNN + git diff)"]
-    Baton --> B["Harness B (e.g. VS Code Copilot)<br/>/pull-work -> next Card or resume"]
-    B --> Gate["Per-repo Oracle + Gate<br/>hybrid stack pack"]
+```text
+ Needs-first playbook (existing skills, no new tooling)
+ API repo  /brain-storm -> /behavior-spec   (limits, required, relationships)
+     |
+     v
+ DB repo   /brain-storm from ../api/.workflow/specs/<slug>-spec.md
+           + grep peer APIs (read-only) for shared / cross-schema tables
+     |
+     v
+ DB repo -> API repo(s): /work-planner -> /pull-work  (each in its own repo)
 ```
 
 ## What Fits vs. What Clashes
 
 | Dimension | External / Initial Idea | Our Context & Take |
 | --- | --- | --- |
-| **Repo physical layout** | Home Repo holds `AGENTS.md` pointers to **sibling** repos on disk (cloning on demand if missing). | **Fits cleanly.** Sibling pointers eliminate nested-`.git` confusion and keep each project's branches, worktrees, and PRs intact. |
-| **Where skills live & sync** | Shared skills live in the Home Repo; earlier explored dual-manifest Agent Plugins. | **Leaning conservative 80/20 sync (no plugins).** Pressure test showed VS Code collides on dual-manifest `agents/` and caches local plugins. With only two Home Repos (`work-home` / `personal-home`), a tiny sync script from one local `Personal.Workflow` clone gives live updates, zero `/pw:` prefixes, and keeps `.github/` script paths working. |
-| **Dual-harness custom agents & hooks** | Single `.claude-plugin/plugin.json` risked frontmatter collisions; earlier assumed `.vscode/settings.json` flags (`chat.agentFilesLocations`, `chat.useClaudeHooks`) could isolate `.claude/`. | **Verified layout without VS Code overrides.** Those settings are Local-harness-only (ignored by Copilot Agent Host). Verified: 1 shared `.claude/skills/` works in both; `.github/agents/*.agent.md` wins over `.claude/agents/*.md` on same-name collision in Copilot; and `.claude/settings.json` hooks fire in Copilot too, so shipping **only** `.claude/settings.json` (no `.github/hooks/` duplicate) avoids double-firing. |
-| **Instruction files (`AGENTS.md` / `CLAUDE.md`)** | Claude Code v2.1.277+ natively reads `AGENTS.md` as a fallback when no `CLAUDE.md` exists. | **Keep `AGENTS.md` + 1-line `CLAUDE.md` (`@AGENTS.md`).** Claude deduplicates it (never loads twice), it works with `--add-dir` sibling repos (where native `AGENTS.md` doesn't load) and older builds. Note: `chat.useClaudeMdFile: false` is Local-harness-only, so keeping `CLAUDE.md` to 1 line avoids context bloat. |
-| **Mid-task quota switches** | Considered adding a handoff scratchpad file for interrupted Cards. | **Zero new files needed.** [pull-work](../../.github/skills/pull-work/SKILL.md) already permits `Next: running SNN` with dirty `plan.md` + slice `Files` and resumes Dispatch from `Done when` (with `git restore` as an easy reset). Conversations already pause via `incubate` / `draft` `Session`. |
-| **Multi-stack `Language Add-on`s** | Considered breaking polyglot single-repo out ahead of Home Repo. | **Keep inside Home Repo scope.** Most real repos are single-stack (3 APIs + 2 DBs in separate repos), so breaking off polyglot monorepo support first wouldn't solve the main bottleneck. Keep [language-addons/](../../language-addons) as on-demand stack packs outside auto-loaded `skills/`. |
-| **Where `.workflow/` lives** | Shared docs live in the Home Repo; repo-specific docs stay in each child repo. | **Per-repo execution.** Keep `Plan`, `Oracle`, `Tests locked`, and `Gate` inside each sibling repo's `.workflow/`, using the Home Repo only to coordinate cross-repo thinking and contracts. |
-| **Existing `cwd` & `.github/` assumptions** | Skills, hooks, and scripts assume `cwd` is the target project repo and `Workflow Core` is copied into `.github/`. | **Concrete clashes to adapt:** [guard-locked-tests.mjs](../../.github/hooks/scripts/guard-locked-tests.mjs) uses `cwd`'s git root and skips `..` paths (silently bypassing sibling `Oracle` locks!); [workspace.mjs](../../.github/tools/workflow-check/src/workspace.mjs) walks up from `cwd`; [pull-work](../../.github/skills/pull-work/SKILL.md) hardcodes `.github/skills/pull-work/scripts/...`, `.github/tools/workflow-core/scripts/trace.mjs`, `.github/agents/coder.agent.md`, and `.github/user-interaction.md`, and dispatches Copilot's built-in `code-review` agent. |
-| **VS Code multi-root `.code-workspace`** | Considered as an alternative to Home Repo pointers. | **Weak foundation today.** Official VS Code docs do not guarantee cross-root skill/hook sharing, and the Agents window does not yet support multi-root sessions. |
+| **Repo layout** | Home Repo with `AGENTS.md` pointers to sibling repos | **Fits.** Siblings, never nested; each repo keeps its own history, branches, and PRs. |
+| **Distribution** | Agent Plugins (dual manifest) | **Rejected.** VS Code collided on dual-manifest agents and cached plugins; a tiny sync script from one clone is simpler. |
+| **Where sessions run** | Sessions run in the Home Repo | **Run in the sibling, Home attached.** Verified skills, agents, and hook load in both CLIs via `--add-dir` (Claude also needs `--settings`). |
+| **Hook** | `.github/hooks/` (Copilot) only | **One `.claude/settings.json`.** Both CLIs run it with Claude-shaped payloads. Deny output must carry both formats; Copilot reports the *Home* dir as `cwd` under `--add-dir`. |
+| **Agents** | One agent format | **Ship both formats per name.** Copilot runs `.github/agents` over `.claude/agents`; Claude-only names leak into Copilot; Copilot's built-in `code-review` beats `.claude/agents/code-review.md`, which Claude runs. |
+| **Cross-repo coordination** | Home Repo coordinates specs and plans | **Playbook only (Level 1).** Root cause of past DB fixes was ordering (schema before consumer needs), not tooling. Contract files / cross-repo traceability deferred. |
+| **Editor** | VS Code multi-root / Agent Host | **Out of scope.** Single-repo VS Code use only as a viewer; CLIs have `/diff`. |
 
 ## Tensions & Tradeoffs
-- **Why we stepped back from Agent Plugins (80/20 tradeoff):** After the pressure test broke single-folder dual-manifest isolation and live uncached updates in VS Code, plugins mainly bought physical harness isolation and availability when opening standalone repos outside a Home Repo—at the cost of generating two plugin roots, `/pw:` slash-command prefixes, plugin-relative path rewrites, and VS Code cache refreshes. If we ever revisit plugins, VS Code's experimental `chat.pluginLocations` setting is worth checking for live uncached loading.
-- **Copilot Agent Host ignores Local-harness `.vscode/settings.json` flags:** Verified that `chat.agentFilesLocations`, `chat.useClaudeMdFile`, and `chat.useClaudeHooks` only apply to VS Code's legacy Local agent harness. In Copilot Agent Host, **one shared `.claude/settings.json` hook** prevents double-firing (don't also ship `.github/hooks/`), and **same-name** `.github/agents/*.agent.md` shadows `.claude/agents/*.md`—but any Claude-only agent name (such as a `code-review.md` agent in `.claude/agents/`) would also be exposed in Copilot unless handled cleanly.
-- **Many-to-many sibling roles (not 1:1 DB <-> API):** Real work apps have 3 separate API repos sharing 1 writable transactional DB repo, plus an API reading from a 2nd read-only reporting DB repo. Coordination must distinguish **co-changed repos** (which receive `Plan`/`Card`s), **read-only reference repos** (schema/view inspection only), and **peer-impact repos** (other APIs sharing the same DB that should be checked for breaking changes).
-- **Silent `Oracle` bypass on sibling edits:** [guard-locked-tests.mjs](../../.github/hooks/scripts/guard-locked-tests.mjs) currently resolves git root from `cwd` and ignores any edited path starting with `..`. Under a Home Repo, the hook must resolve the git root from the *edited file's directory* instead.
-- **Sibling `AGENTS.md` loading:** Neither VS Code Copilot nor Claude Code's native `AGENTS.md` fallback auto-loads `AGENTS.md` from sibling repos outside `cwd` (unless a sibling has `CLAUDE.md` with `@AGENTS.md` and `CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1`). The Home Repo `AGENTS.md` / skills should instruct agents to read a sibling repo's `AGENTS.md` when entering it.
-- **`code-review` agent parity:** `pull-work`'s `Review` step dispatches `code-review` (a built-in agent in Copilot CLI/VS Code). Because Copilot Agent Host also reads `.claude/agents/`, adding a Claude-only `code-review.md` there could shadow or duplicate Copilot's built-in `code-review` unless we verify precedence or use a main-session fallback in Claude Code.
-- **Harness-local & synced file hygiene:** Synced `.github/` and `.claude/` folders in the Home Repo must be gitignored cleanly, and any harness-local files (e.g. `.claude/settings.local.json`, `.vscode/` tweaks) should stay gitignored so switching harnesses never trips `pull-work`'s clean-tree check.
-- **Cross-repo `Session Chain` -> per-repo `Plan` handoff:** Still needs a crisp convention for how a Home Repo `brain-storm` or contract links cleanly into multiple child repos' `.workflow/plans/` without confusing `workflow-check`.
+- **Simplest 80/20 baseline:** instead of attaching Home, the sync script copies `Workflow Core` into every sibling (hidden via `.git/info/exclude`) and the CLIs launch plainly. Buys: no launch flags, probably no hook-`cwd` quirk. Costs: N copies per machine and local-only files inside team repos. Current leaning is Home-attached; `brain-storm` should weigh both explicitly.
+- **Silent launch mistakes:** Claude with `--add-dir` but without `--settings` loads skills but no hook. A launch wrapper should make the correct launch the easy one; the `Gate` remains the backstop.
+- **Existing bug outside this idea:** `guard-locked-tests.mjs` emits only top-level `permissionDecision`, which Claude Code ignores (verified: file overwritten). Claude Code is unguarded today; worth a small fix ahead of the Home Repo work.
+- **Hardcoded paths:** `pull-work` references `.github/skills/...`, `.github/tools/...`, `.github/agents/coder.agent.md`, and `.github/user-interaction.md` relative to `cwd`; these break when cwd is a sibling and Workflow Core lives in Home.
+- **Assumptions to verify:**
+  - All probes ran on the personal machine (Claude Code 2.1.330, Copilot CLI 1.0.116); `--add-dir` / `--settings` behavior on the work machine is untested.
+  - The Claude `code-review` result covers explicit Agent-tool delegation; a prompt saying "run `/code-review`" would hit Claude's bundled skill instead.
+  - Payload `cwd` when Workflow Core is copied into the sibling (80/20 baseline) is untested.
 
 ## Sources
-- [The Home Repo Pattern (Matt Pocock / AI Hero)](https://www.aihero.dev/the-home-repo-pattern) — Proposes one Home Repo holding shared skills, `AGENTS.md` sibling-repo pointers, and shared docs; validated keeping child repos as siblings rather than nested git repos and motivated git-versioned sharing over `~/.claude/skills`.
-- [VS Code AI Settings Reference](https://code.visualstudio.com/docs/agents/reference/ai-settings) — Documents `chat.agentFilesLocations` (default includes `.claude/agents`), deprecated `chat.agentSkillsLocations`, `chat.useClaudeMdFile`, `chat.useClaudeHooks`, and experimental `chat.pluginLocations`.
-- [VS Code Agent Plugins](https://code.visualstudio.com/docs/agent-customization/agent-plugins.md) & [Agent Plugin Reference](https://code.visualstudio.com/docs/agents/reference/agent-plugin-reference.md) — Confirms VS Code supports Git and local-folder plugin installs, prioritizes root `plugin.json` (Agent Plugins 1.0 `$schema`) over `.claude-plugin/plugin.json`, isolates Copilot-specific agents/hooks under `com.github.copilot/`, and supports `${PLUGIN_ROOT}` / `${CLAUDE_PLUGIN_ROOT}`.
-- [VS Code Agent Harnesses](https://code.visualstudio.com/docs/agents/run/agent-harnesses.md), [Hooks](https://code.visualstudio.com/docs/agent-customization/hooks), & [Agents Window](https://code.visualstudio.com/docs/agents/run/agents-window.md) — Confirms VS Code Copilot shares runtime/hook semantics with Copilot CLI, supports PascalCase `PreToolUse`, and does not yet support multi-root sessions in the Agents window.
-- [GitHub Copilot CLI Hooks Reference](https://docs.github.com/en/copilot/reference/hooks-reference) & [CLI Command Reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference) — Confirms Copilot CLI reads `.github/skills`, `.claude/skills`, and `.agents/skills`, supports `--add-dir`, reads repo `.claude/settings.json` hooks (duplicate-firing caveat), and supports Claude-style `PreToolUse` matcher/payload semantics.
-- [Claude Code Plugin Manifest Reference](https://code.claude.com/docs/en/plugins-reference.md) & [Plugin Loading Reference](https://code.claude.com/docs/en/plugins/loading.md) — Confirms Claude Code reads `.claude-plugin/plugin.json`, namespaces components as `/<name>:<skill>` and `<name>:<agent>`, supports live uncached local folder loading via `CLAUDE_CODE_PLUGIN_DIRS` / `--plugin-dir`, provides `claude plugin validate`, and documents enterprise policy checks via `/status`.
-- [Claude Code Skills](https://code.claude.com/docs/en/skills.md), [Memory / AGENTS.md](https://code.claude.com/docs/en/memory.md#agents-md), & [Permissions & Additional Directories](https://code.claude.com/docs/en/permissions.md) — Confirms Claude Code v2.1.277+ natively reads `AGENTS.md` as a fallback (configurable in `/config`), deduplicates `@AGENTS.md` inside `CLAUDE.md` without double-loading, does *not* load `AGENTS.md` from `--add-dir` directories (only `CLAUDE.md`), and grants sibling access via `--add-dir` / `permissions.additionalDirectories`.
-- [Claude Code now supports AGENTS.md Natively (DEV Community / Valyu AI)](https://dev.to/valyuai/claude-code-now-supports-agentsmd-natively-heres-how-it-actually-works-5nl) — Practical walkthrough of Claude Code's four `/config` Project instructions modes and monorepo/fallback tradeoffs (cross-checked against official Claude Code Memory docs).
+- [The Home Repo Pattern (Matt Pocock / AI Hero)](https://www.aihero.dev/the-home-repo-pattern) — one Home Repo holding shared skills, `AGENTS.md` sibling pointers, and shared docs; motivated siblings over nested repos.
+- [VS Code AI Settings Reference](https://code.visualstudio.com/docs/agents/reference/ai-settings) — `chat.agentFilesLocations`, `chat.useClaudeMdFile`, `chat.useClaudeHooks` are Local-harness-only; no longer relevant after scoping out VS Code.
+- [VS Code Agent Plugins](https://code.visualstudio.com/docs/agent-customization/agent-plugins.md) — plugin installs and manifest precedence; informed rejecting plugins.
+- [GitHub Copilot CLI Hooks Reference](https://docs.github.com/en/copilot/reference/hooks-reference) & [CLI Command Reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference) — Copilot reads `.claude/skills` and `.claude/settings.json` hooks; `--add-dir`; `/diff`.
+- [Claude Code Skills](https://code.claude.com/docs/en/skills.md) — skills load from `--add-dir` directories; bundled `/code-review` skill.
+- [Claude Code Commands](https://code.claude.com/docs/en/commands.md) — `/diff`, `/add-dir` ("most `.claude/` configuration isn't discovered" — contradicted for agents by our probe), `/code-review`.
+- [Claude Code Memory / AGENTS.md](https://code.claude.com/docs/en/memory.md#agents-md) — native `AGENTS.md` fallback; `@AGENTS.md` in `CLAUDE.md` is deduplicated.
 
-## Pressure Test Results (2026-11-22, Work Machine)
-Ran [work-policy-dual-harness-pressure-test.md](../../docs/research/work-policy-dual-harness-pressure-test.md) across Claude Code and VS Code Copilot on the work machine:
-- **Passed:**
-  - **Org policy:** Local plugins are allowed in both Claude Code (`claude plugin validate` + `--plugin-dir`, no blocking enterprise restrictions observed) and VS Code Copilot (installed via `Chat: Install Plugin from Source` under User plugins, toggleable).
-  - **Shared skill discovery:** `echo-check` worked in both (`pw-probe:echo-check` in Claude Code; `/echo-check` in VS Code Copilot, though VS Code didn't list it in `/` autocomplete).
-  - **Sibling-repo editing & cross-harness relay:** Both harnesses read/edited `../dummy-sibling` (VS Code prompted `"Allow reading file outside of workspace"`) and relayed cleanly via the working tree with **zero** untracked config clutter (`git status --porcelain` stayed clean).
-  - **Hooks:** `PreToolUse` fired in both harnesses.
-- **Assumptions broken (design-changing findings):**
-  1. **Dual-manifest agent collision in VS Code:** VS Code Copilot reads Claude's `agents/*.md` and chose `agents/probe-scout.md` *over* `com.github.copilot/agents/probe-scout.agent.md` when both lived in the same plugin folder. We cannot ship both `agents/` and `com.github.copilot/agents/` in one folder — we need either **one shared agent format** or **separate generated/dist plugin roots** per harness (or a simpler non-plugin layout).
-  2. **VS Code caches local plugins:** Copilot runs local plugins from a **cached copy**, not live from the source folder. Hooks must use stdin payload paths / `process.cwd()` (never `import.meta.url`-relative paths to reach source/workspace files), and `Model A-Local`'s "zero cache drift on `git pull`" benefit applies to Claude Code (`--plugin-dir`), not VS Code Copilot.
-
-### Home Repo Layout Probe (2026-11-22, VS Code Copilot Agent Host)
-Tested a throwaway folder (`C:\Temp\home-layout-probe`) with `.claude/skills/`, `.claude/agents/`, `.github/agents/`, `.claude/settings.json`, `.github/hooks/`, and `.vscode/settings.json`:
-- **Passed:**
-  - **Shared `.claude/skills/`:** `/probe-skill` appeared in `/` autocomplete and executed cleanly (`FROM_SHARED_CLAUDE_SKILL`).
-  - **Same-name agent precedence:** `probe-agent` appeared once in the Agent picker and executed `.github/agents/probe-agent.agent.md` (`FROM_GITHUB_AGENT`) over `.claude/agents/probe-agent.md`.
-- **Assumptions broken (design-changing findings):**
-  1. **`.vscode/settings.json` Claude-isolation flags are Local-harness-only:** VS Code's settings UI explicitly states that `chat.agentFilesLocations`, `chat.useClaudeMdFile`, and `chat.useClaudeHooks` are *"only used by the Local agent harness."* Copilot CLI / Agent Host ignores them.
-  2. **Shipping both `.github/hooks/` and `.claude/settings.json` double-fires in Copilot:** Even with `"chat.useClaudeHooks": false`, a single file read logged both `GITHUB_HOOK` and `CLAUDE_HOOK`. Because Copilot Agent Host runs `.claude/settings.json` hooks natively, the Home Repo should use **one** shared `.claude/settings.json` hook instead of duplicating `.github/hooks/`.
+## Probe Results
+- **2026-11-22, work machine:** local plugins allowed in both harnesses; sibling read/edit and cross-harness relay worked with a clean tree; VS Code collided on dual-manifest agents and cached local plugins (led to rejecting plugins).
+- **2026-11-25, personal machine, `C:\Temp\hook-parity-probe`** (guard registered only in `.claude/settings.json`):
+  - Copilot CLI, untrusted folder: repository hooks skipped (stderr warning only), locked file edited.
+  - Copilot CLI, trusted: denied with top-level format and with combined format.
+  - Claude Code: hook fired but top-level deny ignored, locked file overwritten; combined format (`hookSpecificOutput`) denied.
+  - Both CLIs send Claude-shaped payloads (`tool_name`, `tool_input`, tool names like `Edit`/`Write`).
+- **2026-11-25, personal machine, `C:\Temp\home-probe`** (`home` + sibling `api1`):
+  - cwd = sibling without `--add-dir`: no Home skills, agents, or hook in either CLI.
+  - Copilot `--add-dir <home>`: skills, agents, hook all load; hook payload `cwd` = Home dir.
+  - Claude `--add-dir <home>`: skills and agents load (agent invocation confirmed by marker + logged `Agent` call), hook does not; adding `--settings <home>\.claude\settings.json` loads it with payload `cwd` = sibling.
+  - Same-name agents: Copilot ran `.github/agents` copy; Claude ran `.claude/agents` copy.
+  - Claude-only agent name: listed and runnable in Copilot.
+  - `code-review`: Copilot ran its built-in over `.claude/agents/code-review.md`; Claude ran ours via the Agent tool.
 
 ## Open Threads
-- **Verify shared `.claude/settings.json` hook parity:** Confirm `guard-locked-tests.mjs` (both allow and deny JSON payloads) works identically in both Claude Code and VS Code Copilot Agent Host when registered *only* in `.claude/settings.json`.
-- **Many-to-many cross-repo coordination & spec handoff:** Design how a Home Repo `brain-storm` / `Behavior Spec` coordinates a feature across a many-to-many sibling graph (e.g., 3 APIs sharing 1 writable transactional DB + 1 read-only reporting DB)—handling co-changed `Plan`s, read-only reference context, and peer-API impact checks without breaking `workflow-check` traceability.
-- **Sibling-aware scripts & `code-review` parity:** Adapt `guard-locked-tests.mjs` to resolve git root from the edited file's directory, check remaining `cwd` assumptions in `workflow-check` / `pull-work`, and decide how Claude Code handles `pull-work`'s `Review` step without colliding with Copilot's built-in `code-review` agent.
-- **Polyglot repo stack packs (secondary):** Confirm how a single repo containing multiple stacks (e.g., `api/` C# + `web/` TS) binds each stack pack to its subdirectory inside `work-planner` and `Gate`.
+- none
 
-## Pick Up Here
-- Resume `/incubate` on the **80/20 Home Repo Sync** model: first verify that `guard-locked-tests.mjs` (especially its deny response) works identically in both Claude Code and VS Code Copilot Agent Host when configured *only* via `.claude/settings.json`; then design the **many-to-many sibling coordination model** (3 APIs <-> 1 shared transactional DB + 1 read-only reporting DB) and resolve sibling-aware `guard-locked-tests.mjs` / `code-review` parity before deciding whether to graduate into `/brain-storm`.
+## Graduation Framing
+- **Distilled idea:** a thin Home Repo per environment holds `Workflow Core` (synced from one `Personal.Workflow` clone), sibling pointers, and a needs-first coordination playbook; Claude Code and Copilot CLIs launch in a sibling repo with Home attached; each repo plans and gates in its own `.workflow/`, and `.workflow/` + commits are the relay baton.
+- **Keep:** sibling layout; CLIs only; shared `.claude/skills/` and one `.claude/settings.json` hook (combined deny, git root from edited file); agents in both formats per name, `code-review` Claude-only; per-repo execution; Level 1 playbook; `Gate` as `Oracle` backstop.
+- **Reject:** Agent Plugins; VS Code Agent Host and its settings; trust detection; contract files and cross-repo traceability (revisit only if the playbook keeps missing peer impact).
+- **Questions for `brain-storm`:** Home-attached vs. copy-into-sibling; launch wrapper ergonomics and failure visibility; fixing `pull-work`'s hardcoded `.github/` paths; ordering the existing guard deny-format fix; rerunning the probes on the work machine as an early slice; polyglot single-repo stack binding (secondary).
+- Handoff: `/brain-storm from .workflow/incubations/home-repo-workflow.md`
