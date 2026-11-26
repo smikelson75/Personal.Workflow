@@ -69,7 +69,7 @@
   - Effort: lowercase the value; `low`, `medium`, `high`, `xhigh`, `max` as written; `none` and `minimal` become `low`.
   - When a half cannot be resolved, its line is omitted from the Claude form (card S04 adds the default).
   - Remove the `model` block (the key line and every following line up to the next top-level key, including comments) and the `reasoning-effort` line; append `model: <alias>` then `effort: <level>` before the closing `---`.
-  - `update-home.mjs`: `planInstall` also maps `.github/agents/<n>.agent.md` to the same Home path; the content written for `.claude/agents/<n>.agent.md` is `renderClaudeForm(source).text`. `replaced` compares the target with the content to be written. `fingerprint` still hashes source files only.
+  - `update-home.mjs`: `planInstall` also maps `.github/agents/<n>.agent.md` to the same Home path; the content written for `.claude/agents/<n>.agent.md` is `renderClaudeForm(source).text`. `replaced` compares the target with the content to be written. `fingerprint` hashes the content to be written for every installed path (the spec's "content the Update Script installs"), so the Claude form and the new Copilot paths are included.
   - Agent name for later notices is the file name without `.agent.md`.
 - **Do not:** edit `tests/**`; add dependencies; change any file under `.github/agents/`; print notices (S03 and S04 add them).
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/home-repo-workflow/*.test.mjs"` exits 0, where the exclusion also lists S01's Restores IDs; targets R49-01, R48-01, R48-02, R48-03, R48-04, R48-05, R48-06, R51-01, R51-02, R51-03; 10 target tests run
@@ -171,10 +171,10 @@
 
 ## S07 - Pins stay in one place and Core skills never override them
 
-- **Kind:** verify
-- **Goal:** the shipped source keeps exactly the two pin fields, no skill requests a per-dispatch model or effort, and a real install prints no agent notice.
+- **Kind:** build
+- **Goal:** the shipped source keeps exactly the two pin fields, no skill line that dispatches a Workflow Core agent mentions a model or effort, and a real install prints no agent notice.
 - **Depends on:** S06
-- **Tier:** delegate - tests expected to pass on the finished code
+- **Tier:** delegate - one wording edit; the other scenarios are expected to pass on the finished code
 - **Review:** none
 - **Scenarios:** fixture: the real source folder and a temp Home Repo
   - R48-17: Given every `.github/skills/**/*.md` and `.github/agents/*.agent.md`, when scanned for lines that contain `dispatch` and the name of a Workflow Core agent, then no such line contains the word `model` or `effort`
@@ -182,9 +182,11 @@
   - R49-03: Given the real Update Script run into a temp Home Repo, when it finishes, then every Home `.github/agents/*.agent.md` equals its source byte for byte
   - R50-08: Given the same run, when output is read, then no `Agent default:` and no `Agent pin:` line prints
 - **Acceptance tests:** `tests/home-repo-workflow/p06-s07.test.mjs`
-- **Files:** none
-- **Patterns:** `tests/home-repo-workflow/p05-s06.test.mjs:1 - reading README and skills in a test`
-- **Decisions:** the real Update Script runs only against a temp Home Repo (`git init`, `AGENTS.md` with no `Stack:` line).
-- **Do not:** edit product files; edit `tests/**` outside the card's own file.
+- **Files:** edit `.github/skills/pull-work/README.md`
+- **Patterns:** `.github/skills/pull-work/README.md:19 - the paragraph to split`
+- **Decisions:**
+  - In `.github/skills/pull-work/README.md` the paragraph under `## Recommended Models` has one line that both says `/pull-work` dispatches `coder` and `test-author` and says `model` and `effort`. Move the sentence beginning `A strong mid-tier model at` onto its own line, separated by a blank line, keeping every word of it.
+  - The real Update Script runs only against a temp Home Repo (`git init`, `AGENTS.md` with no `Stack:` line).
+- **Do not:** edit other files; edit `tests/**`.
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/home-repo-workflow/*.test.mjs"` exits 0; targets R48-17, R49-02, R49-03, R50-08; 4 target tests run
-- **Stop and report if:** a target fails (the slice becomes `blocked` and Revise adds a `fix` card).
+- **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.
