@@ -2,10 +2,10 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: phase review P05
-- Tests locked: `4dbd17a`
+- Next: P05 S01, S03, S05
+- Tests locked: `de0f84e`
 - Oracle: `tests/home-repo-workflow`
-- Phase base: `4dbd17a`
+- Phase base: `de0f84e`
 - Reconciled: `96cf5699d5c914ca684a96621759c3aaf1eed4bb`
 
 ## Current state
@@ -30,15 +30,15 @@
 | P02 | Update Script fills a Home Repo offline | completed | R36, R37, Q-version-identity, Q-offline (update) | [phase-02](phase-02.md) |
 | P03 | Launch Script with stack add-ons and Home-layout guard | completed | R38, R39, R40, R41, Q-offline (launch), Q-seamless-relay | [phase-03](phase-03.md) |
 | P04 | Workflow Core parity across layouts and Harnesses | completed | R42, R43 | [phase-04](phase-04.md) |
-| P05 | Authoring skills, Coordination Playbook, README | planned | R44, R45, R46, R47, Q-offline partial | [phase-05](phase-05.md) |
+| P05 | Authoring skills, Coordination Playbook, README | in progress | R44, R45, R46, R47, Q-offline partial | [phase-05](phase-05.md) |
 
 ## P05 slices
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | stack-check helper proposes stacks and refuses the Home Repo | planned |
-| S02 | agents-md skill | planned |
-| S03 | scaffold helper writes a Language Add-on | planned |
-| S04 | addon-author skill | planned |
-| S05 | Coordination Playbook | planned |
-| S06 | README documents both layouts | planned |
+| S01 | stack-check helper proposes stacks and refuses the Home Repo | ready |
+| S02 | agents-md skill | ready |
+| S03 | scaffold helper writes a Language Add-on | ready |
+| S04 | addon-author skill | ready |
+| S05 | Coordination Playbook | ready |
+| S06 | README documents both layouts | ready |
