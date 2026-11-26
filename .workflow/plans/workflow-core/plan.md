@@ -2,7 +2,7 @@
 
 - Spec: [workflow-core-spec.md](../../specs/workflow-core-spec.md)
 - Lane: standard
-- Next: gate P04
+- Next: done
 - Tests locked: `51c28d9`
 - Oracle: `.github/tools/workflow-core/tests`
 - Phase base: `51c28d9`
@@ -30,10 +30,4 @@
 | P01 | Interaction rules and stage commits | completed | R22, R23 (rules file and references), R13, R19 | [phase-01](phase-01.md) |
 | P02 | Gate and plan scripts | completed | R14, R15, R17 | [phase-02](phase-02.md) |
 | P03 | Reconcile, defects, pair coverage | completed | R20, R21, R16, R23, Q-clean-handoff, Q-checkpoint-cost | [phase-03](phase-03.md) |
-| P04 | AGENTS.md allow-list (spec reconcile) | gating | R22 (allow-list only) | [phase-04](phase-04.md) |
-
-## P04 slices
-
-| # | Slice | Status |
-|---|-------|--------|
-| S01 | Allow-list test for AGENTS.md | completed |
+| P04 | AGENTS.md allow-list (spec reconcile) | completed | R22 (allow-list only) | [phase-04](phase-04.md) |
