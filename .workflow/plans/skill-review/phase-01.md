@@ -1,0 +1,141 @@
+# P01 - Prepare finds unreviewed skill uses
+
+- **Outcome:** `node .github/tools/skill-review/bin/skill-review.mjs prepare [<skill>]`, run in a Home-layout Project Repo, rejects copy layout, unknown skills, and an unreadable Review Record; reads the Copilot CLI and Claude Code Conversation Logs whose working folder is inside the Project Repo; prints notices; and writes a compact-record file listing each unreviewed skill use with its Positions. It writes nothing else.
+- **Covers:** R52 (home-layout, records-unreadable, folder filter, running-Conversation boundary, nothing to review), R53 (unknown-skill, one-skill filter), R54 (reviewed Positions, read side), R61 (read side), R65, R67 (`home-layout-required`)
+- **Invariants:**
+  - ES modules (`.mjs`), Node built-ins only, no dependencies, no network modules and no `fetch`.
+  - CLI entry `.github/tools/skill-review/bin/skill-review.mjs`; code in `.github/tools/skill-review/src/`. Output goes to stdout. Failure is one stdout line `skill-review failed: <category>: <detail>`, exit 1, and nothing is written. Success exits 0.
+  - Home layout means `WORKFLOW_HOME` is set to an existing folder; that folder is the Home Repo. The Project Repo is `git rev-parse --show-toplevel` of the working folder.
+  - Harness names in output are exactly `Copilot CLI` and `Claude Code`.
+  - A Position is a 1-based physical line number of a Conversation Log file. A skill use spans from the line that starts it to the line before the next skill start (any skill name), or to the last line of the file. The final newline does not add a line.
+  - Test overrides: `SKILL_REVIEW_COPILOT_HOME` (default `~/.copilot`; logs at `<dir>/session-state/<id>/events.jsonl`) and `SKILL_REVIEW_CLAUDE_HOME` (default `~/.claude`; logs at `<dir>/projects/<any folder>/<id>.jsonl`).
+  - Tests read stable markers only: output lines, the compact-record JSON, `git status --porcelain`.
+- **Harness:**
+  - run: `node --test --test-reporter=tap --test-name-pattern="<regex of IDs>" "tests/skill-review/*.test.mjs"`; exclude with `--test-skip-pattern="<regex>"`
+  - tag: test title starts with `[R52-01]`
+  - count: the `# pass N` line of the tap output
+  - assert: `^\s*assert|\btest\(`
+- **Known failures:**
+  - `[R29-01] Glossary defines the 13 added terms` - owner P06
+  - `[Q-zero-workflow-check-errors]` - owner P06
+- **Not expressible:**
+  - R52 "reads the full local history" on a first run beyond fixtures - S02 tests a fixture with an old Conversation (2026-01-01); no time limit exists in code
+  - R63 and Q-offline (no network calls) - tested in P04 by absence of network modules and `fetch` in the tool sources
+- **Gate:**
+  - suite: `node --test --test-reporter=tap --test-skip-pattern="<node .github/tools/workflow-core/scripts/trace.mjs --phase-file .workflow/plans/skill-review/phase-01.md --skip-pattern output>" "tests/**/*.test.mjs" ".github/tools/workflow-check/tests/acceptance/*.test.mjs" ".github/tools/workflow-core/tests/acceptance/*.test.mjs"`
+  - traceability: `node --test --test-reporter=tap "tests/skill-review/*.test.mjs" | node .github/tools/workflow-core/scripts/trace.mjs --phase-file .workflow/plans/skill-review/phase-01.md <scenario IDs of S01-S04>`
+  - lock: `git diff --exit-code <Tests locked> -- tests/skill-review`
+  - mutation: unsupported for node - no mutation Language Add-on installed
+
+## S01 - CLI skeleton, layout gate, failures, empty run
+
+- **Kind:** build
+- **Goal:** `prepare` validates layout, skill name, and Review Record, prints the no-log notices, and reports an empty run.
+- **Depends on:** none
+- **Tier:** main - creates the CLI structure (argument parsing, failure function, Review Record reader, skill list) that S02-S04 extend
+- **Review:** required - creates a shared structure; defines a public interface and a persisted format
+- **Scenarios:** fixture: `<home>` is a git repo with `.claude/skills/{pull-work,brain-storm,skill-review}/SKILL.md`; `<proj>` is a git repo; `SKILL_REVIEW_COPILOT_HOME` and `SKILL_REVIEW_CLAUDE_HOME` point to empty folders; the CLI runs with working folder `<proj>` and `WORKFLOW_HOME=<home>`
+  - R67-01: Given `WORKFLOW_HOME` is unset, when `prepare` runs, then stdout is `skill-review failed: home-layout-required: start the Harness with the Launch Script`, exit is 1, and `<home>` and `<proj>` have an unchanged `git status --porcelain` (failure)
+  - R53-01: Given `prepare pul-work`, when it runs, then the first stdout line is `skill-review failed: unknown-skill: pul-work`, a later line is `known skills: brain-storm, pull-work, skill-review`, and exit is 1 (failure)
+  - R52-01: Given `<home>/skill-review/review-record.json` contains `not json`, when it runs, then stdout is `skill-review failed: records-unreadable: <absolute path of that file>` and exit is 1 (failure)
+  - R52-02: Given a record file `{"format":2}`, when it runs, then the same `records-unreadable` line appears (failure)
+  - R65-01: Given both log folders are empty, when `prepare` runs, then stdout has the lines `notice: no-conversation-log: Copilot CLI` and `notice: no-conversation-log: Claude Code` and the last line is `skill-review: nothing to review`, exit is 0, and no `compact-record:` line is printed
+  - R52-03: Given R65-01's fixture, when it runs, then `git status --porcelain` is unchanged in `<home>` and `<proj>` and no file named `review-record.json` exists
+- **Acceptance tests:** `tests/skill-review/p01-s01.test.mjs`
+- **Files:** create `.github/tools/skill-review/bin/skill-review.mjs`; create `.github/tools/skill-review/src/cli.mjs`; create `.github/tools/skill-review/src/record.mjs`
+- **Patterns:** `scripts/update-home.mjs:327 - failure line format and exit code`; `.github/skills/pull-work/scripts/plan-check.mjs:1 - small Node CLI style`
+- **Decisions:**
+  - `bin/skill-review.mjs` imports `src/cli.mjs` and calls `main(argv, env, cwd)` which returns `{lines, code}`; the bin prints the lines and exits with the code.
+  - Command is `process.argv[2]`; only `prepare` exists in P01. Any other command prints `skill-review failed: usage: skill-review prepare [<skill>] [--out <file>]`, exit 1. `prepare` takes an optional skill name (first non-flag argument) and an optional `--out <file>`.
+  - Check order: home layout (`WORKFLOW_HOME` set and an existing folder), then skill name, then Review Record.
+  - Known skills: the sorted names of the folders under `<home>/.claude/skills` that contain a `SKILL.md`, plus the sorted names of folders matching `<home>/.workflow-core/language-addons/*/*` that contain a `SKILL.md`; duplicates removed.
+  - `src/record.mjs` exports `readRecord(homePath)`: absent file returns `{format:1,conversations:{},handoffs:[],observations:[],installs:[],nextObservation:1}`; a file that is not JSON, or whose `format` is not `1`, throws an error with `category: 'records-unreadable'` and `detail` = the absolute path of the file. Path is `<home>/skill-review/review-record.json`.
+  - Notices: for each Harness, in the order `Copilot CLI`, `Claude Code`, print `notice: no-conversation-log: <Harness>` when no in-scope Conversation Log exists for it (S01: when its log folder is missing or holds no log file; S02 and S03 refine "in-scope").
+  - When no unreviewed use exists, the last line is `skill-review: nothing to review`.
+- **Do not:** edit `tests/skill-review/**`; read or write any file in `<proj>`; write any file in `<home>`; add dependencies.
+- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/skill-review/*.test.mjs"` exits 0; targets R67-01, R53-01, R52-01, R52-02, R65-01, R52-03; 6 target tests run
+- **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.
+
+## S02 - Copilot CLI skill uses in the Project Repo
+
+- **Kind:** build
+- **Goal:** `prepare` finds the unreviewed skill uses in Copilot CLI Conversation Logs whose working folder is inside the Project Repo and writes them to the compact-record file.
+- **Depends on:** S01
+- **Tier:** main - creates the Conversation Log reader structure (`logs.mjs`, `uses.mjs`) that S03 and S04 extend
+- **Review:** required - parses untrusted input (log files); creates a shared structure
+- **Scenarios:** fixture: S01's fixture plus Copilot logs. A log line is `{"type":"<type>","data":{...},"id":"e<n>","timestamp":"<ISO>","parentId":null}`. First line is `session.start` with `data.context.cwd` = the Conversation's working folder and `data.sessionId` = the folder name. A skill start is `skill.invoked` with `data.name`.
+  - R52-04: Given Copilot Conversations `c1` (skills `brain-storm` at line 2, `pull-work` at line 5, 8 lines total) and `c2` (cwd `<proj>/sub`, skill `pull-work` at line 2, 3 lines), when `prepare` runs, then stdout has the line `skill-review: prepared 3 skill uses in 2 Conversations` followed by the last line `compact-record: <path>`, which names an existing file, and that JSON has `project` = the `<proj>` folder name and Conversations `c1` (uses `brain-storm` 2-4, `pull-work` 5-8) and `c2` (use `pull-work` 2-3), each use `{skill, start, end, from}` with `from` = `start`
+  - R52-05: Given a Copilot Conversation `c3` with cwd `<other>` (a git repo outside `<proj>`) that used `pull-work`, when `prepare` runs, then the compact record has no Conversation `c3` and no stdout line contains `c3`
+  - R52-06: Given a Conversation with `pull-work` at line 2, `skill-review` at line 6, `brain-storm` at line 9 and 12 lines in total, when `prepare` runs, then its uses are `pull-work` 2-5 and `brain-storm` 9-12 and no `skill-review` use is listed (boundary)
+  - R53-02: Given `c1` of R52-04 and `prepare pull-work`, when it runs, then the compact record lists only the `pull-work` uses and `brain-storm` is absent
+  - R52-07: Given a Conversation with no `skill.invoked` line, when `prepare` runs, then it is absent from the compact record and from every count
+  - R52-08: Given a Conversation dated 2026-01-01 and one dated today, when `prepare` runs, then both are listed (no time limit)
+  - R65-02: Given Copilot logs exist for the Project Repo and the Claude folder is empty, when it runs, then stdout has `notice: no-conversation-log: Claude Code` and no `notice: no-conversation-log: Copilot CLI` line
+- **Acceptance tests:** `tests/skill-review/p01-s02.test.mjs`
+- **Files:** create `.github/tools/skill-review/src/logs.mjs`; create `.github/tools/skill-review/src/uses.mjs`; edit `.github/tools/skill-review/src/cli.mjs`
+- **Patterns:** `.github/tools/skill-review/src/cli.mjs:1 - the S01 main function and its {lines, code} result`; `.github/tools/workflow-core/scripts/trace.mjs:1 - line-oriented parsing of tool output`
+- **Decisions:**
+  - `logs.mjs` exports `findCopilotConversations(copilotHome, projectRoot)` returning `[{harness:'Copilot CLI', id, file, lines}]` where `lines` is the file split into physical lines (no trailing empty line). A Conversation is in scope when its first `session.start` line's `data.context.cwd` equals `projectRoot` or is inside it (compare after `path.resolve`, with `\` and `/` unified, case-insensitive on `win32`). A line that is not valid JSON is skipped for cwd and skill detection.
+  - `uses.mjs` exports `segmentUses(conversation, isStart)` returning `[{skill, start, end}]` for every skill start (known or unknown name), then `cli.mjs` keeps only known skills other than `skill-review`.
+  - Copilot skill start: a line with `type` equal to `skill.invoked`; the skill is `data.name`.
+  - The compact record is `{"project":"<folder name of projectRoot>","conversations":[{"harness","id","file","uses":[{"skill","start","end","from"}]}]}`, Conversations sorted by `harness` then `id`, uses by `start`. `from` is `start` (S04 changes it). Conversations with no kept use are omitted.
+  - Output file: the `--out` value, else `<os.tmpdir()>/skill-review-<project folder name>.json`. Stdout lines: notices first, then `skill-review: prepared <n> skill uses in <m> Conversations`, then `compact-record: <absolute path>`.
+  - A Harness's `no-conversation-log` notice appears when it has no in-scope Conversation (no matching `session.start`), whether or not the folder exists.
+  - An optional skill argument keeps only that skill's uses.
+- **Do not:** edit `tests/skill-review/**`; read the Claude Code folder (S03); write any file except the compact record; add dependencies.
+- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/skill-review/*.test.mjs"` exits 0; targets R52-04 to R52-08, R53-02, R65-02; 7 target tests run
+- **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.
+
+## S03 - Claude Code skill uses and unknown-record notices
+
+- **Kind:** build
+- **Goal:** `prepare` also reads Claude Code Conversation Logs and prints one notice for each record type it does not recognize in either Harness.
+- **Depends on:** S02
+- **Tier:** delegate - mirrors the S02 Copilot reader; record shapes and known types are pinned
+- **Review:** required - parses untrusted input from a changing, undocumented format
+- **Scenarios:** fixture: S02's fixture plus Claude logs under `<claude>/projects/<folder>/<id>.jsonl`. A line is `{"type":"<type>","cwd":"<folder>","sessionId":"<id>","message":{...}}`.
+  - R52-09: Given Claude Conversation `k1` (cwd `<proj>`) whose line 2 is `{"type":"user","cwd":"<proj>","sessionId":"k1","message":{"role":"user","content":"<command-name>/pull-work</command-name>"}}` and which has 6 lines, when `prepare` runs, then the compact record lists `k1` as `Claude Code` with use `pull-work` 2-6
+  - R52-10: Given Claude Conversation `k2` whose line 3 is an `assistant` record with `message.content` `[{"type":"tool_use","name":"Skill","input":{"skill":"brain-storm"}}]` and which has 5 lines, when it runs, then `k2` lists use `brain-storm` 3-5
+  - R52-11: Given Claude Conversation `k3` with cwd `<other>`, when it runs, then `k3` is absent
+  - R65-03: Given `k1` has a line 12 of type `thinking_v9`, when it runs, then stdout has the line `notice: unknown-record: Claude Code k1 line 12: type "thinking_v9"`
+  - R65-04: Given Copilot Conversation `c1` has a line 4 of type `weird.type`, when it runs, then stdout has `notice: unknown-record: Copilot CLI c1 line 4: type "weird.type"`
+  - R65-05: Given no Claude Conversation is in scope and Copilot has one, when it runs, then stdout has `notice: no-conversation-log: Claude Code` and the Copilot Conversation is listed
+  - R65-06: Given a Conversation with no skill use and a record of an unknown type, when it runs, then no `unknown-record` notice is printed for it
+- **Acceptance tests:** `tests/skill-review/p01-s03.test.mjs`
+- **Files:** edit `.github/tools/skill-review/src/logs.mjs`; edit `.github/tools/skill-review/src/uses.mjs`; edit `.github/tools/skill-review/src/cli.mjs`
+- **Patterns:** `.github/tools/skill-review/src/logs.mjs:1 - findCopilotConversations; copy its scope check`; `.github/tools/skill-review/src/uses.mjs:1 - segmentUses`
+- **Decisions:**
+  - `findClaudeConversations(claudeHome, projectRoot)` reads every `<claudeHome>/projects/*/*.jsonl`; the Conversation ID is the file name without `.jsonl`; a Conversation is in scope when the first parsed line carrying a `cwd` string has a `cwd` equal to or inside `projectRoot` (same comparison as Copilot).
+  - Claude skill start: a `user` record whose `message.content` is a string containing `<command-name>/<name></command-name>` (skill = `<name>`), or an `assistant` record whose `message.content` array holds an item with `type` `tool_use`, `name` `Skill`, and `input.skill` (skill = `input.skill`). Several starts on one line count once, using the first.
+  - Known Copilot types: `session.start`, `session.info`, `session.model_change`, `session.permissions_changed`, `session.tool_baseline`, `session.context_changed`, `session.usage_record`, `session.error`, `session.shutdown`, `skill.invoked`, `user.message`, `assistant.message`, `assistant.turn_start`, `assistant.turn_end`, `system.message`, `instruction.update`, `hook.start`, `hook.end`, `tool.execution_start`, `tool.execution_complete`, `subagent.selected`, `subagent.configured`, `subagent.started`, `subagent.completed`, `subagent.failed`.
+  - Known Claude types: `user`, `assistant`, `system`, `summary`, `file-history-snapshot`, `last-prompt`, `mode`, `permission-mode`, `session-owner`, `cost-state`, `data-flow-records`, `attachment`, `queue-operation`.
+  - A line that is not valid JSON, or has no string `type`, is unknown with type `unparseable`.
+  - Notices are printed only for Conversations that have at least one kept skill use, in order Copilot then Claude, by Conversation ID, by line; each unknown record gives one line. They come before the `prepared` line.
+- **Do not:** edit `tests/skill-review/**`; change the compact-record shape; add dependencies.
+- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/skill-review/*.test.mjs"` exits 0; targets R52-09, R52-10, R52-11, R65-03, R65-04, R65-05, R65-06; 7 target tests run
+- **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.
+
+## S04 - Reviewed Positions from the Review Record
+
+- **Kind:** build
+- **Goal:** `prepare` lists only the records after each skill's last reviewed Position in a Conversation, and reports `nothing to review` when every use is reviewed.
+- **Depends on:** S03
+- **Tier:** delegate - one lookup into the S01 Review Record, applied to the S02 uses
+- **Review:** none
+- **Scenarios:** fixture: S03's fixture; the Review Record is `{"format":1,"conversations":{"<Harness>:<id>":{"<skill>":<position>}},"handoffs":[],"observations":[],"installs":[],"nextObservation":1}`
+  - R54-01: Given Copilot Conversation `c1` with `pull-work` at line 2 and 520 lines in total, and a record `{"Copilot CLI:c1":{"pull-work":400}}`, when `prepare` runs, then the `pull-work` use is `{start:2,end:520,from:401}` (boundary)
+  - R54-02: Given the record `{"Copilot CLI:c1":{"pull-work":520}}` for the same Conversation and no other use, when it runs, then stdout ends with `skill-review: nothing to review` and no `compact-record:` line is printed
+  - R54-03: Given `c1` has `brain-storm` 2-9 and `pull-work` 10-20, and the record holds `{"brain-storm":9}`, when it runs, then only `pull-work` is listed (from 10)
+  - R54-04: Given a record entry for another Conversation `c9`, when it runs, then `c1` is unaffected
+  - R61-01: Given a Review Record without any Conversation of the run, when `prepare` runs, then `git status --porcelain` in `<home>` is unchanged (read side only)
+- **Acceptance tests:** `tests/skill-review/p01-s04.test.mjs`
+- **Files:** edit `.github/tools/skill-review/src/uses.mjs`; edit `.github/tools/skill-review/src/cli.mjs`
+- **Patterns:** `.github/tools/skill-review/src/uses.mjs:1 - segmentUses output`; `.github/tools/skill-review/src/record.mjs:1 - readRecord`
+- **Decisions:**
+  - Key is `<Harness>:<Conversation ID>` (`Copilot CLI:c1`, `Claude Code:k1`); value maps skill name to the last reviewed Position (integer).
+  - `from` = `max(start, last + 1)` where `last` is the recorded Position, else 0. A use is unreviewed when `from <= end`.
+  - Skill filter and notices behave as in S02-S03; a Conversation whose uses are all reviewed is omitted and prints no `unknown-record` notice.
+  - Counts in the `prepared` line count only unreviewed uses and the Conversations that still hold one.
+- **Do not:** edit `tests/skill-review/**`; write the Review Record; add dependencies.
+- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/skill-review/*.test.mjs"` exits 0; targets R54-01, R54-02, R54-03, R54-04, R61-01; 5 target tests run
+- **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.
