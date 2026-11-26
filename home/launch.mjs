@@ -1,6 +1,7 @@
 import { execFileSync, spawn } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from 'node:fs';
-import { delimiter, dirname, join, resolve } from 'node:path';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { basename, delimiter, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const USAGE = 'usage: launch claude|copilot [args...] | version';
@@ -101,12 +102,13 @@ function announce(harness, version) {
   const cwd = realpathSync.native(process.cwd());
   const lines = [`Home Repo: ${home}`, `Workflow version: ${version}`];
   const warnings = [];
+  let loaded = [];
   if (sameFolder(cwd, home)) {
     lines.push('Stack: none (Home Repo)', 'Language Add-on: none');
   } else {
     const addons = listAddons(home);
     const stack = readStack(cwd);
-    const loaded = stack.ids.filter((id) => addons.has(id));
+    loaded = stack.ids.filter((id) => addons.has(id));
     const unknown = stack.ids.filter((id) => !addons.has(id));
     lines.push(`Stack: ${stack.ids.length > 0 ? stack.value : 'none'}`);
     if (loaded.length === 0) lines.push('Language Add-on: none');
@@ -128,11 +130,57 @@ function announce(harness, version) {
   }
   if (harness === 'copilot') lines.push(NOTE);
   for (const line of [...lines, ...warnings]) console.log(line);
+  return loaded;
+}
+
+const PLUGIN_PREFIX = 'workflow-stack-';
+
+// Session plugin outside both repositories: loaded add-on skills plus the locked-tests guard hook.
+function buildPlugin(version, loaded) {
+  const plugin = mkdtempSync(join(tmpdir(), PLUGIN_PREFIX));
+  mkdirSync(join(plugin, '.claude-plugin'));
+  mkdirSync(join(plugin, 'hooks'));
+  mkdirSync(join(plugin, 'skills'));
+  writeFileSync(
+    join(plugin, '.claude-plugin', 'plugin.json'),
+    JSON.stringify({
+      name: 'workflow-stack',
+      version,
+      description: 'Language Add-ons and locked-tests guard for this session',
+    }),
+  );
+  const addonRoot = join(home, '.workflow-core', 'language-addons');
+  const addons = listAddons(home);
+  let needsProtocol = false;
+  for (const id of loaded) {
+    for (const skill of addons.get(id)) {
+      const target = join(plugin, 'skills', skill);
+      cpSync(join(addonRoot, id, skill), target, { recursive: true });
+      if (readFileSync(join(target, 'SKILL.md'), 'utf8').includes('mutation-testing/protocol.md')) needsProtocol = true;
+    }
+  }
+  const shared = join(addonRoot, 'mutation-testing');
+  if (needsProtocol && existsSync(shared)) cpSync(shared, join(plugin, 'skills', 'mutation-testing'), { recursive: true });
+  const guard = join(home, '.workflow-core', 'hooks', 'scripts', 'guard-locked-tests.mjs').replaceAll('\\', '/');
+  writeFileSync(
+    join(plugin, 'hooks', 'hooks.json'),
+    JSON.stringify({
+      hooks: { PreToolUse: [{ hooks: [{ type: 'command', command: `node "${guard}"`, timeout: 10 }] }] },
+    }),
+  );
+  return plugin;
+}
+
+// Deletes only the folder buildPlugin created: directly inside tmpdir() with the plugin prefix.
+function removePlugin(plugin) {
+  if (!basename(plugin).startsWith(PLUGIN_PREFIX)) return;
+  if (!sameFolder(dirname(realpathSync.native(plugin)), realpathSync.native(tmpdir()))) return;
+  rmSync(plugin, { recursive: true, force: true });
 }
 
 const quote = (s) => `"${s.replaceAll('"', '""')}"`;
 
-function startHarness(file, args) {
+function startHarness(file, args, plugin) {
   const batch = /\.(cmd|bat)$/i.test(file);
   const child = batch
     ? spawn(process.env.ComSpec ?? 'cmd.exe', ['/d', '/s', '/c', `"${[file, ...args].map(quote).join(' ')}"`], {
@@ -140,10 +188,19 @@ function startHarness(file, args) {
         windowsVerbatimArguments: true,
       })
     : spawn(file, args, { stdio: 'inherit' });
+  const cleanup = () => removePlugin(plugin);
+  for (const signal of ['SIGINT', 'SIGTERM']) {
+    process.on(signal, () => {
+      cleanup();
+      process.exit(1);
+    });
+  }
   child.on('error', () => {
+    cleanup();
     process.exitCode = 1;
   });
   child.on('close', (code) => {
+    cleanup();
     process.exitCode = code ?? 1;
   });
 }
@@ -164,8 +221,9 @@ if (mode === undefined) {
     const file = resolveCommand(harness);
     if (file === null) fail('harness-not-installed', harness);
     else {
-      announce(harness, install.version);
-      startHarness(file, process.argv.slice(3));
+      const loaded = announce(harness, install.version);
+      const plugin = buildPlugin(install.version, loaded);
+      startHarness(file, ['--add-dir', home, '--plugin-dir', plugin, ...process.argv.slice(3)], plugin);
     }
   }
 } else {
