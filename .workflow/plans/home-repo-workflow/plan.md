@@ -2,7 +2,7 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: P04 S01, S02
+- Next: P04 S03, S04
 - Tests locked: `4dbd17a`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `4dbd17a`
@@ -42,8 +42,8 @@
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Launch Script exports `WORKFLOW_HOME` | ready |
-| S02 | Core path rule in every skill and the planner agent | ready |
+| S01 | Launch Script exports `WORKFLOW_HOME` | completed |
+| S02 | Core path rule in every skill and the planner agent | completed |
 | S03 | Home layout resolves every Core path and leaves the Home Repo alone | ready |
 | S04 | Agents dispatchable by name in both Harnesses; `code-review` agent | ready |
 | S05 | README copy steps give Claude Code the skills and agents | ready |

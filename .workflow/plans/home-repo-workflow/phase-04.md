@@ -30,7 +30,7 @@
 - **Goal:** the Harness started by `launch claude|copilot` has the environment variable `WORKFLOW_HOME` set to the Home Repo's real path.
 - **Depends on:** none
 - **Tier:** delegate - one environment option on the two existing `spawn` calls
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:** fixture: the P03 Home fixture, both Harness stubs; the stub also records `process.env.WORKFLOW_HOME` as `home` in its JSON
   - R42-01: Given `claude` and then `copilot` on PATH, when `node <home>/launch.mjs <harness>` runs in a Project folder, then the stub's recorded `home` equals the Home Repo's real path (`realpathSync.native`)
   - R42-02: Given the caller's environment already has `WORKFLOW_HOME=C:\elsewhere`, when `launch claude` runs, then the stub's recorded `home` is the Home Repo's real path (the Launch Script's value wins) (failure)
