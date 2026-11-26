@@ -17,6 +17,8 @@ Whenever starting or resuming work on a repository that is not already in the st
 
 Do not use it when only one artifact is missing and the rest are current — call that owning skill directly.
 
+For ordering changes across Project Repos see [references/COORDINATION-PLAYBOOK.md](./references/COORDINATION-PLAYBOOK.md).
+
 ## Detect First
 
 Read-only inspection per [references/DISCOVERY-CHECKLIST.md](references/DISCOVERY-CHECKLIST.md). Establish repository-wide facts before routing.
