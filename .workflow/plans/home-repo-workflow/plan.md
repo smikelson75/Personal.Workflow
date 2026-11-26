@@ -2,7 +2,7 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: P03 S05
+- Next: gate P03
 - Tests locked: `bd4bfc7`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `a088cd8`
@@ -28,7 +28,7 @@
 |---|-------|--------|--------|--------|
 | P01 | Guard both Harnesses in the copy layout | completed | R35, Q-ordering | [phase-01](phase-01.md) |
 | P02 | Update Script fills a Home Repo offline | completed | R36, R37, Q-version-identity, Q-offline (update) | [phase-02](phase-02.md) |
-| P03 | Launch Script with stack add-ons and Home-layout guard | in progress | R38, R39, R40, R41, Q-offline (launch), Q-seamless-relay | [phase-03](phase-03.md) |
+| P03 | Launch Script with stack add-ons and Home-layout guard | gating | R38, R39, R40, R41, Q-offline (launch), Q-seamless-relay | [phase-03](phase-03.md) |
 | P04 | Workflow Core parity across layouts and Harnesses | planned | R42, R43 | |
 | P05 | Authoring skills, Coordination Playbook, README | planned | R44, R45, R46, R47 | |
 
@@ -40,7 +40,7 @@
 | S02 | Harness selection, argument passthrough, and exit code | completed |
 | S03 | Stack statement, add-on selection, output lines, and warnings | completed |
 | S04 | Session plugin: add-on skills and the locked-tests guard in the Home layout | completed |
-| S05 | Offline and seamless relay across the whole launcher | ready |
+| S05 | Offline and seamless relay across the whole launcher | completed |
 | S06 | Repair S04 fixture: add-on SKILL.md content | completed |
 
 ## Carry-forward
