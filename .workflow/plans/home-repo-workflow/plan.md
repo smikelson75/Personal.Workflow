@@ -2,7 +2,7 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: P06 running S05
+- Next: P06 running S06, S07
 - Tests locked: `39a80fb`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `16d8d09`
@@ -43,8 +43,8 @@
 | S02 | Update Script installs the Copilot form and the Claude form | completed |
 | S03 | Update Script names skipped Claude entries | completed |
 | S04 | Update Script applies and names the shipped default | completed |
-| S05 | Update Script rejects an unparsable agent file | in progress |
-| S06 | README explains agent pins and the effort limitation | ready |
-| S07 | Pins stay in one place and Core skills never override them | ready |
+| S05 | Update Script rejects an unparsable agent file | completed |
+| S06 | README explains agent pins and the effort limitation | in progress |
+| S07 | Pins stay in one place and Core skills never override them | in progress |
 | S08 | Agent install test expects the Claude form, not a copy | completed |
 

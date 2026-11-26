@@ -114,6 +114,25 @@ function renderClaudeForm(text, agent) {
   return { text: body, notices };
 }
 
+// Returns null when an agent file's frontmatter can be read, else the reason it cannot.
+function validateAgent(text) {
+  const lines = text.split(/\r?\n/);
+  if (lines[0] !== '---') return 'no frontmatter';
+  const close = lines.findIndex((line, i) => i > 0 && line === '---');
+  if (close < 0) return 'no closing ---';
+  for (const line of lines.slice(1, close)) {
+    if (line.trim() === '' || /^\s*#/.test(line) || /^\s+\S/.test(line) || /^-\s/.test(line)) continue;
+    const key = TOP_LEVEL_KEY.exec(line);
+    if (!key) return `bad line: ${line}`;
+    const value = (key[2] ?? '').trim();
+    if (value.startsWith('[') && !value.includes(']')) return `unclosed list: ${line}`;
+    if ((value[0] === '"' || value[0] === "'") && !(value.length >= 2 && value.endsWith(value[0]))) {
+      return `unclosed quote: ${line}`;
+    }
+  }
+  return null;
+}
+
 function walk(rel) {
   const found = [];
   const dir = join(sourceRoot, rel);
@@ -281,6 +300,14 @@ function checkHome(arg) {
 
   for (const rel of REQUIRED_SOURCE) {
     if (!existsSync(join(sourceRoot, rel))) return { category: 'incomplete-source', detail: rel };
+  }
+
+  for (const rel of walk('.github/agents').sort()) {
+    const name = rel.slice('.github/agents/'.length);
+    if (name.includes('/') || !name.endsWith('.agent.md')) continue;
+    if (validateAgent(readFileSync(join(sourceRoot, rel), 'utf8')) !== null) {
+      return { category: 'invalid-agent', detail: rel };
+    }
   }
 
   const planned = new Set(planInstall().keys());
