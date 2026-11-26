@@ -2,7 +2,7 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: P05 S02, S03
+- Next: P05 S02, S04
 - Tests locked: `de0f84e`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `de0f84e`
@@ -38,7 +38,7 @@
 |---|-------|--------|
 | S01 | stack-check helper proposes stacks and refuses the Home Repo | completed |
 | S02 | agents-md skill | ready |
-| S03 | scaffold helper writes a Language Add-on | ready |
+| S03 | scaffold helper writes a Language Add-on | completed |
 | S04 | addon-author skill | ready |
 | S05 | Coordination Playbook | completed |
 | S06 | README documents both layouts | ready |
