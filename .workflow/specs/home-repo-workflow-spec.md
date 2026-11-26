@@ -7,7 +7,7 @@
 - Companion specs: [workflow-core-spec.md](workflow-core-spec.md), [workflow-check-spec.md](workflow-check-spec.md), [glossary-alignment-spec.md](glossary-alignment-spec.md), [calc-repl-walkthroughs-spec.md](calc-repl-walkthroughs-spec.md)
 
 ## Target Outcome
-- once v1 is done, each machine has one Home Repo filled by one Update Script run from a `Personal.Workflow` clone or zip. The Launch Script starts Claude Code or Copilot CLI in any Project Repo with Workflow Core, the locked-tests guard, and only that repository's Language Add-on, and prints one visible workflow version. Both Harnesses deny edits to locked Oracle paths in both layouts. New `AGENTS.md` and add-on authoring skills, the Coordination Playbook, and `README.md` cover setup, stacks, and cross-repo ordering. In the Home layout, each Workflow Core agent runs in Claude Code on the Claude family and effort pinned in its one agent file, while Copilot CLI keeps reading the same pins as written.
+- once v1 is done, each machine has one Home Repo filled by one Update Script run from a `Personal.Workflow` clone or zip. The Launch Script starts Claude Code or Copilot CLI in any Project Repo with Workflow Core, the locked-tests guard, and only that repository's Language Add-on, and prints one visible workflow version. Both Harnesses deny edits to locked Oracle paths in both layouts. New `AGENTS.md` and add-on authoring skills, the Coordination Playbook, and `README.md` cover setup, stacks, and cross-repo ordering. In the Home layout, each Workflow Core agent runs in Claude Code on the Claude model and effort pinned in its one agent file, while Copilot CLI keeps reading the same pins as written.
 
 ## Terms Used Here
 - **Home layout**: Workflow Core attached from a Home Repo while the Harness runs in a Project Repo.
@@ -185,12 +185,17 @@
 - Examples:
   - Given only the README, when the Developer follows the direct Claude Code command, then the session matches `launch claude`, minus the printed lines and warnings.
 
-### R48 - Claude Code runs each agent at its pinned family and effort
+### R48 - Claude Code runs each agent at its pinned model and effort
 - Rules:
   - Applies in the Home layout only. In the copy layout, Claude Code agent pins are out of scope.
-  - A **Claude entry** is a `model` list entry whose text begins with the word `Claude` (case-insensitive). A `model` written as a single string counts as a one-entry list. Non-Claude entries do not affect Claude Code.
-  - The first Claude entry whose next word is a known family (`Opus`, `Sonnet`, `Haiku`, `Fable`) decides the model: Claude Code runs that family's alias (`opus`, `sonnet`, `haiku`, `fable`). Version numbers and suffixes in the entry are ignored, so `Claude Opus 4.8 Fast (copilot)` runs `opus`.
-  - A Claude entry with an unknown family word is skipped, and the search continues with the next Claude entry. Each skip prints `Agent pin: <agent>: skipped "<entry>" (not a Claude Code model family)`.
+  - A `model` written as a single string counts as a one-entry list. A **Claude entry** takes one of two forms:
+    - **Display name**: the text begins with the word `Claude` followed by a space (case-insensitive), e.g. `Claude Sonnet 5.5 (copilot)`.
+    - **Model ID**: the whole entry is `claude-` followed by one or more lowercase letters, digits, or hyphens, with no spaces, e.g. `claude-haiku-4-5`.
+  - Other entries do not affect Claude Code.
+  - The first usable Claude entry in list order decides the model, whichever form it has:
+    - A display name whose next word is a known family (`Opus`, `Sonnet`, `Haiku`, `Fable`) gives that family's alias (`opus`, `sonnet`, `haiku`, `fable`). Version numbers and suffixes are ignored, so `Claude Opus 4.8 Fast (copilot)` gives `opus`.
+    - A model ID is used exactly as written. The Update Script does not check that Claude Code offers it, so a mistyped or retired ID fails when Claude Code dispatches that agent.
+  - A display name with an unknown family word is skipped, and the search continues with the next Claude entry. Each skip prints `Agent pin: <agent>: skipped "<entry>" (not a Claude Code model family)`.
   - `reasoning-effort` sets Claude Code's effort for that agent: `low`, `medium`, `high`, `xhigh`, and `max` are used as written; `none` and `minimal` become `low`. Any other value counts as missing (R50).
   - The pin applies whatever model and effort the main session uses. Workflow Core skills never ask for a per-dispatch model or effort when they dispatch a Workflow Core agent.
   - Claude Code's `/tasks` row for a running agent shows the pinned model, and the pinned effort when that model supports effort. When a model does not support effort, `README.md` states this as a known limitation of R48.
@@ -198,6 +203,9 @@
 - Examples:
   - Given the main session on Opus and `repo-scout` listing `Claude Haiku 5.5 (copilot)` with `reasoning-effort: low`, when Claude Code dispatches `repo-scout`, then `/tasks` shows Haiku at `low`.
   - Given the same session, when Claude Code dispatches `planner` (`Claude Opus 5.5 (copilot)`, `high`), then it runs on Opus at `high`.
+  - Given `coder` lists `claude-haiku-4-5`, `Claude Haiku 5.5 (copilot)`, `GPT-6 Luna (copilot)`, when Claude Code dispatches `coder`, then it runs on `claude-haiku-4-5`.
+  - Given `coder` lists `Claude Haiku 5.5 (copilot)`, `claude-haiku-4-5`, when Claude Code dispatches `coder`, then it runs on `haiku` (the first Claude entry wins).
+  - Given `coder` lists `Claude-Haiku-4-5`, `Claude Sonnet 5.5 (copilot)`, when the Update Script runs, then the first entry is neither form, so Claude Code runs `coder` on `sonnet`.
   - Given `coder` lists `GPT-6 Luna (copilot)`, `Claude Nova 1 (copilot)`, `Claude Sonnet 5 (copilot)`, when the Update Script runs, then it prints `Agent pin: coder: skipped "Claude Nova 1 (copilot)" (not a Claude Code model family)`, and Claude Code runs `coder` on `sonnet`.
   - Given `test-author.agent.md` has a frontmatter line that is not valid YAML, when the Update Script runs, then it prints `update failed: invalid-agent: .github/agents/test-author.agent.md`, exits non-zero, and the Home Repo is unchanged. (failure)
 
@@ -206,7 +214,9 @@
   - Each source agent file carries exactly two pins: the Copilot `model` list and `reasoning-effort`. The Developer maintains no other pin field and runs no sync step.
   - In the copy layout and in the Home layout, Copilot CLI sees each agent's `model` list (same entries, same order) and `reasoning-effort` exactly as in the source file, and runs the agent on the first available listed model at that effort.
   - Copilot CLI never sees a Claude Code alias or `effort` value in place of its own pins.
+  - A Claude Code model ID entry (R48) stays in Copilot's list as written. Copilot CLI treats it as unavailable and moves on to the next entry.
 - Examples:
+  - Given `coder` lists `claude-haiku-4-5`, `Claude Haiku 5.5 (copilot)`, `GPT-6 Luna (copilot)`, when Copilot CLI runs `coder`, then it runs on Claude Haiku 5.5.
   - Given `code-review` lists `Claude Sonnet 5.5 (copilot)`, `GPT-6.1 Terra (copilot)`, `Gemini 4 Neon (copilot)` at `medium`, when Copilot CLI runs it in the Home layout with Sonnet 5.5 unavailable, then it runs on GPT-6.1 Terra at `medium`, as in the copy layout.
 
 ### R50 - Shipped default, named in Update Script output
@@ -226,11 +236,12 @@
 - Rules:
   - Editing an agent's `model` list or `reasoning-effort` in `Personal.Workflow`, then one Update Script run, changes that agent in every Harness session started afterwards. No other file is edited by hand.
   - Sessions already running keep the pins they started with until the Harness restarts.
-  - Claude Code changes only when the first known Claude entry's family, or the effort, changes. Copilot CLI changes whenever its list or effort changes.
+  - Claude Code changes only when the effort changes, or when the model R48 picks changes: the family of a display name, or the text of a model ID. Copilot CLI changes whenever its list or effort changes.
 - Examples:
   - Given `coder`'s Claude entry changes from `Claude Haiku 5.5 (copilot)` to `Claude Sonnet 5.5 (copilot)` and the Update Script runs, when a new Claude Code session dispatches `coder`, then it runs on `sonnet`.
   - Given `Gemini 4 Neon (copilot)` is moved to the top of `coder`'s list and the Update Script runs, when new sessions dispatch `coder`, then Copilot CLI runs it on Gemini 4 Neon and Claude Code still runs it on `haiku`.
   - Given `coder`'s entry changes from `Claude Haiku 5.5 (copilot)` to `Claude Haiku 6 (copilot)`, when the Update Script runs, then Claude Code still runs `coder` on `haiku`.
+  - Given `claude-haiku-4-5` is added at the top of `coder`'s list and the Update Script runs, when new sessions dispatch `coder`, then Claude Code runs it on `claude-haiku-4-5` and Copilot CLI still runs it on Claude Haiku 5.5.
 
 ## Quality Thresholds
 - Ordering -> R35 holds before any other requirement in this spec is delivered, so Claude Code is guarded while v1 is built.
@@ -256,7 +267,7 @@
   - A model passed at dispatch overrides the file's `model`. `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` and `CLAUDE_CODE_EFFORT_LEVEL`, when the Developer sets them, override the pins.
   - Agents under `--add-dir` load at session start only.
   - `/tasks` shows each running agent's model and effort.
-- Copilot CLI agent fields: a `model` list of display names tried in order, and `reasoning-effort` - GitHub.
+- Copilot CLI agent fields: a `model` list of display names tried in order, and `reasoning-effort` - GitHub. Unverified: whether Copilot CLI skips a list entry that is not a Copilot model name (R49).
 
 ## Product Interfaces
 - Update Script CLI: argument, output lines, and failure categories in R36, and agent pin notices in R48 and R50.
@@ -288,6 +299,8 @@
 - R44: it refuses to run in the Home Repo. Reason: the Home Repo's `AGENTS.md` holds only Project Pointers.
 - R45: the skill is named `addon-author`; an existing stack folder stops it; non-code stacks may skip roles if at least one remains. Reason: deferred depth for non-code stacks; extending an existing add-on is not in scope.
 - R46: the database Phase completes before the consuming API Phase starts. Reason: needs-first ordering was the Session's root-cause fix.
+- R48: both alias and exact model ID are supported, and the entry's form decides: a Copilot display name gives the family alias, and a `claude-...` model ID written in the list is used as written. Reason: the Developer asked for both. Of the two readings offered (entry form vs. deriving an exact ID from every display name), this keeps the never-fail alias as the default and makes exact versions opt-in per agent.
+- R49: Copilot CLI treats a Claude Code model ID entry as unavailable and moves on to the next entry. Reason: this matches its "first available listed model" behavior, but it is unverified. If Copilot rejects the entry instead, R48's model-ID form must change.
 - R50: the shipped default is `sonnet` at `medium`. Reason: it is the median of the six shipped agents' pins (three use Sonnet, four use `medium`).
 - R48: unknown-family Claude entries are skipped with a notice rather than failing the run. Reason: the Session rejects refusing an install over a pin and prefers a named notice.
 - R36/R48: an unparsable agent file fails the whole run as `invalid-agent`. Reason: such a file loads in neither Harness, and R36 already validates the source before any write.
