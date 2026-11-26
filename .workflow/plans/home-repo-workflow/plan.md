@@ -2,7 +2,8 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: gate P06
+- Next: review P06
+- Review pending: S02, S03, S04, S05
 - Tests locked: `39a80fb`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `16d8d09`
@@ -33,7 +34,7 @@
 | P03 | Launch Script with stack add-ons and Home-layout guard | completed | R38, R39, R40, R41, Q-offline (launch), Q-seamless-relay | [phase-03](phase-03.md) |
 | P04 | Workflow Core parity across layouts and Harnesses | completed | R42, R43 | [phase-04](phase-04.md) |
 | P05 | Authoring skills, Coordination Playbook, README | completed | R44, R45, R46, R47, Q-offline | [phase-05](phase-05.md) |
-| P06 | Claude Code agent pins from one edit | completed | R48, R49, R50, R51 | [phase-06](phase-06.md) |
+| P06 | Claude Code agent pins from one edit | gating | R48, R49, R50, R51 | [phase-06](phase-06.md) |
 
 ## P06 slices
 
