@@ -79,6 +79,30 @@ function manifestPathFor(home) {
   return join(resolve(home, gitPath), 'manifest.json');
 }
 
+const EXCLUDE_BEGIN = '# personal-workflow:begin';
+const EXCLUDE_END = '# personal-workflow:end';
+const EXCLUDE_BLOCK = new RegExp(`^${EXCLUDE_BEGIN}\\r?\\n[\\s\\S]*?^${EXCLUDE_END}(?:\\r?\\n|$)`, 'm');
+
+function excludePathFor(home) {
+  const gitPath = execFileSync('git', ['-C', home, 'rev-parse', '--git-path', 'info/exclude'], { encoding: 'utf8' }).trim();
+  return resolve(home, gitPath);
+}
+
+// Replaces the managed block in .git/info/exclude so it lists exactly the installed paths.
+// Lines outside the block are kept as they are.
+function writeExcludeBlock(home, homePaths) {
+  const path = excludePathFor(home);
+  mkdirSync(dirname(path), { recursive: true });
+  const existing = existsSync(path) ? readFileSync(path, 'utf8') : '';
+  const block = [EXCLUDE_BEGIN, ...homePaths.map((p) => `/${p}`), EXCLUDE_END].join('\n') + '\n';
+  if (EXCLUDE_BLOCK.test(existing)) {
+    writeFileSync(path, existing.replace(EXCLUDE_BLOCK, () => block));
+    return;
+  }
+  const separator = existing === '' || existing.endsWith('\n') ? '' : '\n';
+  writeFileSync(path, existing + separator + block);
+}
+
 function normalizeCase(path) {
   return CASE_INSENSITIVE ? path.toLowerCase() : path;
 }
@@ -196,6 +220,7 @@ function main() {
   }
 
   writeFileSync(manifestPath, JSON.stringify({ version, status: 'complete', files: [...plan.keys()] }, null, 2) + '\n');
+  writeExcludeBlock(home, [...plan.keys()]);
 
   console.log(`Home Repo: ${home}`);
   console.log(`Workflow version: ${previous?.version ?? 'none'} -> ${version}`);
