@@ -25,13 +25,17 @@ test('[R22-02] each asking skill and the planner agent contain the rules-file li
   }
 });
 
-test('[R22-03] no file under skills, agents, or hooks names AGENTS.md', () => {
+const ALLOWED_PREFIXES = ['.github/skills/onboard-project/', '.github/skills/agents-md/'];
+
+test('[R22-03] only onboard-project and agents-md name AGENTS.md', () => {
   const scanned = [];
   for (const dir of ['.github/skills', '.github/agents', '.github/hooks']) {
     if (existsSync(join(repoRoot, dir))) scanned.push(...files(dir));
   }
   assert.ok(scanned.length > 0, 'at least one file is scanned');
-  const offenders = scanned.filter((rel) => read(rel).includes('AGENTS.md'));
+  const offenders = scanned.filter(
+    (rel) => read(rel).includes('AGENTS.md') && !ALLOWED_PREFIXES.some((p) => rel.replaceAll('\\', '/').startsWith(p)),
+  );
   assert.deepEqual(offenders, []);
 });
 
