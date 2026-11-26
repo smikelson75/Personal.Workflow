@@ -2,7 +2,7 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: P05 S06
+- Next: gate P05
 - Tests locked: `de0f84e`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `de0f84e`
@@ -41,4 +41,4 @@
 | S03 | scaffold helper writes a Language Add-on | completed |
 | S04 | addon-author skill | completed |
 | S05 | Coordination Playbook | completed |
-| S06 | README documents both layouts | ready |
+| S06 | README documents both layouts | completed |

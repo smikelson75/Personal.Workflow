@@ -24,6 +24,79 @@ This repository consolidates skills, agents, hooks, and tooling into a single re
 | **Forgotten architectural reasoning** | Hard-to-reverse decisions are surfaced as ADR candidates during planning and recorded in `.workflow/adr/` via `adr-writer` so later Phases do not silently undo them. |
 | **Inconsistent linting, testing, and mutation setups** | Optional Language Add-ons standardize code style, unit vs. black-box acceptance test layouts, and unit-only Stryker mutation gates per stack. |
 
+## Home Repo (Recommended)
+
+One **Home Repo** per machine holds the Workflow Core, every Language Add-on, and your Project Pointers. The **Launch Script** starts Claude Code or Copilot CLI in any Project Repo with the Workflow Core, the locked-tests guard, and only that repository's Language Add-on. Nothing is copied into Project Repos.
+
+### Set up the Home Repo
+
+1. Create a git repository for it (for example `C:\work-home`) with `git init`.
+2. Commit an `AGENTS.md` that holds only your Project Pointers (one line per Project Repo: its path and its role, `co-changed`, `read-only reference`, or `peer-impact`), and a one-line `CLAUDE.md` containing `@AGENTS.md`.
+3. Run the Update Script against it (below). It copies Workflow Core and Language Add-ons into the Home Repo, hides them from git (`.git/info/exclude`), changes no committed file, and needs no network.
+
+### Run the Update Script
+
+From a clone of `Personal.Workflow`:
+
+```powershell
+git clone https://github.com/smikelson75/Personal.Workflow C:\src\Personal.Workflow
+cd C:\src\Personal.Workflow
+node scripts\update-home.mjs <home>
+```
+
+From a downloaded zip (no network on the machine that runs it):
+
+```powershell
+Expand-Archive Personal.Workflow-main.zip C:\src
+cd C:\src\Personal.Workflow-main
+node scripts\update-home.mjs <home>
+```
+
+It prints `Workflow version: <old> -> <new>`. The version is a content fingerprint, so a clone and a zip of the same content print the same version. Rerun it to update.
+
+### Launch a Harness
+
+Call the Launch Script by its full path; it needs no profile change, administrator rights, or `PATH` change:
+
+```powershell
+cd C:\Projects\MyApp
+<home>\launch claude      # or: <home>\launch copilot
+<home>\launch version     # prints the workflow version and Home Repo path; starts nothing
+```
+
+Harness arguments pass through (`<home>\launch claude --resume`). The Launch Script reads the `Stack:` line of the Project Repo's `AGENTS.md`: a `Stack:` line in `AGENTS.md` selects the Language Add-on (`csharp`, `node-javascript`, `node-typescript`, or one you add). Run `/agents-md` to write it, and `/addon-author` in a `Personal.Workflow` clone to add a stack.
+
+Optional per-machine short command `wf` (add to your PowerShell profile):
+
+```powershell
+function wf { & "<home>\launch.cmd" @args }
+```
+
+`wf version` prints the same output as `<home>\launch version`.
+
+### Direct Harness commands
+
+These start the same session as the Launch Script, minus its printed lines, warnings, and the stack's Language Add-on skills (only the Launch Script loads those):
+
+```powershell
+$wfHome = "<home>"
+$guard  = "$wfHome/.workflow-core/hooks/scripts/guard-locked-tests.mjs"
+$settings = Join-Path $env:TEMP 'wf-guard-settings.json'
+@{ hooks = @{ PreToolUse = @(@{ hooks = @(@{ type = 'command'; command = "node `"$guard`""; timeout = 10 }) }) } } |
+  ConvertTo-Json -Depth 8 | Set-Content $settings
+
+claude --add-dir $wfHome --settings $settings
+copilot --add-dir $wfHome
+```
+
+- Claude Code started without `--settings` carrying the guard hook is unguarded: it does not deny edits to locked tests. The Gate still catches them.
+- Copilot CLI needs a trusted folder: it runs the guard only there, so trust the folder when asked.
+- Both Harnesses see `WORKFLOW_HOME` only when the Launch Script sets it. For the direct commands, set `$env:WORKFLOW_HOME = $wfHome` first.
+
+### Changes across several repositories
+
+When one change spans an API repository and a database repository, follow the [Coordination Playbook](./.github/skills/onboard-project/references/COORDINATION-PLAYBOOK.md): needs-first ordering with the existing skills.
+
 ## Quick Start
 
 ### 1. Prerequisites
@@ -31,7 +104,9 @@ This repository consolidates skills, agents, hooks, and tooling into a single re
 - **Git**
 - **Node.js LTS** (`22.12+` or `24`) on your `PATH` — required even for non-Node projects because the workflow's deterministic helper scripts (`workflow-check`, lock guard, traceability, and plan checks) run on Node.js with zero npm dependencies.
 
-### 2. Copy the Workflow Core into Your Repository
+### 2. Copy the Workflow Core into Your Repository (Alternative)
+
+Use this instead of the Home Repo when you want the Workflow Core committed inside one repository.
 
 From your target repository root (PowerShell):
 
@@ -128,6 +203,8 @@ See [`language-addons/README.md`](./language-addons/README.md) for stack details
 - **[Pull Work](./.github/skills/pull-work/README.md)** — single-command execution loop, automated commits, and locked-test safety nets.
 - **[ADR Writer](./.github/skills/adr-writer/README.md)** — capturing approved, hard-to-reverse architecture decisions.
 - **[Conventional Commit](./.github/skills/conventional-commit/README.md)** — commitlint-compatible Conventional Commits 1.0.0.
+- **[Agents Md](./.github/skills/agents-md/SKILL.md)** (`/agents-md`) — writes or amends a Project Repo's `AGENTS.md`, always with one `Stack:` line.
+- **[Addon Author](./.github/skills/addon-author/SKILL.md)** (`/addon-author`) — scaffolds a new Language Add-on in a `Personal.Workflow` clone.
 
 ### Supporting Components
 
