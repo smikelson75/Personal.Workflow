@@ -1,62 +1,74 @@
 # Incubation - Session Review
 
-Status: incubating
+Status: graduated
 Started: 2026-11-26
 Updated: 2026-11-26
 
 ## Spark
-- Reviewing workflow skills by hand (one skill at a time, in documents that grow without bound) is unreadable and costly. Starting point: `docs/research/session-review.md` (draft brain-storm capture with R46-R48) and `docs/research/incubate-session-review.md` (the Developer's current hand-kept review of `/incubate`). Goal: a review that uses real past sessions to drive improvement, and that the Developer never writes by hand.
+- Reviewing workflow skills by hand (one skill at a time, in documents that grow without bound) is unreadable and costly. Starting point: `docs/research/session-review.md` (draft brain-storm capture with R46-R48) and `docs/research/incubate-session-review.md` (the Developer's hand-kept review of `/incubate`). Goal: a review that uses real past sessions to improve the workflow, and that the Developer never writes by hand.
 
 ## Current Mental Model
-- Current leanings (not verified): the review's real product is an **Executive Summary** the Developer can act on. Signals and quotes are backing evidence only; any number that cannot be translated into a plain statement should not appear.
-- The Executive Summary should answer four things: did the skill do its job; what should change and on which side; how it affected the direct downstream skill; how sure we are (one session vs. trend, watching vs. confirmed).
-- Findings have more than two sides. The existing hand-kept doc produced model findings (Gemini hallucinated user replies) and harness findings (143 tool schemas per call, Mermaid not rendering) that changed decisions. R46's workflow-vs-Developer split omits them.
-- Downstream effect matters as much as in-session behavior. Backfill exists because a skill's handoff value is only visible after the next skill consumes its output.
+- **Purpose:** improve workflow parts (skills, agents, hooks, tools, instructions). Every finding ends at one of three outcomes: a part plus a proposed change; a Developer note with the reason, when no part could nudge a better interaction; or no action, with the outside cause recorded (model habit, harness limit, normal requirements miss).
+- **Scope:** a skill's own session plus, when they exist, the downstream sessions that consumed its artifact. Run any time; a missing downstream shows as "pending" and a later run backfills it. A natural cadence is after a phase, when every skill except optional incubate has run.
+- **Inputs:** handoff review (effective: no restating, re-verifying, or lost items; efficient: artifact sections never used downstream are artifact no-ops) and health review (skill followed its own rules, Developer contributed rather than being prompt-driven, skill not growing without payoff). Incidents (a reopen, a restatement) are traced on request.
+- **Four Tiers are the mission and escalation rule:** never spend model tokens where a script answers; never read log beyond what a flag points to. v1 may merge Tier 1 and Tier 2 as long as nothing reads unflagged log.
+- **Output:** a short plain-language Executive Summary (what happened, why, changes proposed with status, Developer note, confidence with evidence pointers) plus one ledger. Grounding comes from repeats over time (watching -> confirmed), not from more signals per summary.
+- **Fix Filter (from `retro`):** before proposing a change ask: can a check or script do it; can an existing rule be clarified or removed instead; where does it cost the least context.
 
 ```text
- Tier 0  extract   script reads log -> signal counts + anomaly timestamps   (no model tokens)
- Tier 1  triage    model reads only: compact record, last column, ledger
- Tier 2  excerpt   model reads log slices only around flagged anomalies
- Tier 3  judge     model writes deltas: findings, status changes, side + reason
+ Tier 0  extract   script: logs + artifacts + commits -> signals, flags   (no model tokens)
+ Tier 1  triage    model reads compact record only
+ Tier 2  excerpt   model reads only flagged slices
+ Tier 3  judge     summary + ledger deltas, each through the Fix Filter
+ rule: escalate a tier only when the tier below flags it
 
- incubate --note--> brain-storm --session--> behavior-spec --spec--> work-planner --cards--> pull-work
-     ^                   |
-     +-- backfill: what the next skill re-asked, re-verified or discarded
+ inputs: handoff | health | incident (on request)
+ finding ──> part + change | Developer note + reason | no action (outside cause recorded)
+```
+
+```text
+ Miss labels (from the worked example)
+ requirements miss   never said, never implied            (normal)
+ capture miss        said in conversation, not written    (writing skill)
+ translation miss    written, then dropped downstream     (consuming skill)
+ decomposition miss  implied by an outcome word, no R covers that part
 ```
 
 ## What Fits vs. What Clashes
 
-| Dimension | Existing hand-kept doc (`incubate-session-review.md`) | Our take |
+| Dimension | External / Initial Idea | Our Context & Take |
 | --- | --- | --- |
-| Hard signals (rule compliance counts) | Compact, mechanical, extractable from logs | Keep, but each must map to a plain-language meaning |
-| Variable signals (tokens, duration) | Useful only as trend | Keep as trend evidence, never as a verdict |
-| Per-session narratives (sections 7-9) | Grows every session; unreadable | Drop; replace with Executive Summary + delta findings |
-| Recommendation ledger (target, signal moved, status) | Small and actionable | Keep; add a "watching" state before "confirmed" |
-| Change-to-session link ("first session under it") | Present | Keep; it is the only proof a change worked |
-| Downstream outcome | Absent; tracker says `incubating` for a note that is `graduated` | Make it the first thing the summary reports |
-| Sides | Agent / User, with ad hoc model and harness items | Workflow, model, harness, Developer |
-| Definition of "intended" | Implicit in SKILL.md rules | Make explicit: rules in the skill are the rubric |
+| Per-session narratives | Hand-kept doc sections 7-9 grow every session | Drop; replace with Executive Summary + ledger deltas |
+| Recommendation ledger | Hand-kept doc: target, signal moved, status | Keep; add "watching" before "confirmed" |
+| Sides | Draft R46: workflow vs. Developer | Part change, Developer note with reason, or no action for model or harness causes |
+| Downstream outcome | Absent from the hand-kept doc | Standing handoff review, effective and efficient |
+| `retro` categories and severity order | Single session, coding environment | Keep the target idea; no handoffs, trend, or Developer side in `retro` |
+| `retro` check-over-rule, no-ops | Mechanical violations get deterministic checks; delete instructions that do nothing | Core of the Fix Filter; also applied to artifact sections |
+| Warn-before checks | Flag gaps at every handoff | Not part of the review; they come out of reviews as proposed skill or check changes |
+| Harness logs | Copilot only in the hand-kept doc | Artifacts and commits as the harness-neutral link; logs are enrichment per harness |
 
 ## Tensions & Tradeoffs
-- **Simplest 80/20 baseline:** one extractor, one signal table, one change ledger, short timestamped evidence quotes, and a model that reviews only what the extractor flags. The draft's four lenses, Fix Filter and backfill may be the heavy version; what they buy over this is unproven.
-- The tracker went stale: `home-repo-workflow.md` shows `Status: graduated` while the hand-kept doc still lists it as `incubating`. A review that depends on hand upkeep will drift.
-- A single session can mislead: the prose-routing-menu finding looked like a skill gap in S4 and was a Gemini habit by S6. Findings need a watching state.
-- Observed (git log, session store listing, 2026-11-26): chain incubate (`5f979475`) -> brain-storm (`59364369`) -> behavior spec -> many pull-work sessions, and P04-P06 commits for `home-repo-workflow`. Inferred from titles only; later sessions not read.
-- Handoff signal example (my read, ambiguous): brain-storm `59364369` used the note's code findings in its grounding brief, but its Q1 asked for the purpose "fresh", so the Developer restated much of what the incubation held. This may be brain-storm's design rather than an incubate fault.
-- Review cost: a full read of a long session (S6: ~4.35M input tokens) is itself expensive; extraction before any model read is how the review stays cheap.
+- **Worked example (agent model pins, `home-repo-workflow`):** incubation line 9 named "model preferences"; its probes (lines 89-92) checked agents "load and run" only. Session file `context-2026-11-25-1955.md` line 19 "switch Harnesses seamlessly" narrowed to R43 "each runs". P04 commit `ccea1f0` added Claude tool names and kept Copilot-format pins, faithful to R43. Session `7170fcfb` reopened it ("we forgot") as R48-R51. Read: decomposition miss that started in incubate's probe and was inherited by brain-storm. The Developer recalled stating it directly; the log search (user messages, first 500 characters per turn) did not find it.
+- **Side fix (watching, one case):** brain-storm maps each quality word in the Desired Outcome to R#s or a written exclusion; incubate notes what a "works in both" probe did not check. The Fix Filter may push the brain-storm half toward a check instead of skill prose.
+- **Explain vs. warn:** the review explains misses after the fact; it never prevents a first miss, but each confirmed finding makes that kind less likely.
+- **Grounding vs. confusion:** the Developer wants more grounding but more signals per summary would confuse; the ledger's repeat evidence is the likely answer.
+- **Harness gap:** the Developer switches harness when tokens run out or a task fails, so a Copilot-only review misses exactly the cases worth reviewing. Handoff and incident checks use artifacts and commits and work in both; health checks need logs.
+- **Work machine out of scope:** it is isolated; only workflow updates flow to it. Nothing comes back.
+- **Simplest 80/20 baseline (chosen):** handoff + health run by hand after a phase; script over Copilot logs plus artifacts and commits; flagged slices only; summary + one ledger; Fix Filter; Four Tiers kept as mission. The steelman adds automatic incident triggers, trend views, and both harnesses from day one.
 - **Assumptions to verify:**
-  - Which sessions the first run covers, and whether it starts from the incubation or from the downstream sessions that consumed it.
-  - That session logs on this machine carry enough structure to extract the signals mechanically (the hand-kept doc cites `events.jsonl`).
-  - What a trustworthy Executive Summary looks like to the Developer; they did not yet know.
-  - Open items from the draft still stand: harness scope (Q4), trigger, success measure, Vocabulary clash between Glossary `Session` and an agent conversation log, writes outside the workspace.
+  - Claude Code logs on the personal machine carry messages, tool calls, and usage. Observed only one 2.5 KB setup-only log in `~\.claude\projects\C--Projects-Personal-Workflow\`.
+  - Commit trailers identify which harness made a commit (inference).
 
 ## Sources
-- none (local files only: `docs/research/session-review.md`, `docs/research/incubate-session-review.md`, git log, Copilot session store)
+- [mattpocock/skills `retro`](https://github.com/mattpocock/skills/tree/main/skills/engineering/retro) — retrospective that suggests environment improvements by category; mechanical violations get deterministic checks, judgement calls get rules; removes no-op instructions. Source of the Fix Filter.
+- Local: `docs/research/session-review.md`, `docs/research/incubate-session-review.md`, git log, Copilot session store, `~\.copilot\session-state\7170fcfb-b320-4700-9e83-3a2928f0a44c\events.jsonl` (verified 879 KB, all lines parsed: typed `user.message`, `assistant.message`, `tool.execution_start`, `skill.invoked`, `subagent.*`, `session.usage_record`, `session.model_change`).
 
 ## Open Threads
-- First-run scope: start from a skill's session or from the downstream sessions that consumed its output.
-- What the Developer needs to see to trust a summary without opening the log.
-- How the draft's R46-R48 change given model and harness sides and the "watching" state.
+- none
 
-## Pick Up Here
-- Resume on `claude-opus-5.5`. Decide the first-run scope, using the `/incubate` -> `/brain-storm` -> behavior spec chain for `home-repo-workflow` as the worked example, and sketch what its Executive Summary would say in plain language before any mechanics.
+## Graduation Framing
+- **Distilled idea:** a session review that improves workflow parts by reviewing a skill's own session plus the downstream sessions that consumed its artifacts, producing a short Executive Summary and a ledger (watching -> confirmed), driven by the Four Tiers cost rule.
+- **Keep:** Four Tiers as mission and escalation rule; handoff review (effective and efficient) and health review (including Developer contribution); Fix Filter from `retro`; outcomes as part change, Developer note with reason, or no action for outside causes; the miss labels with the agent-model-pin worked example; artifacts and commits as the harness-neutral link.
+- **Reject or defer:** hand-kept per-session narratives; warn-before rules inside the review; automatic incident triggers and trend views in v1; work machine (out of scope); Claude Code logs until a home probe proves their format.
+- **Questions for brain-storm:** how draft R46-R48 change; what triggers a run beyond by hand after a phase; the Vocabulary clash between Glossary `Session` and an agent conversation log; where the ledger lives; the success measure; whether the quality-word side fix goes forward on its own.
+- Handoff: `/brain-storm from .workflow/incubations/session-review.md`
