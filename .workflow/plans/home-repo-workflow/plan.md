@@ -2,10 +2,10 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: phase review P03
-- Tests locked: `fd4ab6e`
+- Next: P03 S01
+- Tests locked: `a088cd8`
 - Oracle: `tests/home-repo-workflow`
-- Phase base: `d6846dd`
+- Phase base: `a088cd8`
 - Reconciled: `96cf5699d5c914ca684a96621759c3aaf1eed4bb`
 
 ## Current state
@@ -28,7 +28,7 @@
 |---|-------|--------|--------|--------|
 | P01 | Guard both Harnesses in the copy layout | completed | R35, Q-ordering | [phase-01](phase-01.md) |
 | P02 | Update Script fills a Home Repo offline | completed | R36, R37, Q-version-identity, Q-offline (update) | [phase-02](phase-02.md) |
-| P03 | Launch Script with stack add-ons and Home-layout guard | planned | R38, R39, R40, R41, Q-offline (launch), Q-seamless-relay | [phase-03](phase-03.md) |
+| P03 | Launch Script with stack add-ons and Home-layout guard | in progress | R38, R39, R40, R41, Q-offline (launch), Q-seamless-relay | [phase-03](phase-03.md) |
 | P04 | Workflow Core parity across layouts and Harnesses | planned | R42, R43 | |
 | P05 | Authoring skills, Coordination Playbook, README | planned | R44, R45, R46, R47 | |
 
@@ -36,11 +36,11 @@
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Launch Script by path: version option and install-state checks | planned |
-| S02 | Harness selection, argument passthrough, and exit code | planned |
-| S03 | Stack statement, add-on selection, output lines, and warnings | planned |
-| S04 | Session plugin: add-on skills and the locked-tests guard in the Home layout | planned |
-| S05 | Offline and seamless relay across the whole launcher | planned |
+| S01 | Launch Script by path: version option and install-state checks | ready |
+| S02 | Harness selection, argument passthrough, and exit code | ready |
+| S03 | Stack statement, add-on selection, output lines, and warnings | ready |
+| S04 | Session plugin: add-on skills and the locked-tests guard in the Home layout | ready |
+| S05 | Offline and seamless relay across the whole launcher | ready |
 
 ## Carry-forward
 - P05: R44's `agents-md` skill (and the existing `onboard-project` skill) must name `AGENTS.md`, contradicting workflow-core R22 ("No file under `.github/` refers to `AGENTS.md`"); route to `behavior-spec` to amend R22 before planning P05. `[R22-03]` is a Known failure owned by P05.
