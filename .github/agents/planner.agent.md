@@ -2,7 +2,7 @@
 name: planner
 description: "Optional: run work-planner's Plan mode on the strongest model for a large or architecture-heavy first plan. Every other mode runs in the main session."
 argument-hint: "What to plan (e.g. 'plan v1')."
-tools: ['read', 'search', 'edit', 'execute', 'agent', 'todo']
+tools: ['read', 'search', 'edit', 'execute', 'agent', 'todo', 'Read', 'Grep', 'Glob', 'Edit', 'Write', 'Bash', 'Agent', 'TodoWrite']
 model:
   - Claude Opus 5.5 (copilot)
   - GPT-6.1 Sol (copilot)

@@ -1,7 +1,7 @@
 ---
 name: test-author
 description: "Write, or for test-fix cards rewrite, the locked acceptance tests at the product boundary for one Card."
-tools: ['read', 'search', 'edit', 'execute']
+tools: ['read', 'search', 'edit', 'execute', 'Read', 'Grep', 'Glob', 'Edit', 'Write', 'Bash']
 user-invocable: false
 model:
   - Claude Sonnet 5.5 (copilot)

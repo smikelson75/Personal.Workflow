@@ -2,7 +2,7 @@
 name: coder
 description: "Implement one delegate-tier Card until its locked acceptance tests pass."
 argument-hint: "Paste one Card."
-tools: ['read', 'search', 'edit', 'execute']
+tools: ['read', 'search', 'edit', 'execute', 'Read', 'Grep', 'Glob', 'Edit', 'Write', 'Bash']
 model:
   # Cheap cloud models run delegate cards today; put a local model ID first once one is configured.
   - Claude Haiku 5.5 (copilot)

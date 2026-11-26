@@ -11,8 +11,9 @@ The `.github/agents/` folder defines the custom subagents used by `work-planner`
 | `test-author` | [test-author.agent.md](./test-author.agent.md) | Writes failing black-box acceptance tests for a Card, or performs fixture-only repairs on `test-fix` Cards. | Mid | `medium` | No |
 | `test-reviewer` | [test-reviewer.agent.md](./test-reviewer.agent.md) | Read-only reviewer that approves or rejects fixture repairs to locked tests so the author never approves its own edit. | Mid | `medium` | No |
 | `planner` | [planner.agent.md](./planner.agent.md) | Optional stand-in for `work-planner`'s Plan mode on the strongest model for large or architecture-heavy first plans. | Strongest | `high` | Yes |
+| `code-review` | [code-review.agent.md](./code-review.agent.md) | Read-only review of one Phase's critical code that returns only high-confidence defects. | Mid | `medium` | No |
 
-Built-in `code-review` is also invoked once per Phase after the Gate passes, only for Cards marked `Review: required`.
+`pull-work` invokes `code-review` once per Phase after the Gate passes, only for Cards marked `Review: required`. Copilot CLI uses its built-in `code-review` in preference to this file, and Claude Code runs this file.
 
 ## Pinned Model Lists
 

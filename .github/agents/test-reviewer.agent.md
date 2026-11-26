@@ -1,7 +1,7 @@
 ---
 name: test-reviewer
 description: "Read-only check that a fixture repair to locked acceptance tests changed no expectation and left each fixture with one spec-valid fault."
-tools: ['read', 'search', 'execute']
+tools: ['read', 'search', 'execute', 'Read', 'Grep', 'Glob', 'Bash']
 user-invocable: false
 model:
   - Claude Sonnet 5.5 (copilot)

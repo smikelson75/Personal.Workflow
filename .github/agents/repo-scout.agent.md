@@ -1,7 +1,7 @@
 ---
 name: repo-scout
 description: "Read-only repo survey for the planner: answers specific questions with a short, cited fact sheet."
-tools: ['read', 'search', 'execute']
+tools: ['read', 'search', 'execute', 'Read', 'Grep', 'Glob', 'Bash']
 user-invocable: false
 model:
   - Claude Haiku 5.5 (copilot)
