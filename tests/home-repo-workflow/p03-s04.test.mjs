@@ -63,7 +63,7 @@ function makeHome() {
   put(dir, '.git/personal-workflow/manifest.json', '{"version":"3f9a2c1","status":"complete","files":[]}');
   for (const [id, skills] of Object.entries(ADDONS)) {
     for (const skill of skills) {
-      const link = skill.startsWith('stryker-') ? '\nSee [protocol](../mutation-testing/protocol.md)\n' : '\n';
+      const link = skill.startsWith('stryker-') ? '\nSee [protocol](../mutation-testing/protocol.md)\n' : '\n\n';
       put(dir, `.workflow-core/language-addons/${id}/${skill}/SKILL.md`, `# ${skill}${link}`);
     }
   }
