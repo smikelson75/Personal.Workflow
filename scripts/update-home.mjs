@@ -58,9 +58,20 @@ function fingerprint(plan) {
   return hash.digest('hex').slice(0, 7);
 }
 
+// Manifest paths are Home-relative with `/` separators. Anything else (absolute, drive letter,
+// backslash, `..` segment, inside .git) is dropped, so a corrupt manifest can never name a file to delete outside the managed set.
+function isSafeManifestPath(path) {
+  if (typeof path !== 'string' || path === '' || /^[a-zA-Z]:|[\\\0]|^\//.test(path)) return false;
+  const parts = path.split('/');
+  return !parts.some((part) => part === '' || part === '.' || part === '..') && parts[0].toLowerCase() !== '.git';
+}
+
 function readManifest(path) {
   try {
-    return JSON.parse(readFileSync(path, 'utf8'));
+    const manifest = JSON.parse(readFileSync(path, 'utf8'));
+    if (manifest === null || typeof manifest !== 'object') return null;
+    const files = Array.isArray(manifest.files) ? manifest.files.filter(isSafeManifestPath) : [];
+    return { ...manifest, version: typeof manifest.version === 'string' ? manifest.version : 'none', files };
   } catch {
     return null;
   }
@@ -81,7 +92,10 @@ function manifestPathFor(home) {
 
 const EXCLUDE_BEGIN = '# personal-workflow:begin';
 const EXCLUDE_END = '# personal-workflow:end';
-const EXCLUDE_BLOCK = new RegExp(`^${EXCLUDE_BEGIN}\\r?\\n[\\s\\S]*?^${EXCLUDE_END}(?:\\r?\\n|$)`, 'm');
+const EXCLUDE_BLOCK = new RegExp(
+  `^${EXCLUDE_BEGIN}\\r?\\n(?:(?!^${EXCLUDE_BEGIN})[\\s\\S])*?^${EXCLUDE_END}(?:\\r?\\n|$)`,
+  'm',
+);
 
 function excludePathFor(home) {
   const gitPath = execFileSync('git', ['-C', home, 'rev-parse', '--git-path', 'info/exclude'], { encoding: 'utf8' }).trim();

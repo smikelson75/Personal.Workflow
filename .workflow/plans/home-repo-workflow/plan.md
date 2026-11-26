@@ -2,7 +2,8 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: review P02
+- Next: gate P02
+- Review pending: S07
 - Tests locked: `fd4ab6e`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `d6846dd`
@@ -41,6 +42,7 @@
 | S04 | Installed files stay out of git status | completed |
 | S05 | Version identity and offline operation hold on this repository | completed |
 | S06 | R37-03 fixture keeps a tracked file under .claude/skills | completed |
+| S07 | Review fix: manifest entries and exclude block cannot cause data loss | completed |
 
 ## Carry-forward
 - P03: `.claude/settings.json` runs `node .github/hooks/scripts/guard-locked-tests.mjs` relative to the session folder (Claude Code resets Bash to the project root, so the copy layout is safe); in the Home layout the Project Repo has no guard script, so the Home-layout registration must resolve the guard from the Home Repo.

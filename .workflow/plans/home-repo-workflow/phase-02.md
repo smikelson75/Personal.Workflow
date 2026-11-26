@@ -153,6 +153,19 @@
 - **Decisions:** the committed file is `.claude/skills/keep/SKILL.md`, a path the source never installs; every expectation in the test stays the same; the fixture change must not touch lines that match the Harness `assert` regex.
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="Q-version-identity|Q-offline" "tests/home-repo-workflow/*.test.mjs"` exits 0; targets R37-03; 1 target test runs
 
+## S07 - Review fix: manifest entries and exclude block cannot cause data loss
+
+- **Kind:** fix
+- **Goal:** a corrupt manifest never names a file to delete outside the managed set, and an unpaired `# personal-workflow:begin` line never makes a rerun overwrite user lines in `.git/info/exclude`.
+- **Depends on:** S04
+- **Tier:** main - small edit to S01 and S04 code, carried out in this session
+- **Review:** required - data loss on user files
+- **Restores:** review - manifest `files` entries were deleted without validation and an orphan begin marker let the block regex span user lines
+- **Files:** edit `scripts/update-home.mjs`
+- **Decisions:** `readManifest` keeps only `files` entries that are Home-relative `/`-separated strings with no empty, `.`, or `..` segment, no drive letter, no backslash, and not under `.git`; a non-array `files` reads as empty and a non-string `version` reads as `none`. The managed-block pattern cannot span another begin marker. Symlink and junction handling is out of scope.
+- **Do not:** edit `tests/home-repo-workflow/**`; change success output or failure categories; add dependencies.
+- **Done when:** `node --test --test-reporter=tap "tests/home-repo-workflow/*.test.mjs"` exits 0; 47 tests run
+
 ## S05 - Version identity and offline operation hold on this repository
 
 - **Kind:** verify
