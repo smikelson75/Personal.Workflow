@@ -114,7 +114,7 @@
   - Home Repo case: the working folder's real path equals the Home Repo (compare lower-cased on Windows) -> `Stack: none (Home Repo)`, `Language Add-on: none`, no warnings; `AGENTS.md` is not read.
   - The exact note text is the one in R38-09. Put the parsing in functions `readStack(cwd)` and `listAddons(home)` that S04 calls.
 - **Do not:** edit `tests/home-repo-workflow/**`; read any file other than `AGENTS.md` and the add-on folders; write any file; add dependencies.
-- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/home-repo-workflow/*.test.mjs"` exits 0; targets R38-08 to R38-13 and R39-01 to R39-04; 10 target tests run
+- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/home-repo-workflow/*.test.mjs"` exits 0; targets R38-08 to R38-13 and R39-01 to R39-04; 11 target tests run (R39-02 has two cases)
 - **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.
 
 ## S04 - Session plugin: add-on skills and the locked-tests guard in the Home layout
