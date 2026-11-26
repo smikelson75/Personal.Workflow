@@ -16,7 +16,9 @@
 
 ## Recommended Models
 
-`/pull-work` runs in your main session as the orchestrator: it reads `plan.md`, dispatches `delegate` Cards to `coder` and test authoring to `test-author`, implements `main`-tier Cards directly, and triages Gate failures. A strong mid-tier model at `medium` effort balances coordination speed with implementation judgment on `main` Cards.
+`/pull-work` runs in your main session as the orchestrator: it reads `plan.md`, dispatches `delegate` Cards to `coder` and test authoring to `test-author`, implements `main`-tier Cards directly, and triages Gate failures.
+
+A strong mid-tier model at `medium` effort balances coordination speed with implementation judgment on `main` Cards.
 
 | Provider  | Model               | Default effort | Raise to `high` when                                         |
 | --------- | ------------------- | -------------- | ------------------------------------------------------------ |
