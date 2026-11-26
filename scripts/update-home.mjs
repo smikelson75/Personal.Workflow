@@ -58,10 +58,15 @@ function readModelEntries(front) {
   return { entries, start, end };
 }
 
+// The word after `Claude` in a Claude entry, lower-cased; empty when there is no next word.
+function claudeFamily(entry) {
+  return (/^claude\s+(\S+)/i.exec(entry)?.[1] ?? '').toLowerCase();
+}
+
 function pickAlias(entries) {
   for (const entry of entries) {
     if (!/^claude\b/i.test(entry)) continue;
-    const family = (/^claude\s+(\S+)/i.exec(entry)?.[1] ?? '').toLowerCase();
+    const family = claudeFamily(entry);
     if (KNOWN_FAMILIES.has(family)) return family;
   }
   return null;
@@ -75,7 +80,8 @@ function pickEffort(front) {
   return EFFORTS.has(value) ? value : null;
 }
 
-function renderClaudeForm(text) {
+// Returns the Claude Code form of an agent file plus one notice per Claude entry with an unknown family, in list order.
+function renderClaudeForm(text, agent) {
   const parts = splitFrontmatter(text);
   if (!parts) return { text, notices: [] };
 
@@ -83,12 +89,16 @@ function renderClaudeForm(text) {
   const alias = pickAlias(entries);
   const effort = pickEffort(parts.front);
 
+  const notices = entries
+    .filter((entry) => /^claude\b/i.test(entry) && !KNOWN_FAMILIES.has(claudeFamily(entry)))
+    .map((entry) => `Agent pin: ${agent}: skipped "${entry.replace(/"/g, '')}" (not a Claude Code model family)`);
+
   const kept = parts.front.filter((line, i) => !(i >= start && i < end && start >= 0) && !/^reasoning-effort:/.test(line));
   if (alias) kept.push(`model: ${alias}`);
   if (effort) kept.push(`effort: ${effort}`);
 
   const body = ['---', ...kept].map((line) => line + parts.eol).join('') + parts.rest;
-  return { text: body, notices: [] };
+  return { text: body, notices };
 }
 
 function walk(rel) {
@@ -132,20 +142,26 @@ function planInstall() {
   return new Map([...plan].map(([homePath, rel]) => [homePath.replace(/^\//, ''), rel]).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
 }
 
-// Bytes installed at homePath. Claude Code reads `.claude/agents/`, so those files get the Claude form;
-// every other path is the source file as it is.
+// Agent name: the source file name without `.agent.md`.
+function agentName(sourcePath) {
+  return sourcePath.slice('.github/agents/'.length).replace(/\.agent\.md$/, '');
+}
+
+// Bytes installed at homePath plus the notices for that file. Claude Code reads `.claude/agents/`, so those files
+// get the Claude form; every other path is the source file as it is.
 function contentFor(homePath, sourcePath) {
   const raw = readFileSync(join(sourceRoot, sourcePath));
   if (homePath.startsWith('.claude/agents/') && sourcePath.startsWith('.github/agents/')) {
-    return Buffer.from(renderClaudeForm(raw.toString('utf8')).text, 'utf8');
+    const rendered = renderClaudeForm(raw.toString('utf8'), agentName(sourcePath));
+    return { content: Buffer.from(rendered.text, 'utf8'), notices: rendered.notices };
   }
-  return raw;
+  return { content: raw, notices: [] };
 }
 
 function fingerprint(plan) {
   const hash = createHash('sha256');
   for (const [homePath, sourcePath] of plan) {
-    const content = contentFor(homePath, sourcePath).toString('utf8').replace(/\r\n/g, '\n');
+    const content = contentFor(homePath, sourcePath).content.toString('utf8').replace(/\r\n/g, '\n');
     hash.update(Buffer.concat([Buffer.from(homePath, 'utf8'), Buffer.from([0]), Buffer.from(content, 'utf8'), Buffer.from([0])]));
   }
   return hash.digest('hex').slice(0, 7);
@@ -296,11 +312,16 @@ function main() {
   );
 
   let current = null;
+  const noticesByAgent = new Map();
   try {
     for (const [homePath, sourcePath] of plan) {
       current = homePath;
       const target = join(home, homePath);
-      const content = contentFor(homePath, sourcePath);
+      const { content, notices } = contentFor(homePath, sourcePath);
+      if (notices.length > 0) {
+        const name = agentName(sourcePath);
+        noticesByAgent.set(name, [...(noticesByAgent.get(name) ?? []), ...notices]);
+      }
       if (!previousFiles.has(homePath)) {
         installed += 1;
       } else if (!existsSync(target) || !readFileSync(target).equals(content)) {
@@ -332,6 +353,9 @@ function main() {
   console.log(`Home Repo: ${home}`);
   console.log(`Workflow version: ${previous?.version ?? 'none'} -> ${version}`);
   console.log(`Files: ${installed} installed, ${replaced} replaced, ${removed} removed`);
+  for (const name of [...noticesByAgent.keys()].sort()) {
+    for (const notice of noticesByAgent.get(name)) console.log(notice);
+  }
 }
 
 main();

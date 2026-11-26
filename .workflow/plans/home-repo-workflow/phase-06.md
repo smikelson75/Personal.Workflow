@@ -81,7 +81,7 @@
 - **Goal:** a Claude entry whose family Claude Code does not know is skipped with a printed notice, and the search continues with the next Claude entry.
 - **Depends on:** S02
 - **Tier:** delegate - extends one function and one output step with every string pinned
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:** fixture: as S02
   - R48-07: Given `coder` listing `GPT-6 Luna (copilot)`, `Claude Nova 1 (copilot)`, `Claude Sonnet 5 (copilot)`, when the Update Script runs, then it exits 0, the fourth output line is `Agent pin: coder: skipped "Claude Nova 1 (copilot)" (not a Claude Code model family)`, and the Claude form has `model: sonnet`
   - R48-08: Given `repo-scout` skipping two entries and `coder` skipping one, when it runs, then the notice lines follow `Files:` sorted by agent name (`coder` first), and an agent's lines follow its list order
