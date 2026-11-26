@@ -22,7 +22,7 @@
   - Q-ordering: R35 lands before any other requirement - a plan property; P01 covers R35 alone
 - **Gate:**
   - suite: `node --test --test-reporter=tap --test-skip-pattern="<node .github/tools/workflow-core/scripts/trace.mjs --phase-file .workflow/plans/home-repo-workflow/phase-01.md --skip-pattern output>" "tests/home-repo-workflow/*.test.mjs" "tests/glossary-alignment/*.test.mjs" "tests/acceptance/*.test.mjs" "tests/mutation-addon.test.mjs" ".github/tools/workflow-check/tests/acceptance/*.test.mjs" ".github/tools/workflow-core/tests/acceptance/*.test.mjs"`
-  - traceability: `node --test --test-reporter=tap "tests/home-repo-workflow/*.test.mjs" "tests/glossary-alignment/*.test.mjs" "tests/acceptance/*.test.mjs" "tests/mutation-addon.test.mjs" ".github/tools/workflow-check/tests/acceptance/*.test.mjs" ".github/tools/workflow-core/tests/acceptance/*.test.mjs" | node .github/tools/workflow-core/scripts/trace.mjs --phase-file .workflow/plans/home-repo-workflow/phase-01.md R35-01 R35-02 R35-03 R35-04 R35-05 R35-06 R35-07 R35-08 R35-09 R35-10 R35-11 R35-12 R35-13 R35-14 R35-15 R35-16 R35-17 R35-18`
+  - traceability: `node --test --test-reporter=tap "tests/home-repo-workflow/*.test.mjs" "tests/glossary-alignment/*.test.mjs" "tests/acceptance/*.test.mjs" "tests/mutation-addon.test.mjs" ".github/tools/workflow-check/tests/acceptance/*.test.mjs" ".github/tools/workflow-core/tests/acceptance/*.test.mjs" | node .github/tools/workflow-core/scripts/trace.mjs --phase-file .workflow/plans/home-repo-workflow/phase-01.md R35-01 R35-02 R35-03 R35-04 R35-05 R35-06 R35-07 R35-08 R35-09 R35-10 R35-11 R35-12 R35-13 R35-14 R35-15 R35-16 R35-17 R35-18 R35-19`
   - lock: `git diff --exit-code <Tests locked> -- tests/home-repo-workflow`
   - mutation: unsupported for node - no mutation Language Add-on installed
 
@@ -84,3 +84,23 @@
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/home-repo-workflow/*.test.mjs"` exits 0; targets R35-15 to R35-18; 4 target tests run
 - **Stop and report if:** a file outside Files must change; a locked test looks wrong; either Harness fails the live probe; the same failure after 3 attempts.
 - **Outcome:** live probe on Claude Code and Copilot CLI 1.0.116 in a temp copy-layout repo: Claude Code (`claude -p`, `acceptEdits`) and Copilot CLI in a trusted folder both denied the `Edit` with the guard's reason and left the file unchanged; Copilot CLI in an untrusted folder skipped repository hooks and the edit succeeded (the accepted R35 risk).
+
+## S03 - Guard matches locked paths regardless of path case on case-insensitive file systems
+
+- **Kind:** build
+- **Goal:** on a case-insensitive file system, an edit naming a locked test with different letter case inside the repository is denied like the on-disk spelling.
+- **Depends on:** S01
+- **Tier:** delegate - one function in one existing script; the normalization is pinned
+- **Review:** required - permissions guard that parses untrusted hook input
+- **Scenarios:**
+  - R35-19: Given a git repo with plan `calc` (`- Next: P01 S02`, `` - Tests locked: `<lock>` ``, `` - Oracle: `tests/acceptance/` ``) where `tests/acceptance/add.test.mjs` is tracked at `<lock>`, on a file system where `<repo>/Tests/Acceptance/add.test.mjs` names the same file, when the guard receives `{"tool_name":"Edit","tool_input":{"file_path":"<repo>/Tests/Acceptance/add.test.mjs"},"cwd":"<repo>"}`, then it denies and `permissionDecisionReason` starts with `tests/acceptance/add.test.mjs is a locked acceptance test (plan calc, Tests locked <lock>).`; on a case-sensitive file system the test is skipped (failure)
+- **Acceptance tests:** `tests/home-repo-workflow/p01-s03.test.mjs`
+- **Files:** edit `.github/hooks/scripts/guard-locked-tests.mjs`
+- **Patterns:** `.github/hooks/scripts/guard-locked-tests.mjs:75 - repoRootOf walks to the nearest existing ancestor`; `.github/hooks/scripts/guard-locked-tests.mjs:142 - abs and rel computed per target path`
+- **Decisions:**
+  - After `abs` is computed, replace it with its on-disk spelling: find the nearest existing ancestor `existing` of `abs` (`abs` itself when it exists), then `abs = join(realpathSync.native(existing), relative(existing, abs))`. Segments below `existing` keep their given spelling.
+  - `repoRootOf`, `rel`, the Oracle and allowed-path checks, `git cat-file`, and the deny reason all use the normalized `abs`.
+  - A `realpathSync.native` failure falls back to the original `abs`.
+- **Do not:** edit `tests/home-repo-workflow/**`; edit `.github/hooks/locked-tests.json` or `.claude/settings.json`; add dependencies; change the allow output, the deny output shape, or the exit code.
+- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/home-repo-workflow/*.test.mjs"` exits 0; targets R35-19; 1 target test runs
+- **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.
