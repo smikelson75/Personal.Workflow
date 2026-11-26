@@ -63,7 +63,7 @@ function fingerprint(plan) {
 function isSafeManifestPath(path) {
   if (typeof path !== 'string' || path === '' || /^[a-zA-Z]:|[\\\0]|^\//.test(path)) return false;
   const parts = path.split('/');
-  return !parts.some((part) => part === '' || part === '.' || part === '..') && parts[0].toLowerCase() !== '.git';
+  return !parts.some((part) => part === '' || part === '.' || part === '..' || /[:. ]$|:/.test(part)) && !/^(\.git|git~\d+)$/i.test(parts[0]);
 }
 
 function readManifest(path) {
