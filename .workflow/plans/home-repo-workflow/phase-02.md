@@ -139,6 +139,20 @@
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/home-repo-workflow/*.test.mjs"` exits 0; targets R37-01 to R37-06; 6 target tests run
 - **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.
 
+## S06 - R37-03 fixture keeps a tracked file under .claude/skills
+
+- **Kind:** test-fix
+- **Scope:** fixture
+- **Goal:** the R37-03 fixture commits one unrelated skill file under `.claude/skills/`, so git status lists `my-own` by its own path instead of collapsing the folder to `.claude/`.
+- **Depends on:** none
+- **Tier:** main - Fixture Repair is run by the main session
+- **Review:** none
+- **Restores:** R37-03; gate finding: with every installed file excluded, git collapses an untracked-only `.claude/` to one `?? .claude/` line, so `my-own` can never appear in the porcelain output of a fixture whose `.claude/` has no tracked file
+- **Acceptance tests:** `tests/home-repo-workflow/p02-s04.test.mjs`
+- **Files:** none
+- **Decisions:** the committed file is `.claude/skills/keep/SKILL.md`, a path the source never installs; every expectation in the test stays the same; the fixture change must not touch lines that match the Harness `assert` regex.
+- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="Q-version-identity|Q-offline" "tests/home-repo-workflow/*.test.mjs"` exits 0; targets R37-03; 1 target test runs
+
 ## S05 - Version identity and offline operation hold on this repository
 
 - **Kind:** verify
