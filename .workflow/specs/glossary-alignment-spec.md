@@ -6,22 +6,23 @@
 - Companion specs: [workflow-core-spec.md](workflow-core-spec.md), [workflow-check-spec.md](workflow-check-spec.md), [calc-repl-walkthroughs-spec.md](calc-repl-walkthroughs-spec.md)
 
 ## Target Outcome
-- once v1 is done, the Glossary defines all 28 canonical workflow terms, `language-addons/` replaces `language-skills/` across all active files and suites with prior Sessions untouched, all three stack walkthroughs and Workflow Core prose under `.github/` use one consistent canonical vocabulary with no stale remarks or duplicate glossary file, and downstream Workflow Core skills and subagents ground their work in `.workflow/language.md` according to their required, optional, or closed-world contracts.
+- once v1 is done, the Glossary defines the 13 core workflow terms alongside its other terms, `language-addons/` replaces `language-skills/` across all active files and suites with prior Sessions untouched, all three stack walkthroughs and Workflow Core prose under `.github/` use one consistent canonical vocabulary with no stale remarks or duplicate glossary file, and downstream Workflow Core skills and subagents ground their work in `.workflow/language.md` according to their required, optional, or closed-world contracts.
 
 ## Requirements
 
 ### R29 - Glossary defines the 13 core workflow terms
-- Data: `.workflow/language.md` contains `## Terms` with 28 canonical term entries (15 existing plus 13 added) and `## Retired`, in Glossary format (`` - `Term` - meaning `` with optional `Avoid:`, `States:`, `Code:` parts).
+- Data: `.workflow/language.md` contains `## Terms` (the 13 added terms plus every other active term) and `## Retired`, in Glossary format (`` - `Term` - meaning `` with optional `Avoid:`, `States:`, `Code:` parts).
 - Rules:
   - `.workflow/language.md` defines all 13 added workflow terms: `Behavior Spec`, `Plan`, `Phase`, `Slice`, `Card`, `Scenario`, `Tier`, `Gate`, `Phase Review`, `Setup-Card Approval`, `Oracle`, `Traceability`, and `ADR`.
   - `Slice` (thin vertical unit of observable behavior) and `Card` (closed-world work brief in a Phase file) remain two separate canonical terms; no merged `Slice Card` term exists.
   - `Language Add-on` records `Code: language-addons/`.
-  - Total Glossary term count stays at or below `workflow-check`'s 40-term cap (28 terms).
+  - Total Glossary term count is not fixed: later Sessions may add terms, and the total only has to stay at or below `workflow-check`'s 40-term cap.
   - Running `node .github/tools/workflow-check/bin/workflow-check.mjs` on the Workflow Folder exits `0` with `0 errors`, and reports zero `structure/glossary-section`, `structure/glossary-term-format`, `vocabulary/glossary-conflict`, `vocabulary/missing-term`, or `excess/glossary-size` Findings on `.workflow/language.md`.
 - Failure:
   - any of the 13 terms missing, `Slice` and `Card` merged, invalid entry syntax, duplicate or conflicting Glossary term, or any `workflow-check` error Finding -> rejected as `glossary-invalid`; Workflow Folder stays unchanged and downstream stages do not proceed until corrected.
 - Examples:
-  - Given `.workflow/language.md` containing all 28 terms with `Slice` and `Card` defined separately and `Language Add-on` pointing to `Code: language-addons/`, when `workflow-check` runs, then exit code is `0` and stdout ends with `workflow-check: 0 errors, ...`.
+  - Given `.workflow/language.md` containing all 13 added terms with `Slice` and `Card` defined separately and `Language Add-on` pointing to `Code: language-addons/`, when `workflow-check` runs, then exit code is `0` and stdout ends with `workflow-check: 0 errors, ...`.
+  - Given `.workflow/language.md` with 35 terms including all 13 added terms, when checked against R29, then it passes acceptance; with 41 terms it fails (failure).
   - Given `.workflow/language.md` missing `Oracle` or merging `Slice` and `Card` into `Slice Card`, when checked against R29, then it fails acceptance (failure).
 
 ### R30 - Rename `language-skills/` to `language-addons/` and update active references
@@ -32,7 +33,7 @@
     - `docs/walkthrough-node.md`, `docs/walkthrough-typescript.md`, and `docs/walkthrough-csharp.md` (all Markdown links `../language-addons/...` and PowerShell `Copy-Item` paths `$workflowSrc\language-addons\...`)
     - `tests/acceptance/p01-s03.test.mjs` (the PowerShell forward-slash path guard checks `language-addons/` instead of `language-skills/`)
   - Internal relative links inside `language-addons/` remain unchanged because zero files inside `language-addons/` reference `language-skills/` and existing relative links (such as `../mutation-testing/protocol.md`, `references/BASELINE.md`, `references/ENFORCEMENT.md`, `scripts/trace.mjs`, and `scripts/mutation-gate.mjs`) are target-repo-relative once copied into `.github/skills/`.
-  - Prior Session files in `.workflow/sessions/` are never modified; historical `language-skills/` references in prior Sessions remain untouched.
+  - Prior Session files are never modified or deleted; historical `language-skills/` references in them remain untouched. Prior Session files are `context-2026-11-20-1124.md`, `context-2026-11-21-1442.md`, `context-2026-11-21-1750.md`, and `context-2026-11-21-1859.md` in `.workflow/sessions/`. Adding new Session files to `.workflow/sessions/` does not violate this rule.
   - Existing acceptance suites (`tests/acceptance/*.test.mjs`, `.github/tools/workflow-check/tests/acceptance/*.test.mjs`, and `.github/tools/workflow-core/tests/acceptance/*.test.mjs`) pass.
 - Failure:
   - `language-skills/` still exists, `language-addons/` is missing any migrated file, any active documentation, Glossary entry, add-on file, or acceptance suite file still references `language-skills/`, any prior Session file is modified, or an acceptance suite fails -> rejected as `rename-incomplete`.
@@ -40,6 +41,7 @@
   - Given the renamed repository, when checked, then `language-addons/mutation-testing/protocol.md` and every stack add-on exist, `language-skills/` does not exist, zero occurrences of `language-skills` appear outside `.workflow/sessions/`, and all acceptance suites pass.
   - Given `docs/walkthrough-typescript.md` or `tests/acceptance/p01-s03.test.mjs` still containing `language-skills`, when checked against R30, then it fails acceptance (failure).
   - Given `.workflow/sessions/context-2026-11-21-1442.md` edited to replace `language-skills/` with `language-addons/`, when checked against R30, then it fails acceptance because prior Sessions are immutable (failure).
+  - Given a new Session file `.workflow/sessions/context-2026-11-25-1955.md` added and the four prior Session files unchanged, when checked against R30, then it passes acceptance.
 
 ### R31 - Align the three stack walkthroughs to canonical vocabulary
 - Rules:
@@ -96,7 +98,7 @@
   - Given `.github/agents/coder.agent.md` inspected for `.workflow/language.md` or a Glossary read step, then zero matches exist; adding `.workflow/language.md` as an input to `coder.agent.md` fails acceptance (failure).
 
 ## Quality Thresholds
-- Zero `workflow-check` errors -> `node .github/tools/workflow-check/bin/workflow-check.mjs` exits `0` with `0 errors` on the repository's Workflow Folder (28 Glossary terms <= 40 cap).
+- Zero `workflow-check` errors -> `node .github/tools/workflow-check/bin/workflow-check.mjs` exits `0` with `0 errors` on the repository's Workflow Folder (Glossary terms <= 40 cap).
 - Zero stale `language-skills/` references -> 0 occurrences of `language-skills` across `.workflow/language.md`, `docs/walkthrough-*.md`, `language-addons/**`, `.github/**`, and `tests/acceptance/*.test.mjs` (prior Sessions in `.workflow/sessions/` excluded).
 - Zero vocabulary drift -> 0 occurrences of forbidden avoided workflow synonyms or variant Checkpoint labels across `docs/walkthrough-*.md`, `.github/skills/**`, `.github/agents/**`, and `.github/user-interaction.md` (exemptions per R31 and R32).
 - Suite preservation -> 100% of existing acceptance tests (`tests/acceptance/*.test.mjs`, `.github/tools/workflow-check/tests/acceptance/*.test.mjs`, and `.github/tools/workflow-core/tests/acceptance/*.test.mjs`) pass with zero regressions.
@@ -110,7 +112,7 @@
 - Out of scope: extending `workflow-check` to scan `docs/` or `.github/`, wiring `.workflow/language.md` into `conventional-commit`, and shipping a second workflow-terms file inside `.github/` - session scope.
 
 ## Product Interfaces
-- `.workflow/language.md`: 28-term canonical Glossary checked by `node .github/tools/workflow-check/bin/workflow-check.mjs`.
+- `.workflow/language.md`: canonical Glossary (at most 40 terms) checked by `node .github/tools/workflow-check/bin/workflow-check.mjs`.
 - `language-addons/`: top-level directory containing stack Language Add-ons and the shared `mutation-testing` protocol.
 - `docs/walkthrough-node.md`, `docs/walkthrough-typescript.md`, `docs/walkthrough-csharp.md`: Developer-facing stack walkthroughs.
 - `/pull-work`, `/adr-writer`, and subagents `test-author`, `test-reviewer`, `repo-scout`, `coder`: Glossary input and missing-Glossary contracts as specified in R32–R34.
@@ -122,6 +124,8 @@
 - How R29–R34 are sliced and sequenced across phases and Cards.
 
 ## Assumptions
+- R29: the Glossary has no exact term count; R29 requires only the 13 added terms, `Slice`/`Card` separation, and the 40-term cap - the Session's "total 28" described the Glossary when that Session was settled, and the later final Session `context-2026-11-25-1955.md` grew it to 35 terms. Pinning any exact count would make R29 fail every time a later Session adds a term.
+- R30: "prior Session" means the four Session files in this spec's Session Chain; Session files added later are allowed - `brain-storm` adds a new Session file for each Session, and `context-2026-11-25-1955.md` was added rather than edited.
 - R30: zero internal relative links inside `language-addons/` need updating during the rename - verified across all 17 files in `language-skills/`: none reference `language-skills/`, and links such as `../mutation-testing/protocol.md` are already target-repo-relative once copied into `.github/skills/`.
 - R33: `.workflow/language.md` is passed by path (not inline) to `test-author` and `test-reviewer` by both `work-planner` (Phase Review) and `pull-work` (Fixture Repair) - matches how both callers already pass the spec path, avoids duplicating Glossary content in prompts, and both agents have `read` access.
 - R33: `pull-work`'s missing-Glossary check runs in Preflight after argument syntax parsing (`parse-args.mjs`) and before routing or subagent dispatch, with a plain-language redirect naming `.workflow/language.md` and `/brain-storm` - preserves `workflow-core` R21's empty-`bug:` usage line while ensuring no mode or subagent runs without a Glossary.
