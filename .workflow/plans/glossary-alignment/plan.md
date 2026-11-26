@@ -2,10 +2,10 @@
 
 - Spec: [glossary-alignment-spec.md](../../specs/glossary-alignment-spec.md)
 - Lane: standard
-- Next: phase review P03
-- Tests locked: `d80c964`
+- Next: gate P03
+- Tests locked: `22842c4`
 - Oracle: `tests/glossary-alignment`
-- Phase base: `d80c964`
+- Phase base: `22842c4`
 - Reconciled: `3b6f1f8afd43fc15f7fc3f26fcadd02b5b7383c6`
 
 ## Current state
@@ -27,5 +27,11 @@
 |---|-------|--------|--------|--------|
 | P01 | Glossary, language-addons rename, and walkthrough alignment | completed | R29, R30, R31, Q-zero-workflow-check-errors, Q-zero-stale-language-skills-references | [phase-01](phase-01.md) |
 | P02 | Workflow Core prose and Glossary contracts | completed | R32, R33, R34, Q-zero-vocabulary-drift, Q-suite-preservation | [phase-02](phase-02.md) |
-| P03 | Reconcile Glossary count and Session immutability tests | in progress | R29 (term count only), R30 (Session immutability only) | [phase-03](phase-03.md) |
+| P03 | Reconcile Glossary count and Session immutability tests | gating | R29 (term count only), R30 (Session immutability only) | [phase-03](phase-03.md) |
+
+## P03 slices
+
+| # | Slice | Status |
+|---|-------|--------|
+| S01 | Relax Glossary count and Session immutability assertions | completed |
 
