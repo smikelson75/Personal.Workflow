@@ -2,10 +2,10 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: phase review P04
-- Tests locked: `bd4bfc7`
+- Next: P04 S01, S02
+- Tests locked: `4dbd17a`
 - Oracle: `tests/home-repo-workflow`
-- Phase base: `a088cd8`
+- Phase base: `4dbd17a`
 - Reconciled: `96cf5699d5c914ca684a96621759c3aaf1eed4bb`
 
 ## Current state
@@ -29,7 +29,7 @@
 | P01 | Guard both Harnesses in the copy layout | completed | R35, Q-ordering | [phase-01](phase-01.md) |
 | P02 | Update Script fills a Home Repo offline | completed | R36, R37, Q-version-identity, Q-offline (update) | [phase-02](phase-02.md) |
 | P03 | Launch Script with stack add-ons and Home-layout guard | completed | R38, R39, R40, R41, Q-offline (launch), Q-seamless-relay | [phase-03](phase-03.md) |
-| P04 | Workflow Core parity across layouts and Harnesses | planned | R42, R43 | [phase-04](phase-04.md) |
+| P04 | Workflow Core parity across layouts and Harnesses | in progress | R42, R43 | [phase-04](phase-04.md) |
 | P05 | Authoring skills, Coordination Playbook, README | planned | R44, R45, R46, R47, Q-offline partial | |
 
 ## Carry-forward
@@ -42,11 +42,8 @@
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Launch Script exports `WORKFLOW_HOME` | planned |
-| S02 | Core path rule in every skill and the planner agent | planned |
-| S03 | Home layout resolves every Core path and leaves the Home Repo alone | planned |
-| S04 | Agents dispatchable by name in both Harnesses; `code-review` agent | planned |
-| S05 | README copy steps give Claude Code the skills and agents | planned |
-
-## ADR candidates
-- Home layout resolves Workflow Core paths through the `WORKFLOW_HOME` environment variable plus a one-line mapping rule in each skill - over rewriting skill text at install (breaks the byte-equal install and the version fingerprint), mirroring `.github/` into the Project Repo (violates R38's no-writes rule), and a per-skill resolver script (needs the very path it resolves).
+| S01 | Launch Script exports `WORKFLOW_HOME` | ready |
+| S02 | Core path rule in every skill and the planner agent | ready |
+| S03 | Home layout resolves every Core path and leaves the Home Repo alone | ready |
+| S04 | Agents dispatchable by name in both Harnesses; `code-review` agent | ready |
+| S05 | README copy steps give Claude Code the skills and agents | ready |
