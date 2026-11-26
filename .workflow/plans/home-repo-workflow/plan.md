@@ -2,10 +2,10 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: phase review P06
-- Tests locked: `de0f84e`
+- Next: P06 S02
+- Tests locked: `16d8d09`
 - Oracle: `tests/home-repo-workflow`
-- Phase base: `de0f84e`
+- Phase base: `16d8d09`
 - Reconciled: `7ede1a4f0724923dcf7efbbc8d2c9e3727e92a83`
 
 ## Current state
@@ -33,20 +33,17 @@
 | P03 | Launch Script with stack add-ons and Home-layout guard | completed | R38, R39, R40, R41, Q-offline (launch), Q-seamless-relay | [phase-03](phase-03.md) |
 | P04 | Workflow Core parity across layouts and Harnesses | completed | R42, R43 | [phase-04](phase-04.md) |
 | P05 | Authoring skills, Coordination Playbook, README | completed | R44, R45, R46, R47, Q-offline | [phase-05](phase-05.md) |
-| P06 | Claude Code agent pins from one edit | planned | R48, R49, R50, R51 | [phase-06](phase-06.md) |
+| P06 | Claude Code agent pins from one edit | in progress | R48, R49, R50, R51 | [phase-06](phase-06.md) |
 
 ## P06 slices
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Update Script tests expect the two agent forms | planned |
-| S02 | Update Script installs the Copilot form and the Claude form | planned |
-| S03 | Update Script names skipped Claude entries | planned |
-| S04 | Update Script applies and names the shipped default | planned |
-| S05 | Update Script rejects an unparsable agent file | planned |
-| S06 | README explains agent pins and the effort limitation | planned |
-| S07 | Pins stay in one place and Core skills never override them | planned |
-
-## ADR candidates
-- Home Repo holds two forms of each agent: the source verbatim at `.github/agents/` for Copilot CLI and a Claude form at `.claude/agents/` with `model` alias and `effort` - over one shared file (Claude ignores a list-form `model` and Copilot needs it, so one file serves only one Harness), and over session-only injection through the Launch Script (the README's direct Claude Code command would lose the pins). Relies on the probed rule that Copilot CLI prefers `.github/agents` for a duplicate name.
+| S01 | Update Script tests expect the two agent forms | completed |
+| S02 | Update Script installs the Copilot form and the Claude form | ready |
+| S03 | Update Script names skipped Claude entries | ready |
+| S04 | Update Script applies and names the shipped default | ready |
+| S05 | Update Script rejects an unparsable agent file | ready |
+| S06 | README explains agent pins and the effort limitation | ready |
+| S07 | Pins stay in one place and Core skills never override them | ready |
 
