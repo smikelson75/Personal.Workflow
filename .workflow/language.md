@@ -36,5 +36,17 @@
 - `Update Script` - the script shipped in `Personal.Workflow` that copies Workflow Core and Language Add-ons into a Home Repo and prints the version. Avoid: sync script, installer.
 - `Coordination Playbook` - the Workflow Core document describing needs-first ordering of changes across Project Repos with existing skills. Avoid: runbook.
 - `ADR` - a point-in-time record of an approved, hard-to-reverse build decision and its trade-offs (`ADR candidate` before approval). Code: `.workflow/adr/`
+- `Conversation` - one agent chat in one Harness, identified by its Harness ID; distinct from a `Session` file. Avoid: chat, transcript.
+- `Conversation Log` - a Harness's local record of one Conversation (Copilot CLI `events.jsonl`, Claude Code project `.jsonl`).
+- `Skill Review` - the hand-run skill that reviews skill uses and Handoffs since the last run in a Project Repo and writes its records to the Home Repo. Code: `/skill-review`
+- `Apply Observation` - the hand-run skill in `Personal.Workflow` that applies picked confirmed Observations to workflow parts, or undoes one. Code: `/apply-observation`
+- `Observation` - one Skill Review result about one workflow part, with a side, an optional Miss Label, and an outcome (part change, Developer note, or no action). States: watching -> confirmed -> changed -> improved | unchanged; dismissed. Avoid: lesson, insight.
+- `Handoff` - one artifact passed from the skill that wrote it to the skill that used it; reviewed once when both ends exist. States: pending -> reviewed.
+- `Miss Label` - the cause of a Handoff miss, which sets its side: capture miss and decomposition miss (writing skill), translation miss (using skill), requirements miss (watched by area as a question gap).
+- `Fix Filter` - the questions every proposed change passes: can a check or script do it; can an existing rule be clarified or removed; where does it cost the least context.
+- `Depth` - how deeply Skill Review reads, 0 to 3: extract by script, triage the compact record, read flagged slices, judge; go one Depth deeper only when the Depth above flags it.
+- `Executive Summary` - the Developer's short STE report of one Skill Review run: what changed, what improved, what stayed the same, what to do next.
+- `Ledger` - the Developer's STE list of every Observation and its state, kept in the Home Repo. Avoid: tracker.
+- `Review Record` - Skill Review's fixed-layout record for agents of reviewed state, Observations, and installed version, kept in the Home Repo.
 
 ## Retired
