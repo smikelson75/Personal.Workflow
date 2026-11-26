@@ -123,11 +123,14 @@
     - ask one question at a time in plain language, defining unfamiliar terms
     - keep a conversational, unrushed pace: discuss when the Developer is unsure or pushes back, and confirm brief answers before treating them as settled
     - token savings never come from shortening what the Developer reads
-  - Every skill and agent under `.github/` that asks the Developer a question refers to that file: brain-storm, behavior-spec, work-planner, pull-work, adr-writer, conventional-commit, and the `planner` agent. No file under `.github/` refers to `AGENTS.md`.
+  - Every skill and agent under `.github/` that asks the Developer a question refers to that file: brain-storm, behavior-spec, work-planner, pull-work, adr-writer, conventional-commit, and the `planner` agent.   Only the `onboard-project` and `agents-md` skills (and their reference files) may name `AGENTS.md`, because they assess or write a Project Repo's own `AGENTS.md`; no other file under `.github/` refers to it.
+   - No Workflow Core skill or agent requires `AGENTS.md` to exist in order to run. `agents-md` creates one when absent; `onboard-project` reports it missing as a finding.
   - `coder`, `test-author`, `test-reviewer`, and `repo-scout` never ask the Developer; they stop and report to their caller.
   - Skill-specific question formats (brain-storm's question format, behavior-spec's Conversation) add to the rules and never contradict them. A Checkpoint (R23) counts as one question.
 - Examples:
-  - Given `.github/` copied into a repository without `AGENTS.md`, when its files are searched for `AGENTS.md`, then there is no match, and each asking skill and agent names the rules file.
+  - Given `.github/` copied into a repository without `AGENTS.md`, when its files are searched for `AGENTS.md`, then every matching file is under `.github/skills/onboard-project/` or `.github/skills/agents-md/`, and each asking skill and agent names the rules file.
+  - Given a repository without `AGENTS.md`, when `/agents-md` runs, then it creates one and does not stop for its absence; when `/brain-storm` runs there, it proceeds with no mention of `AGENTS.md` (failure boundary: no other skill is blocked).
+  - Given a new reference to `AGENTS.md` in `.github/skills/pull-work/SKILL.md`, when files are searched, then the match is outside the two named skills and the rule is violated.
 
 ### R23 - A Checkpoint is one bundled question
 - Rules:
@@ -150,7 +153,7 @@
 - Plan and phase formats - owner: work-planner.
 - Commit Message Rules - owner: conventional-commit skill.
 - The workflow runs in a git repository; commits are the handoff between stages - pull-work Preflight and Commits.
-- The Workflow Core is copied into target repositories without `AGENTS.md` and must not depend on it - session constraint.
+- The Workflow Core is copied into target repositories without `AGENTS.md` and must not depend on it - session constraint; `onboard-project` and `agents-md` may name it per R22 but still run without it.
 - No user steps beyond existing Checkpoints - session constraint.
 - Language Add-ons (their mutation protocol and trace scripts) are out of scope - session scope.
 
@@ -182,6 +185,7 @@
 - R23: naming items approves the unnamed ones - "approve it all or name items" implies it, and avoids a second bundled question.
 - R23: the Checkpoint list and phase completion as a question-free stop - taken from work-planner's existing checkpoints.
 - R22: rules content is AGENTS.md's User Interaction section; subagents never ask - the rules being moved; subagents already stop and report.
+- R22: the `AGENTS.md` ban is narrowed to an allow-list of `onboard-project` and `agents-md`, not a move of those skills outside `.github/` - their purpose is the Project Repo's `AGENTS.md` (R44, onboarding), and skill discovery locations are imposed by the Harnesses so a move would stop them loading; the session's real constraint, no dependence on it, is kept by the "requires to exist" rule.
 - R17: an installed add-on whose tool cannot run is left to Plan mode - Language Add-ons are out of scope.
 - R14: a Known Failure is excluded only before its owning phase; a passing one does not fail - "owning later phase" in the Glossary; debt fixed incidentally is not a defect.
 - R14: applies to the Workflow Core's Gate and trace script; Language Add-on trace scripts are out of scope - Session scope.
