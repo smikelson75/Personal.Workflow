@@ -2,12 +2,12 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: review P01
-- Tests locked: `67787b5`
+- Next: P01 S03
+- Tests locked: `725b02c`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `67787b5`
 - Reconciled: `96cf5699d5c914ca684a96621759c3aaf1eed4bb`
-- Review pending: S01, S02
+- Review pending: S03
 
 ## Current state
 - stack: Node ES modules (`.mjs`, built-in `node:test`, zero dependencies, ADR 0001); the product is Workflow Core under `.github/`, `language-addons/`, `README.md`, and small Node scripts.
@@ -38,6 +38,7 @@
 |---|-------|--------|
 | S01 | Guard finds the edited file's repository and denies in both Harness formats | completed |
 | S02 | Register the guard for Claude Code in the copy layout | completed |
+| S03 | Guard matches locked paths regardless of path case | ready |
 
 ## Carry-forward
 - P05: R44's `agents-md` skill (and the existing `onboard-project` skill) must name `AGENTS.md`, contradicting workflow-core R22 ("No file under `.github/` refers to `AGENTS.md`"); route to `behavior-spec` to amend R22 before planning P05. `[R22-03]` is a Known failure owned by P05.
