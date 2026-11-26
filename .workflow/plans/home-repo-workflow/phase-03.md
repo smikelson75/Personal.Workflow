@@ -160,3 +160,17 @@
 - **Do not:** edit `tests/home-repo-workflow/**` other than this card's file; change product code.
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/home-repo-workflow/*.test.mjs"` exits 0; targets Q-offline, Q-seamless-relay; 2 target tests run
 - **Stop and report if:** a target test fails (set blocked so Revise adds a `fix` card); a locked test looks wrong.
+
+## S06 - Repair S04 fixture: add-on SKILL.md content
+
+- **Kind:** test-fix
+- **Scope:** fixture
+- **Goal:** the S04 Home fixture writes each non-stryker add-on `SKILL.md` as `# <skill>` followed by a blank line (`# <skill>\n\n`), so the unchanged expectation `skills/dotnet-editorconfig/SKILL.md` equals `# dotnet-editorconfig\n\n` holds when the launcher copies the file byte for byte.
+- **Depends on:** none
+- **Tier:** main - Fixture Repair
+- **Review:** none
+- **Restores:** R38-14, R38-15 (the fixture wrote one trailing newline where the expectation has two; the launcher is correct)
+- **Acceptance tests:** `tests/home-repo-workflow/p03-s04.test.mjs`
+- **Files:** none
+- **Do not:** change any line matching the Harness `assert` regex; change what any test expects.
+- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="Q-offline|Q-seamless-relay" "tests/home-repo-workflow/*.test.mjs"` exits 0
