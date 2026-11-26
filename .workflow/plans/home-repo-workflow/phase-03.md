@@ -174,3 +174,16 @@
 - **Files:** none
 - **Do not:** change any line matching the Harness `assert` regex; change what any test expects.
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="Q-offline|Q-seamless-relay" "tests/home-repo-workflow/*.test.mjs"` exits 0
+
+
+## S07 - Review fix: launcher signal handling and plugin build failure
+
+- **Kind:** fix
+- **Goal:** Ctrl+C does not kill the launcher or delete the session plugin while the Harness runs (cleanup only on the child's close; SIGTERM is forwarded to the child); a failure while building the plugin removes the temp folder and prints `launch failed: launch-failed: <message>` with exit 1.
+- **Depends on:** S04
+- **Tier:** main - small review-driven fix
+- **Review:** required - process spawn and recursive delete
+- **Restores:** review - SIGINT killed launcher and removed plugin under a live Harness; review - plugin temp folder leaked when buildPlugin threw
+- **Acceptance tests:** none (defect no black-box test expresses)
+- **Files:** `home/launch.mjs`
+- **Done when:** `node --test "tests/home-repo-workflow/*.test.mjs"` exits 0

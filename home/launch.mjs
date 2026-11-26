@@ -134,10 +134,12 @@ function announce(harness, version) {
 }
 
 const PLUGIN_PREFIX = 'workflow-stack-';
+let pluginDir = null;
 
 // Session plugin outside both repositories: loaded add-on skills plus the locked-tests guard hook.
 function buildPlugin(version, loaded) {
   const plugin = mkdtempSync(join(tmpdir(), PLUGIN_PREFIX));
+  pluginDir = plugin;
   mkdirSync(join(plugin, '.claude-plugin'));
   mkdirSync(join(plugin, 'hooks'));
   mkdirSync(join(plugin, 'skills'));
@@ -189,12 +191,9 @@ function startHarness(file, args, plugin) {
       })
     : spawn(file, args, { stdio: 'inherit' });
   const cleanup = () => removePlugin(plugin);
-  for (const signal of ['SIGINT', 'SIGTERM']) {
-    process.on(signal, () => {
-      cleanup();
-      process.exit(1);
-    });
-  }
+  // The child shares the console and receives Ctrl+C itself; cleanup waits for it to close.
+  process.on('SIGINT', () => {});
+  process.on('SIGTERM', () => child.kill('SIGTERM'));
   child.on('error', () => {
     cleanup();
     process.exitCode = 1;
@@ -222,8 +221,14 @@ if (mode === undefined) {
     if (file === null) fail('harness-not-installed', harness);
     else {
       const loaded = announce(harness, install.version);
-      const plugin = buildPlugin(install.version, loaded);
-      startHarness(file, ['--add-dir', home, '--plugin-dir', plugin, ...process.argv.slice(3)], plugin);
+      let plugin = null;
+      try {
+        plugin = buildPlugin(install.version, loaded);
+      } catch (error) {
+        if (pluginDir) removePlugin(pluginDir);
+        fail('launch-failed', error.message);
+      }
+      if (plugin) startHarness(file, ['--add-dir', home, '--plugin-dir', plugin, ...process.argv.slice(3)], plugin);
     }
   }
 } else {
