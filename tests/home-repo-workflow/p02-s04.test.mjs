@@ -110,6 +110,8 @@ test('[R37-02] git status is identical before and after with an untracked and a 
 test('[R37-03] an untracked my-own skill stays listed after two runs', () => {
   const f = fixture();
   try {
+    f.repo.write('.claude/skills/keep/SKILL.md', '# keep\n');
+    f.repo.commit('add unrelated tracked skill');
     put(f.home, '.claude/skills/my-own/SKILL.md', '# mine\n');
     ok(update(f.src, f.home));
     const first = status(f.home);
