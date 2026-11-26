@@ -2,7 +2,7 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: P06 S02
+- Next: P06 S03
 - Tests locked: `39a80fb`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `16d8d09`
@@ -40,7 +40,7 @@
 | # | Slice | Status |
 |---|-------|--------|
 | S01 | Update Script tests expect the two agent forms | completed |
-| S02 | Update Script installs the Copilot form and the Claude form | ready |
+| S02 | Update Script installs the Copilot form and the Claude form | completed |
 | S03 | Update Script names skipped Claude entries | ready |
 | S04 | Update Script applies and names the shipped default | ready |
 | S05 | Update Script rejects an unparsable agent file | ready |

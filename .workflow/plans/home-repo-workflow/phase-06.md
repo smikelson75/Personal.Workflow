@@ -88,8 +88,8 @@
   - R48-09: Given the same source run twice against the same Home Repo, when the second run finishes, then it prints the same notice lines again and exits 0
   - R48-10: Given entries `GPT-6 Luna (copilot)`, `Claudette 1`, `Claude Haiku 5.5 (copilot)`, when it runs, then no `Agent pin:` line prints and the Claude form has `model: haiku`
 - **Acceptance tests:** `tests/home-repo-workflow/p06-s03.test.mjs`
-- **Files:** edit `scripts/agent-pins.mjs`; edit `scripts/update-home.mjs`
-- **Patterns:** `scripts/agent-pins.mjs:1 - renderClaudeForm and its notices array; scripts/update-home.mjs:241 - the success output lines`
+- **Files:** edit `scripts/update-home.mjs`
+- **Patterns:** `scripts/update-home.mjs:78 - renderClaudeForm and its notices array; scripts/update-home.mjs:334 - the success output lines`
 - **Decisions:**
   - A Claude entry (`/^claude\b/i`) whose next word is not a known family, or that has no next word, adds the notice string `Agent pin: <agent>: skipped "<entry>" (not a Claude Code model family)` with `<entry>` the entry text after quotes are removed.
   - `renderClaudeForm` returns notices in list order; `update-home.mjs` collects them per agent and prints them after the `Files:` line, agents sorted by name (plain code-unit order).
@@ -114,8 +114,8 @@
   - R50-06: Given a valid Claude entry and no `reasoning-effort`, when it runs, then output includes `Agent default: <agent>: effort medium (no reasoning-effort)` and the model line is not printed
   - R50-07: Given a source with a defaulted agent run twice, when the second run finishes, then it prints the same `Agent default:` lines and exits 0
 - **Acceptance tests:** `tests/home-repo-workflow/p06-s04.test.mjs`
-- **Files:** edit `scripts/agent-pins.mjs`; edit `scripts/update-home.mjs`
-- **Patterns:** `scripts/agent-pins.mjs:1 - renderClaudeForm notices; scripts/update-home.mjs:241 - notice printing`
+- **Files:** edit `scripts/update-home.mjs`
+- **Patterns:** `scripts/update-home.mjs:78 - renderClaudeForm notices; scripts/update-home.mjs:334 - notice printing`
 - **Decisions:**
   - Default model alias `sonnet`, default effort `medium`; each half applies alone.
   - Model notice text is `Agent default: <agent>: model sonnet (no Claude model in list)` whenever no Claude entry resolved (no `model`, no Claude entry, or only skipped entries).
@@ -139,10 +139,10 @@
   - R48-14: Given an earlier successful install and a source agent edited to be unparsable, when it runs again, then it fails as `invalid-agent`, every installed file and the manifest are byte-identical to before
   - R48-15: Given an unparsable agent and a committed file at an installed-file path in the Home Repo, when it runs, then the failure is `invalid-agent`, not `tracked-workflow-files`
 - **Acceptance tests:** `tests/home-repo-workflow/p06-s05.test.mjs`
-- **Files:** edit `scripts/agent-pins.mjs`; edit `scripts/update-home.mjs`
-- **Patterns:** `scripts/update-home.mjs:130 - checkHome ordered checks returning { category, detail }`
+- **Files:** edit `scripts/update-home.mjs`
+- **Patterns:** `scripts/update-home.mjs:226 - checkHome ordered checks returning { category, detail }`
 - **Decisions:**
-  - `agent-pins.mjs` exports `validateAgent(text)` returning `null` or a reason string. Invalid when: the first line is not `---`; no later line is `---`; a frontmatter line is not blank, not a comment (`^\s*#`), not a top-level key (`^[A-Za-z][A-Za-z0-9_-]*:(\s.*)?$`), not an indented line (`^\s+\S`), and not a list item (`^-\s`); or a line's inline value starts with `[` and has no `]`, or starts with `"` or `'` and has no matching closing quote.
+  - `scripts/update-home.mjs` defines `validateAgent(text)` (not exported; the P02 tests copy only that file) returning `null` or a reason string. Invalid when: the first line is not `---`; no later line is `---`; a frontmatter line is not blank, not a comment (`^\s*#`), not a top-level key (`^[A-Za-z][A-Za-z0-9_-]*:(\s.*)?$`), not an indented line (`^\s+\S`), and not a list item (`^-\s`); or a line's inline value starts with `[` and has no `]`, or starts with `"` or `'` and has no matching closing quote.
   - `checkHome` runs the check after `incomplete-source` and before `tracked-workflow-files`; it validates every `.github/agents/*.agent.md` in path order and returns `{ category: 'invalid-agent', detail: '.github/agents/<n>.agent.md' }` for the first failure.
   - `renderClaudeForm` no longer needs its unchanged-return path for invalid files; keep it for safety.
 - **Do not:** edit `tests/**`; write any file before the check passes; add dependencies.
