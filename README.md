@@ -38,17 +38,19 @@ From your target repository root (PowerShell):
 ```powershell
 $workflowSrc = "C:\Projects\Personal.Workflow"
 
-New-Item -ItemType Directory -Path .github\tools, .github\skills, .claude -Force | Out-Null
+New-Item -ItemType Directory -Path .github\tools, .github\skills, .claude\skills, .claude\agents -Force | Out-Null
 
 Copy-Item -Recurse "$workflowSrc\.github\agents"               ".github\agents"
 Copy-Item -Recurse "$workflowSrc\.github\hooks"                ".github\hooks"
 Copy-Item -Recurse "$workflowSrc\.github\skills\*"             ".github\skills"
 Copy-Item -Recurse "$workflowSrc\.github\tools\workflow-check" ".github\tools\workflow-check"
 Copy-Item          "$workflowSrc\.github\user-interaction.md"  ".github\user-interaction.md"
+Copy-Item -Recurse "$workflowSrc\.github\skills\*"             ".claude\skills"
+Copy-Item          "$workflowSrc\.github\agents\*.agent.md"    ".claude\agents"
 Copy-Item          "$workflowSrc\.claude\settings.json"        ".claude\settings.json"
 ```
 
-If the repository already has .claude\settings.json, merge the hooks.PreToolUse entry into it instead of overwriting.
+Claude Code reads skills and agents only from `.claude\`, Copilot CLI prefers `.github\agents` over `.claude\agents`, and the skills keep their `.github\` copy because their helper commands name `.github\` paths. If the repository already has .claude\settings.json, merge the hooks.PreToolUse entry into it instead of overwriting.
 
 Copilot CLI runs the locked-tests guard only in a trusted folder; trust the repository when asked. The Gate still verifies locked tests.
 
