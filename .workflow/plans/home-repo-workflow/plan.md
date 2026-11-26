@@ -2,7 +2,7 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: P02 S02
+- Next: P02 S03
 - Tests locked: `d6846dd`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `d6846dd`
@@ -36,7 +36,7 @@
 | # | Slice | Status |
 |---|-------|--------|
 | S01 | Update installs and mirrors Workflow Core with a content version | completed |
-| S02 | Update rejects unsafe or invalid targets before writing | ready |
+| S02 | Update rejects unsafe or invalid targets before writing | completed |
 | S03 | A failed write leaves an incomplete marker | ready |
 | S04 | Installed files stay out of git status | ready |
 | S05 | Version identity and offline operation hold on this repository | ready |

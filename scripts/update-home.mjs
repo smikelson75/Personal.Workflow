@@ -1,11 +1,15 @@
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const sourceRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SKIPPED_DIRS = new Set(['tests', 'node_modules', '.git']);
+const USAGE = 'usage: node scripts/update-home.mjs <home-repo-path>';
+const REQUIRED_SOURCE = ['.github/skills', '.github/agents', '.github/hooks', '.github/tools', 'language-addons'];
+const PROJECT_STACK_LINE = /^\s*(?:[-*]\s+)?Stack:/m;
+const CASE_INSENSITIVE = process.platform === 'win32';
 
 function walk(rel) {
   const found = [];
@@ -70,10 +74,77 @@ function removeEmptyParents(home, file) {
   }
 }
 
-function main() {
-  const home = resolve(process.argv[2]);
+function manifestPathFor(home) {
   const gitPath = execFileSync('git', ['-C', home, 'rev-parse', '--git-path', 'personal-workflow'], { encoding: 'utf8' }).trim();
-  const manifestPath = join(resolve(home, gitPath), 'manifest.json');
+  return join(resolve(home, gitPath), 'manifest.json');
+}
+
+function normalizeCase(path) {
+  return CASE_INSENSITIVE ? path.toLowerCase() : path;
+}
+
+// True when child is the same folder as parent or lies inside it. Both must be real paths.
+function isSameOrInside(child, parent) {
+  const rel = relative(normalizeCase(parent), normalizeCase(child));
+  if (rel === '') return true;
+  return rel.split(/[\\/]/)[0] !== '..' && !isAbsolute(rel);
+}
+
+// Validation step: returns null when the Home Repo target is safe, else { category, detail }.
+// Runs before any write. Order matters: the first failing check wins.
+function checkHome(arg) {
+  if (!arg) return { category: 'missing-home-path', detail: 'no home repo path given' };
+
+  const home = resolve(arg);
+  if (!existsSync(home) || !statSync(home).isDirectory()) return { category: 'home-not-found', detail: arg };
+  const homeReal = realpathSync.native(home);
+
+  if (isSameOrInside(homeReal, realpathSync.native(sourceRoot))) return { category: 'home-is-source', detail: homeReal };
+
+  let top = null;
+  try {
+    top = execFileSync('git', ['-C', homeReal, 'rev-parse', '--show-toplevel'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    top = null;
+  }
+  if (!top || normalizeCase(realpathSync.native(top)) !== normalizeCase(homeReal)) {
+    return { category: 'home-not-git', detail: homeReal };
+  }
+
+  const agentsPath = join(homeReal, 'AGENTS.md');
+  if (existsSync(agentsPath) && PROJECT_STACK_LINE.test(readFileSync(agentsPath, 'utf8'))) {
+    return { category: 'home-is-project', detail: agentsPath };
+  }
+
+  for (const rel of REQUIRED_SOURCE) {
+    if (!existsSync(join(sourceRoot, rel))) return { category: 'incomplete-source', detail: rel };
+  }
+
+  const planned = new Set(planInstall().keys());
+  for (const rel of readManifest(manifestPathFor(homeReal))?.files ?? []) planned.add(rel);
+  const tracked = execFileSync('git', ['-C', homeReal, 'ls-files', '-z'], { encoding: 'utf8' })
+    .split('\0')
+    .filter((rel) => planned.has(rel))
+    .sort();
+  if (tracked.length > 0) return { category: 'tracked-workflow-files', detail: tracked.join(', ') };
+
+  return null;
+}
+
+function main() {
+  const failure = checkHome(process.argv[2]);
+  if (failure) {
+    console.log(`update failed: ${failure.category}: ${failure.detail}`);
+    if (failure.category === 'missing-home-path') console.log(USAGE);
+    process.exitCode = 1;
+    return;
+  }
+
+  const home = resolve(process.argv[2]);
+  const manifestPath = manifestPathFor(home);
   const previous = readManifest(manifestPath);
   const previousFiles = new Set(previous?.files ?? []);
 
