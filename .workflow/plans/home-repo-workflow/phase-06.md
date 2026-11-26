@@ -60,10 +60,10 @@
   - R51-02: Given the same installed `coder` and a source edit that moves `Gemini 4 Neon (copilot)` to the top of the list, when it runs again, then the Claude form is byte-identical to before, the Copilot form equals the edited source, and the output line is `Files: 0 installed, 1 replaced, 0 removed`
   - R51-03: Given the same installed `coder` and a source edit from `Claude Haiku 5.5 (copilot)` to `Claude Haiku 6 (copilot)`, when it runs again, then the Claude form still has `model: haiku` and is byte-identical to before
 - **Acceptance tests:** `tests/home-repo-workflow/p06-s02.test.mjs`
-- **Files:** create `scripts/agent-pins.mjs`; edit `scripts/update-home.mjs`
+- **Files:** edit `scripts/update-home.mjs`
 - **Patterns:** `scripts/update-home.mjs:30 - install map and walk helpers; scripts/update-home.mjs:200 - the write loop and the replaced/installed counting`
 - **Decisions:**
-  - `scripts/agent-pins.mjs` exports `renderClaudeForm(text)` returning `{ text, notices: [] }`; it never throws in this card. A source without an opening `---` line or a closing `---` line is returned unchanged with no notices.
+  - `renderClaudeForm(text)` lives inside `scripts/update-home.mjs` (the P02 tests copy only that file into temp sources) and is not exported; it returning `{ text, notices: [] }`; it never throws in this card. A source without an opening `---` line or a closing `---` line is returned unchanged with no notices.
   - Parse: the frontmatter is the lines between the first line `---` and the next line `---`. Line ending of the output is the first line's ending (`\r\n` or `\n`). `model` is the top-level `model:` key. An inline value starting `[` is a flow list split on `,`; another inline value is a one-entry list; an empty inline value takes the following lines of the form `^\s*-\s+(.+)$` until the next top-level key, and comment and blank lines are skipped. Quotes around an entry are removed. `reasoning-effort` is the trimmed inline value with quotes removed.
   - A Claude entry matches `/^claude\b/i`; its family is the lowercase next word; known families are `opus`, `sonnet`, `haiku`, `fable`. The first Claude entry with a known family sets `model`.
   - Effort: lowercase the value; `low`, `medium`, `high`, `xhigh`, `max` as written; `none` and `minimal` become `low`.
@@ -190,3 +190,18 @@
 - **Do not:** edit other files; edit `tests/**`.
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/home-repo-workflow/*.test.mjs"` exits 0; targets R48-17, R49-02, R49-03, R50-08; 4 target tests run
 - **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.
+
+## S08 - Agent install test expects the Claude form, not a copy
+
+- **Kind:** test-fix
+- **Scope:** assertion
+- **Goal:** the P04 install test expects what R48 and R49 now require: the Copilot form equals the source and the Claude form keeps the body with a Claude model alias.
+- **Depends on:** none
+- **Tier:** main - judgment about which expectation changes
+- **Review:** none - writes tests only
+- **Restores:** R43-03; finding: install behavior changed by R48-R49
+- **Acceptance tests:** `tests/home-repo-workflow/p04-s04.test.mjs`
+- **Files:** none
+- **Decisions:** in R43-03, per agent: Home `.github/agents/<n>.agent.md` equals the source; Home `.claude/agents/<n>.agent.md` has the same body after the frontmatter and a `model: opus|sonnet|haiku|fable` line; the six-file list check stays.
+- **Do not:** weaken any other R43 assertion.
+- **Stop and report if:** another P04 expectation must change.

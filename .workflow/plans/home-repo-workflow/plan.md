@@ -2,7 +2,7 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: P06 S02
+- Next: phase review P06
 - Tests locked: `16d8d09`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `16d8d09`
@@ -46,4 +46,5 @@
 | S05 | Update Script rejects an unparsable agent file | ready |
 | S06 | README explains agent pins and the effort limitation | ready |
 | S07 | Pins stay in one place and Core skills never override them | ready |
+| S08 | Agent install test expects the Claude form, not a copy | planned |
 

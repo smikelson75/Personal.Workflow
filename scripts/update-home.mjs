@@ -11,6 +11,86 @@ const REQUIRED_SOURCE = ['.github/skills', '.github/agents', '.github/hooks', '.
 const PROJECT_STACK_LINE = /^\s*(?:[-*]\s+)?Stack:/m;
 const CASE_INSENSITIVE = process.platform === 'win32';
 
+// Claude Code form of an agent file: the source keeps a `model` list of Copilot display names and `reasoning-effort`;
+// the Claude form replaces both with `model: <alias>` and `effort: <level>`.
+const KNOWN_FAMILIES = new Set(['opus', 'sonnet', 'haiku', 'fable']);
+const EFFORTS = new Set(['low', 'medium', 'high', 'xhigh', 'max']);
+const TOP_LEVEL_KEY = /^([A-Za-z][A-Za-z0-9_-]*):(?:\s(.*))?$/;
+
+function unquote(value) {
+  const text = value.trim();
+  const quote = text[0];
+  if ((quote === '"' || quote === "'") && text.length >= 2 && text.endsWith(quote)) return text.slice(1, -1);
+  return text;
+}
+
+// Splits a source into its frontmatter lines and the text from the closing `---` line on.
+function splitFrontmatter(text) {
+  const eol = text.startsWith('---\r\n') ? '\r\n' : '\n';
+  const lines = text.split(/(?<=\n)/);
+  if (lines.length === 0 || lines[0].replace(/\r?\n$/, '') !== '---') return null;
+  const close = lines.findIndex((line, i) => i > 0 && line.replace(/\r?\n$/, '') === '---');
+  if (close < 0) return null;
+  return {
+    eol,
+    front: lines.slice(1, close).map((line) => line.replace(/\r?\n$/, '')),
+    rest: lines.slice(close).join(''),
+  };
+}
+
+function readModelEntries(front) {
+  const start = front.findIndex((line) => /^model:/.test(line));
+  if (start < 0) return { entries: [], start: -1, end: -1 };
+  let end = start + 1;
+  while (end < front.length && !TOP_LEVEL_KEY.test(front[end])) end += 1;
+  const inline = front[start].slice('model:'.length).trim();
+  let entries = [];
+  if (inline.startsWith('[')) {
+    entries = inline.replace(/^\[|\]\s*$/g, '').split(',').map(unquote).filter(Boolean);
+  } else if (inline !== '') {
+    entries = [unquote(inline)];
+  } else {
+    for (const line of front.slice(start + 1, end)) {
+      const item = /^\s*-\s+(.+)$/.exec(line);
+      if (item) entries.push(unquote(item[1]));
+    }
+  }
+  return { entries, start, end };
+}
+
+function pickAlias(entries) {
+  for (const entry of entries) {
+    if (!/^claude\b/i.test(entry)) continue;
+    const family = (/^claude\s+(\S+)/i.exec(entry)?.[1] ?? '').toLowerCase();
+    if (KNOWN_FAMILIES.has(family)) return family;
+  }
+  return null;
+}
+
+function pickEffort(front) {
+  const line = front.find((l) => /^reasoning-effort:/.test(l));
+  if (line === undefined) return null;
+  const value = unquote(line.slice('reasoning-effort:'.length)).toLowerCase();
+  if (value === 'none' || value === 'minimal') return 'low';
+  return EFFORTS.has(value) ? value : null;
+}
+
+function renderClaudeForm(text) {
+  const parts = splitFrontmatter(text);
+  if (!parts) return { text, notices: [] };
+
+  const { entries, start, end } = readModelEntries(parts.front);
+  const alias = pickAlias(entries);
+  const effort = pickEffort(parts.front);
+
+  const kept = parts.front.filter((line, i) => !(i >= start && i < end && start >= 0) && !/^reasoning-effort:/.test(line));
+  if (alias) kept.push(`model: ${alias}`);
+  if (effort) kept.push(`effort: ${effort}`);
+
+  const body = ['---', ...kept].map((line) => line + parts.eol).join('') + parts.rest;
+  return { text: body, notices: [] };
+}
+
 function walk(rel) {
   const found = [];
   const dir = join(sourceRoot, rel);
@@ -36,7 +116,10 @@ function planInstall() {
   mapTree('.github/skills', '.claude/skills');
   for (const rel of walk('.github/agents')) {
     const name = rel.slice('.github/agents/'.length);
-    if (!name.includes('/') && name.endsWith('.agent.md')) plan.set(`.claude/agents/${name}`, rel);
+    if (!name.includes('/') && name.endsWith('.agent.md')) {
+      plan.set(`.claude/agents/${name}`, rel);
+      plan.set(`.github/agents/${name}`, rel);
+    }
   }
   mapTree('.github/hooks', '.workflow-core/hooks');
   mapTree('.github/tools', '.workflow-core/tools');
@@ -49,10 +132,20 @@ function planInstall() {
   return new Map([...plan].map(([homePath, rel]) => [homePath.replace(/^\//, ''), rel]).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
 }
 
+// Bytes installed at homePath. Claude Code reads `.claude/agents/`, so those files get the Claude form;
+// every other path is the source file as it is.
+function contentFor(homePath, sourcePath) {
+  const raw = readFileSync(join(sourceRoot, sourcePath));
+  if (homePath.startsWith('.claude/agents/') && sourcePath.startsWith('.github/agents/')) {
+    return Buffer.from(renderClaudeForm(raw.toString('utf8')).text, 'utf8');
+  }
+  return raw;
+}
+
 function fingerprint(plan) {
   const hash = createHash('sha256');
   for (const [homePath, sourcePath] of plan) {
-    const content = readFileSync(join(sourceRoot, sourcePath)).toString('utf8').replace(/\r\n/g, '\n');
+    const content = contentFor(homePath, sourcePath).toString('utf8').replace(/\r\n/g, '\n');
     hash.update(Buffer.concat([Buffer.from(homePath, 'utf8'), Buffer.from([0]), Buffer.from(content, 'utf8'), Buffer.from([0])]));
   }
   return hash.digest('hex').slice(0, 7);
@@ -207,7 +300,7 @@ function main() {
     for (const [homePath, sourcePath] of plan) {
       current = homePath;
       const target = join(home, homePath);
-      const content = readFileSync(join(sourceRoot, sourcePath));
+      const content = contentFor(homePath, sourcePath);
       if (!previousFiles.has(homePath)) {
         installed += 1;
       } else if (!existsSync(target) || !readFileSync(target).equals(content)) {
