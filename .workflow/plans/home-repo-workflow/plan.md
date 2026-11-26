@@ -2,7 +2,7 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: gate P02
+- Next: review P02
 - Tests locked: `fd4ab6e`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `d6846dd`
