@@ -2,10 +2,10 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: phase review P01
-- Tests locked: none (first Phase Review pending)
+- Next: P01 S01
+- Tests locked: `67787b5`
 - Oracle: `tests/home-repo-workflow`
-- Phase base: none (first Phase Review pending)
+- Phase base: `67787b5`
 - Reconciled: `96cf5699d5c914ca684a96621759c3aaf1eed4bb`
 
 ## Current state
@@ -25,7 +25,7 @@
 
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
-| P01 | Guard both Harnesses in the copy layout | planned | R35, Q-ordering | [phase-01](phase-01.md) |
+| P01 | Guard both Harnesses in the copy layout | in progress | R35, Q-ordering | [phase-01](phase-01.md) |
 | P02 | Update Script fills a Home Repo offline | planned | R36, R37, Q-version-identity, Q-offline (update) | |
 | P03 | Launch Script with stack add-ons and Home-layout guard | planned | R38, R39, R40, R41, Q-offline (launch), Q-seamless-relay | |
 | P04 | Workflow Core parity across layouts and Harnesses | planned | R42, R43 | |
@@ -35,8 +35,8 @@
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Guard finds the edited file's repository and denies in both Harness formats | planned |
-| S02 | Register the guard for Claude Code in the copy layout | planned |
+| S01 | Guard finds the edited file's repository and denies in both Harness formats | ready |
+| S02 | Register the guard for Claude Code in the copy layout | ready |
 
 ## Carry-forward
 - P05: R44's `agents-md` skill (and the existing `onboard-project` skill) must name `AGENTS.md`, contradicting workflow-core R22 ("No file under `.github/` refers to `AGENTS.md`"); route to `behavior-spec` to amend R22 before planning P05. `[R22-03]` is a Known failure owned by P05.
