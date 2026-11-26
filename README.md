@@ -54,6 +54,18 @@ node scripts\update-home.mjs <home>
 
 It prints `Workflow version: <old> -> <new>`. The version is a content fingerprint, so a clone and a zip of the same content print the same version. Rerun it to update.
 
+### Agent models and effort
+
+To change an agent's `model` or `reasoning-effort`, edit `.github/agents/<n>.agent.md` in the `Personal.Workflow` source, then run the Update Script again: `node scripts\update-home.mjs <home>`.
+
+- **Copilot CLI** uses the `model` list as written.
+- **Claude Code** uses the first Claude entry whose family is `Opus`, `Sonnet`, `Haiku`, or `Fable`.
+- The default is `sonnet` at `medium` effort.
+- The update prints `Agent pin:` and `Agent default:` notice lines after `Files:`.
+- The copy layout does not pin Claude Code agents.
+- Claude Code shows the pinned effort in `/tasks` only when the model supports effort. This is a known limitation for models without effort support.
+- Sessions already running keep their pins until the Harness restarts.
+
 ### Launch a Harness
 
 Call the Launch Script by its full path; it needs no profile change, administrator rights, or `PATH` change:
