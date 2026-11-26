@@ -188,8 +188,9 @@ function startHarness(file, args, plugin) {
     ? spawn(process.env.ComSpec ?? 'cmd.exe', ['/d', '/s', '/c', `"${[file, ...args].map(quote).join(' ')}"`], {
         stdio: 'inherit',
         windowsVerbatimArguments: true,
+        env: { ...process.env, WORKFLOW_HOME: home },
       })
-    : spawn(file, args, { stdio: 'inherit' });
+    : spawn(file, args, { stdio: 'inherit', env: { ...process.env, WORKFLOW_HOME: home } });
   const cleanup = () => removePlugin(plugin);
   // The child shares the console and receives Ctrl+C itself; cleanup waits for it to close.
   process.on('SIGINT', () => {});
