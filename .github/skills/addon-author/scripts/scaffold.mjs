@@ -85,7 +85,7 @@ function skillText(id, role, folder, tool, command) {
   const head = [
     '---',
     `name: ${folder}`,
-    `description: "${capitalize(role.label)} for ${id} using ${tool}."`,
+    `description: "${capitalize(role.label)} for ${id} using ${tool.replace(/[\\"]/g, '\\$&')}."`,
     `argument-hint: "Say 'run' to apply it"`,
     'user-invocable: true',
     '---',

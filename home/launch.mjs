@@ -52,7 +52,7 @@ function resolveCommand(name) {
   return null;
 }
 
-const STACK_LINE = /^\s*(?:-\s+)?stack:(.*)$/i;
+const STACK_LINE = /^\s*(?:[-*]\s+)?stack:(.*)$/i;
 const NOTE =
   'note: Copilot CLI skips the locked-tests guard in untrusted folders; trust this folder when asked. The Gate still verifies locked tests.';
 

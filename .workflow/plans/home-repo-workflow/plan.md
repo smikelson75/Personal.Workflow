@@ -2,7 +2,7 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: gate P05
+- Next: done
 - Tests locked: `de0f84e`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `de0f84e`
@@ -14,7 +14,8 @@
 - suite baseline: green (313 tests, 0 fail)
 - mutation: unsupported for node - no mutation Language Add-on installed
 - in place: locked-tests guard `.github/hooks/scripts/guard-locked-tests.mjs` finds the repository from the edited file (on-disk spelling) and denies with top-level and `hookSpecificOutput` fields; registered for Copilot CLI (`.github/hooks/locked-tests.json`) and Claude Code (`.claude/settings.json`, command `node .github/hooks/scripts/guard-locked-tests.mjs`, no matcher); `README.md` copy steps install both and note the trusted-folder rule; live-probed in both Harnesses (copy layout); Update Script `scripts/update-home.mjs` (install map, `manifest.json` under `git rev-parse --git-path personal-workflow`, `.git/info/exclude` managed block, no network); Launch Script `home/launch.mjs` + `home/launch.cmd` (session plugin `workflow-stack` with add-on skills and the guard hook, passed via `--add-dir`/`--plugin-dir`); Home layout parity (P04): the Launch Script sets `WORKFLOW_HOME`; seven skills and `planner` carry a `Core paths:` line mapping `.github/...` to the Home install (ADR 0002); all six agents (`coder`, `planner`, `repo-scout`, `test-author`, `test-reviewer`, `code-review`) list Copilot and Claude Code tool names and install to `.claude/agents/`; README copy block also fills `.claude\skills` and `.claude\agents` (Claude Code sees only `.claude/`); live-probed in Home layout: Claude Code dispatches `repo-scout` and `code-review` by name
-- gap to spec: R44, R45, R46, R47, Q-offline partial
+- not live-probed: /agents-md and /addon-author running in a Harness; the README's direct Claude Code command (--add-dir, --settings; both flags confirmed present in claude --help)
+- gap to spec: none
 - live-probed in both Harnesses (`-p` mode, Claude Code and Copilot CLI 1.0.116): `--add-dir <home>` lists the Home Repo's `.claude/skills` unprefixed; `--plugin-dir <dir>` (Claude plugin layout) lists plugin skills; Claude Code runs plugin `hooks/hooks.json` hooks; Copilot CLI runs plugin `hooks/hooks.json` hooks only in a trusted folder (`--trust-folder`; the guard denied a locked-test edit, and an untrusted folder skipped it); `WORKFLOW_HOME` is visible in the shell tool of both; Copilot CLI finds the Home Repo's `.claude/agents` under `--add-dir`; `/pull-work` completed a Card end to end in the Home layout (Launch Script, `delegate` Card, Gate, completion)
 
 ## Decisions pinned by the plan
@@ -30,15 +31,5 @@
 | P02 | Update Script fills a Home Repo offline | completed | R36, R37, Q-version-identity, Q-offline (update) | [phase-02](phase-02.md) |
 | P03 | Launch Script with stack add-ons and Home-layout guard | completed | R38, R39, R40, R41, Q-offline (launch), Q-seamless-relay | [phase-03](phase-03.md) |
 | P04 | Workflow Core parity across layouts and Harnesses | completed | R42, R43 | [phase-04](phase-04.md) |
-| P05 | Authoring skills, Coordination Playbook, README | in progress | R44, R45, R46, R47, Q-offline partial | [phase-05](phase-05.md) |
+| P05 | Authoring skills, Coordination Playbook, README | completed | R44, R45, R46, R47, Q-offline | [phase-05](phase-05.md) |
 
-## P05 slices
-
-| # | Slice | Status |
-|---|-------|--------|
-| S01 | stack-check helper proposes stacks and refuses the Home Repo | completed |
-| S02 | agents-md skill | completed |
-| S03 | scaffold helper writes a Language Add-on | completed |
-| S04 | addon-author skill | completed |
-| S05 | Coordination Playbook | completed |
-| S06 | README documents both layouts | completed |
