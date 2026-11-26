@@ -85,7 +85,7 @@ test('[R43-02] code-review is read-only and its body states the finding classes 
   assert.match(body, /`none`/);
 });
 
-test('[R43-03] the Update Script installs exactly the six agent files, equal to their sources', () => {
+test('[R43-03] the Update Script installs six agent files per form: Copilot equals source, Claude keeps the body with a Claude model alias', () => {
   const repo = tempRepo();
   try {
     const home = realpathSync.native(repo.dir);
@@ -98,9 +98,15 @@ test('[R43-03] the Update Script installs exactly the six agent files, equal to 
     assert.ok(existsSync(dir), '.claude/agents missing');
     const expected = AGENTS.map((n) => `${n}.agent.md`).sort();
     assert.deepEqual(readdirSync(dir).sort(), expected);
+    const stripFront = (t) => t.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '');
     for (const name of AGENTS) {
-      const installed = readText(join(dir, `${name}.agent.md`));
-      assert.equal(installed, readText(agentPath(name)), `${name} differs from source`);
+      const source = readText(agentPath(name));
+      const copilot = readText(join(home, '.github', 'agents', `${name}.agent.md`));
+      assert.equal(copilot, source, `${name}: Copilot form differs from source`);
+      const claude = readText(join(dir, `${name}.agent.md`));
+      assert.equal(stripFront(claude), stripFront(source), `${name}: Claude body differs from source`);
+      const front = claude.match(/^---\r?\n([\s\S]*?)\r?\n---/)[1];
+      assert.match(front, /^model:\s*(opus|sonnet|haiku|fable)\s*$/m, `${name}: Claude model alias`);
     }
   } finally {
     repo.cleanup();
