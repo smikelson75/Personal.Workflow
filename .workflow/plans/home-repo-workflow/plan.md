@@ -2,7 +2,7 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: P02 S04
+- Next: gate P02
 - Tests locked: `fd4ab6e`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `d6846dd`
@@ -26,7 +26,7 @@
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
 | P01 | Guard both Harnesses in the copy layout | completed | R35, Q-ordering | [phase-01](phase-01.md) |
-| P02 | Update Script fills a Home Repo offline | in progress | R36, R37, Q-version-identity, Q-offline (update) | [phase-02](phase-02.md) |
+| P02 | Update Script fills a Home Repo offline | gating | R36, R37, Q-version-identity, Q-offline (update) | [phase-02](phase-02.md) |
 | P03 | Launch Script with stack add-ons and Home-layout guard | planned | R38, R39, R40, R41, Q-offline (launch), Q-seamless-relay | |
 | P04 | Workflow Core parity across layouts and Harnesses | planned | R42, R43 | |
 | P05 | Authoring skills, Coordination Playbook, README | planned | R44, R45, R46, R47 | |
@@ -38,8 +38,8 @@
 | S01 | Update installs and mirrors Workflow Core with a content version | completed |
 | S02 | Update rejects unsafe or invalid targets before writing | completed |
 | S03 | A failed write leaves an incomplete marker | completed |
-| S04 | Installed files stay out of git status | ready |
-| S05 | Version identity and offline operation hold on this repository | ready |
+| S04 | Installed files stay out of git status | completed |
+| S05 | Version identity and offline operation hold on this repository | completed |
 | S06 | R37-03 fixture keeps a tracked file under .claude/skills | completed |
 
 ## Carry-forward
