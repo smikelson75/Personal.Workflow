@@ -2,7 +2,7 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: P01 S03
+- Next: gate P01
 - Tests locked: `725b02c`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `67787b5`
@@ -38,7 +38,7 @@
 |---|-------|--------|
 | S01 | Guard finds the edited file's repository and denies in both Harness formats | completed |
 | S02 | Register the guard for Claude Code in the copy layout | completed |
-| S03 | Guard matches locked paths regardless of path case | ready |
+| S03 | Guard matches locked paths regardless of path case | completed |
 
 ## Carry-forward
 - P05: R44's `agents-md` skill (and the existing `onboard-project` skill) must name `AGENTS.md`, contradicting workflow-core R22 ("No file under `.github/` refers to `AGENTS.md`"); route to `behavior-spec` to amend R22 before planning P05. `[R22-03]` is a Known failure owned by P05.

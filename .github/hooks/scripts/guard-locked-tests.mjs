@@ -3,7 +3,7 @@
 // Any internal error allows the call: command preToolUse hooks fail closed,
 // and a broken guard must not block every edit.
 import { execFileSync } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 
 const PHASE_REVIEW = /^phase review\b/;
@@ -86,6 +86,22 @@ function repoRootOf(abs) {
   }
 }
 
+// abs with its existing part spelled as on disk; segments below the nearest
+// existing ancestor keep the spelling they were given.
+function onDiskSpelling(abs) {
+  let existing = abs;
+  while (!existsSync(existing)) {
+    const parent = dirname(existing);
+    if (parent === existing) return abs;
+    existing = parent;
+  }
+  try {
+    return join(realpathSync.native(existing), relative(existing, abs));
+  } catch {
+    return abs;
+  }
+}
+
 function readLocks(root) {
   const plansDir = join(root, '.workflow', 'plans');
   if (!existsSync(plansDir)) return [];
@@ -139,7 +155,7 @@ try {
 
   const cwd = event.cwd ?? process.cwd();
   for (const p of targetPaths(toolArgs)) {
-    const abs = isAbsolute(p) ? p : resolve(cwd, p);
+    const abs = onDiskSpelling(isAbsolute(p) ? p : resolve(cwd, p));
     const root = repoRootOf(abs);
     if (!root) continue;
     const rel = relative(root, abs).split(sep).join('/');
