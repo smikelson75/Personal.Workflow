@@ -2,7 +2,7 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: gate P03
+- Next: review P03
 - Tests locked: `bd4bfc7`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `a088cd8`
@@ -42,6 +42,8 @@
 | S04 | Session plugin: add-on skills and the locked-tests guard in the Home layout | completed |
 | S05 | Offline and seamless relay across the whole launcher | completed |
 | S06 | Repair S04 fixture: add-on SKILL.md content | completed |
+
+Review pending: S01, S02, S03, S04
 
 ## Carry-forward
 - P05: R44's `agents-md` skill (and the existing `onboard-project` skill) must name `AGENTS.md`, contradicting workflow-core R22 ("No file under `.github/` refers to `AGENTS.md`"); route to `behavior-spec` to amend R22 before planning P05. `[R22-03]` is a Known failure owned by P05.
