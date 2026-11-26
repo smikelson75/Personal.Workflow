@@ -8,6 +8,7 @@ user-invocable: true
 # Incubate
 
 Question rules: follow `.github/user-interaction.md` with the incubation rules below.
+Core paths: when the environment variable WORKFLOW_HOME is set (Home layout), read each Workflow Core path written here as follows: .github/skills/ is $WORKFLOW_HOME/.claude/skills/, .github/agents/ is $WORKFLOW_HOME/.claude/agents/, .github/tools/ is $WORKFLOW_HOME/.workflow-core/tools/, .github/hooks/ is $WORKFLOW_HOME/.workflow-core/hooks/, .github/user-interaction.md is $WORKFLOW_HOME/.workflow-core/user-interaction.md; run every command from the Project Repo root and never from $WORKFLOW_HOME. Without WORKFLOW_HOME (copy layout) read the paths as written.
 
 Work through the meaning, implications, and tradeoffs of an early idea through back-and-forth conversation, visual models, and targeted web research. Unlike `brain-storm`, the goal is understanding—not requirements. Many incubations stay paused or get dropped; only graduate an idea when the user decides it is worth building.
 

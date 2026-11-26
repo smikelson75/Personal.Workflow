@@ -8,6 +8,7 @@ user-invocable: true
 # Pull Work
 
 Question rules: follow `.github/user-interaction.md`.
+Core paths: when the environment variable WORKFLOW_HOME is set (Home layout), read each Workflow Core path written here as follows: .github/skills/ is $WORKFLOW_HOME/.claude/skills/, .github/agents/ is $WORKFLOW_HOME/.claude/agents/, .github/tools/ is $WORKFLOW_HOME/.workflow-core/tools/, .github/hooks/ is $WORKFLOW_HOME/.workflow-core/hooks/, .github/user-interaction.md is $WORKFLOW_HOME/.workflow-core/user-interaction.md; run every command from the Project Repo root and never from $WORKFLOW_HOME. Without WORKFLOW_HOME (copy layout) read the paths as written.
 
 The single entry point for moving a plan forward. Each run checks the working tree, reads `plan.md`'s `Next` line, and runs steps back to back until it reaches a point in Escalate Only, or the active phase completes. Never wait for "go ahead" between steps; the `Next` line is the instruction.
 

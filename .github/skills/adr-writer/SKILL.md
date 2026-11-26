@@ -8,6 +8,7 @@ user-invocable: true
 # ADR Writer
 
 Question rules: follow `.github/user-interaction.md`.
+Core paths: when the environment variable WORKFLOW_HOME is set (Home layout), read each Workflow Core path written here as follows: .github/skills/ is $WORKFLOW_HOME/.claude/skills/, .github/agents/ is $WORKFLOW_HOME/.claude/agents/, .github/tools/ is $WORKFLOW_HOME/.workflow-core/tools/, .github/hooks/ is $WORKFLOW_HOME/.workflow-core/hooks/, .github/user-interaction.md is $WORKFLOW_HOME/.workflow-core/user-interaction.md; run every command from the Project Repo root and never from $WORKFLOW_HOME. Without WORKFLOW_HOME (copy layout) read the paths as written.
 
 Record why a hard-to-reverse build decision was made, so a later planning run or a future reader does not undo it unknowingly. An ADR (Architecture Decision Record) is a point-in-time record, not a living document.
 
