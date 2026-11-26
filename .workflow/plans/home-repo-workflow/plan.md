@@ -2,10 +2,10 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: phase review P02
-- Tests locked: `725b02c`
+- Next: P02 S01
+- Tests locked: `d6846dd`
 - Oracle: `tests/home-repo-workflow`
-- Phase base: `67787b5`
+- Phase base: `d6846dd`
 - Reconciled: `96cf5699d5c914ca684a96621759c3aaf1eed4bb`
 
 ## Current state
@@ -26,10 +26,20 @@
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
 | P01 | Guard both Harnesses in the copy layout | completed | R35, Q-ordering | [phase-01](phase-01.md) |
-| P02 | Update Script fills a Home Repo offline | planned | R36, R37, Q-version-identity, Q-offline (update) | [phase-02](phase-02.md) |
+| P02 | Update Script fills a Home Repo offline | in progress | R36, R37, Q-version-identity, Q-offline (update) | [phase-02](phase-02.md) |
 | P03 | Launch Script with stack add-ons and Home-layout guard | planned | R38, R39, R40, R41, Q-offline (launch), Q-seamless-relay | |
 | P04 | Workflow Core parity across layouts and Harnesses | planned | R42, R43 | |
 | P05 | Authoring skills, Coordination Playbook, README | planned | R44, R45, R46, R47 | |
+
+## P02 slices
+
+| # | Slice | Status |
+|---|-------|--------|
+| S01 | Update installs and mirrors Workflow Core with a content version | ready |
+| S02 | Update rejects unsafe or invalid targets before writing | ready |
+| S03 | A failed write leaves an incomplete marker | ready |
+| S04 | Installed files stay out of git status | ready |
+| S05 | Version identity and offline operation hold on this repository | ready |
 
 ## Carry-forward
 - P03: `.claude/settings.json` runs `node .github/hooks/scripts/guard-locked-tests.mjs` relative to the session folder (Claude Code resets Bash to the project root, so the copy layout is safe); in the Home layout the Project Repo has no guard script, so the Home-layout registration must resolve the guard from the Home Repo.
