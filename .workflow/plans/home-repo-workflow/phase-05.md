@@ -37,7 +37,7 @@
   - R44-04: Given a Project Repo with no manifest anywhere, when the script runs, then `stacks` is `[]` and exit is 0 (the skill then asks the Developer)
   - R44-05: Given the cwd is a Home Repo (git path `personal-workflow/manifest.json` exists), when the script runs, then exit is 2, stderr is `the Home Repo's AGENTS.md holds only Project Pointers`, stdout is empty, and no file is created or changed (failure)
   - R44-06: Given `AGENTS.md` containing `- Stack: csharp` and also `.github/copilot-instructions.md`, when the script runs, then `mode` is `amendment`, `stackLine` is `csharp`, `competing` is `true`
-- **Acceptance tests:** (written at Phase Review)
+- **Acceptance tests:** `tests/home-repo-workflow/p05-s01.test.mjs`
 - **Files:** create `.github/skills/agents-md/scripts/stack-check.mjs`
 - **Patterns:** `.github/skills/pull-work/scripts/glossary-check.mjs:1 - header comment, exit codes, stderr message; scripts/update-home.mjs:11 - the Stack line pattern`
 - **Decisions:**
@@ -63,7 +63,7 @@
   - R44-08: Given the same file, when read, then it runs `node .github/skills/agents-md/scripts/stack-check.mjs`, says to write exactly one `Stack:` line (`Stack: <id>[, <id>...]`, kebab-case IDs), proposes IDs from the script's `stacks`, asks the Developer when `stacks` is empty and accepts any kebab-case ID, and changes an existing `Stack:` line only with the Developer's agreement
   - R44-09: Given the same file, when read, then it stops with `the Home Repo's AGENTS.md holds only Project Pointers` when the script exits 2, asks which file is canonical when `competing` is true, writes no file but `AGENTS.md`, and commits only `AGENTS.md` with a Conventional Commit of type `docs` (`git add AGENTS.md`)
   - R42-07: Given the same file, when read, then it has the `Question rules:` line directly followed by exactly one `Core paths:` line identical to the one in `.github/skills/pull-work/SKILL.md`, and every `.github/` path it writes exists
-- **Acceptance tests:** (written at Phase Review)
+- **Acceptance tests:** `tests/home-repo-workflow/p05-s02.test.mjs`
 - **Files:** create `.github/skills/agents-md/SKILL.md`; create `.github/skills/agents-md/references/AGENTS-FORMAT.md`
 - **Patterns:** `.github/skills/adr-writer/SKILL.md:1 - frontmatter, Question rules and Core paths lines, section style`
 - **Decisions:**
@@ -91,7 +91,7 @@
   - R45-07: Given `--id Sql_Schema`, when the script runs, then exit is 2, stdout is `addon-author failed: invalid-id: Sql_Schema is not kebab-case`, and nothing is written (failure)
   - R45-08: Given `--id sql-schema` with no role flag, when the script runs, then exit is 2, stdout is `addon-author failed: no-roles: give at least one of --code-style, --test-harness, --mutation`, and nothing is written (failure)
   - R45-09: Given `--id sql-schema --code-style "sqlfluff|sqlfluff lint ."`, when the script finishes, then `git status --porcelain` in the temp copy lists only `language-addons/README.md` and `language-addons/sql-schema/`, and every README line outside the new `### sql-schema` section is unchanged
-- **Acceptance tests:** (written at Phase Review)
+- **Acceptance tests:** `tests/home-repo-workflow/p05-s03.test.mjs`
 - **Files:** create `.github/skills/addon-author/scripts/scaffold.mjs`
 - **Patterns:** `.github/skills/work-planner/scripts/mutation-addon.mjs:1 - argument parsing and exit codes; language-addons/node-javascript/stryker-javascript/SKILL.md:1 - add-on skill shape and the Mutation lines; language-addons/README.md:11 - the Available Stacks tables`
 - **Decisions:**
@@ -116,7 +116,7 @@
 - **Scenarios:**
   - R45-10: Given `.github/skills/addon-author/SKILL.md`, when read, then its frontmatter `name` is `addon-author`, it runs `node .github/skills/addon-author/scripts/scaffold.mjs`, asks only for the stack ID, the roles (code style, test harness, mutation testing), and each role's tool and command, says non-code stacks may skip roles but at least one is required, asks again when the ID is not kebab-case, stops and says where to run it when `not-a-workflow-source`, stops naming the folder when `addon-exists`, and says it writes only under `language-addons/<id>/` and the `Available Stacks` section of `language-addons/README.md`
   - R42-08: Given the same file, when read, then it has the `Question rules:` line directly followed by exactly one `Core paths:` line identical to the one in `.github/skills/pull-work/SKILL.md`, and it does not contain `AGENTS.md`
-- **Acceptance tests:** (written at Phase Review)
+- **Acceptance tests:** `tests/home-repo-workflow/p05-s04.test.mjs`
 - **Files:** create `.github/skills/addon-author/SKILL.md`
 - **Patterns:** `.github/skills/adr-writer/SKILL.md:1 - frontmatter, Question rules and Core paths lines`
 - **Decisions:** sections Purpose, Where It Runs, Questions (one grouped question for ID and roles, then one per role for tool and command, following `.github/user-interaction.md`), Run, Failure outcomes (the four `addon-author failed:` categories and what to tell the Developer), Exit (brief: files written, README rows; tells the Developer to run the Update Script and then `launch` in a repo with `Stack: <id>`). Frontmatter `argument-hint`: `Name the stack ID, or say what stack you want an add-on for`.
@@ -136,7 +136,7 @@
   - R46-02: Given the same file, when read, then it names the roles `co-changed`, `read-only reference`, and `peer-impact` and says what each means for step 2 and for step 3
   - R46-03: Given the same file, when every backticked word matching a skill name is compared with the folders under `.github/skills/`, then each one it names (`brain-storm`, `behavior-spec`, `work-planner`, `pull-work`) exists, and it names no skill or command that is not a folder there, `launch`, or `workflow-check`
   - R46-04: Given the real source installed into a temp Home Repo by `node scripts/update-home.mjs <home>`, when `.claude/skills/onboard-project/references/` is listed, then `COORDINATION-PLAYBOOK.md` is there and equal to its source after `\r\n` -> `\n`, and `.github/skills/onboard-project/SKILL.md` links `./references/COORDINATION-PLAYBOOK.md`
-- **Acceptance tests:** (written at Phase Review)
+- **Acceptance tests:** `tests/home-repo-workflow/p05-s05.test.mjs`
 - **Files:** create `.github/skills/onboard-project/references/COORDINATION-PLAYBOOK.md`; edit `.github/skills/onboard-project/SKILL.md`
 - **Patterns:** `.github/skills/onboard-project/SKILL.md:1 - tone and heading style; .github/skills/onboard-project/references/DISCOVERY-CHECKLIST.md:1 - a references file`
 - **Decisions:**
@@ -161,7 +161,7 @@
   - R47-04: Given the same file, when read, then equivalent direct commands for Claude Code (`claude --add-dir`) and Copilot CLI (`copilot --add-dir`) are shown, with a warning that Claude Code started without the Home Repo settings option (`--settings`) is unguarded and that Copilot CLI needs a trusted folder
   - R47-05: Given the same file, when read, then it keeps the copy-into-repository section, including the `.claude\skills` and `.claude\agents` copies and the trusted-folder sentence
   - R47-06: Given the same file, when read, then it links `.github/skills/onboard-project/references/COORDINATION-PLAYBOOK.md`, names `/agents-md` and `/addon-author`, and states that a `Stack:` line in `AGENTS.md` selects the Language Add-on
-- **Acceptance tests:** (written at Phase Review)
+- **Acceptance tests:** `tests/home-repo-workflow/p05-s06.test.mjs`
 - **Files:** edit `README.md`
 - **Patterns:** `README.md:34 - the copy block and its prose; README.md:93 - the Core Skills list`
 - **Decisions:**
