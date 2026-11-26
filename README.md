@@ -38,14 +38,19 @@ From your target repository root (PowerShell):
 ```powershell
 $workflowSrc = "C:\Projects\Personal.Workflow"
 
-New-Item -ItemType Directory -Path .github\tools, .github\skills -Force | Out-Null
+New-Item -ItemType Directory -Path .github\tools, .github\skills, .claude -Force | Out-Null
 
 Copy-Item -Recurse "$workflowSrc\.github\agents"               ".github\agents"
 Copy-Item -Recurse "$workflowSrc\.github\hooks"                ".github\hooks"
 Copy-Item -Recurse "$workflowSrc\.github\skills\*"             ".github\skills"
 Copy-Item -Recurse "$workflowSrc\.github\tools\workflow-check" ".github\tools\workflow-check"
 Copy-Item          "$workflowSrc\.github\user-interaction.md"  ".github\user-interaction.md"
+Copy-Item          "$workflowSrc\.claude\settings.json"        ".claude\settings.json"
 ```
+
+If the repository already has .claude\settings.json, merge the hooks.PreToolUse entry into it instead of overwriting.
+
+Copilot CLI runs the locked-tests guard only in a trusted folder; trust the repository when asked. The Gate still verifies locked tests.
 
 Optionally copy the **Language Add-ons** for your stack from [`language-addons/`](./language-addons/README.md) into `.github/skills/`.
 

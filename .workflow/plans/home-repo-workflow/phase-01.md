@@ -83,3 +83,4 @@
 - **Do not:** edit `tests/home-repo-workflow/**`; edit `.github/hooks/**`; change README lines outside the copy section.
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/home-repo-workflow/*.test.mjs"` exits 0; targets R35-15 to R35-18; 4 target tests run
 - **Stop and report if:** a file outside Files must change; a locked test looks wrong; either Harness fails the live probe; the same failure after 3 attempts.
+- **Outcome:** live probe on Claude Code and Copilot CLI 1.0.116 in a temp copy-layout repo: Claude Code (`claude -p`, `acceptEdits`) and Copilot CLI in a trusted folder both denied the `Edit` with the guard's reason and left the file unchanged; Copilot CLI in an untrusted folder skipped repository hooks and the edit succeeded (the accepted R35 risk).
