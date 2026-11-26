@@ -87,7 +87,7 @@
 
 - **Kind:** build
 - **Goal:** the five agent files list tool names both Harnesses accept, a Workflow Core `code-review` agent exists for Claude Code, and the Update Script installs all six into the Home Repo's `.claude/agents/`.
-- **Depends on:** none
+- **Depends on:** S02 (both edit `.github/agents/planner.agent.md`)
 - **Tier:** delegate - frontmatter edits plus one new agent file copying an existing one's shape
 - **Review:** none
 - **Scenarios:**
