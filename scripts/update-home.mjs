@@ -154,29 +154,47 @@ function main() {
   let replaced = 0;
   let removed = 0;
 
-  for (const [homePath, sourcePath] of plan) {
-    const target = join(home, homePath);
-    const content = readFileSync(join(sourceRoot, sourcePath));
-    if (!previousFiles.has(homePath)) {
-      installed += 1;
-    } else if (!existsSync(target) || !readFileSync(target).equals(content)) {
-      replaced += 1;
-    }
-    mkdirSync(dirname(target), { recursive: true });
-    writeFileSync(target, content);
-  }
-
-  for (const homePath of previousFiles) {
-    if (plan.has(homePath)) continue;
-    const target = join(home, homePath);
-    if (existsSync(target)) {
-      rmSync(target);
-      removeEmptyParents(home, target);
-    }
-    removed += 1;
-  }
-
+  // Mark the install incomplete before the first write. It keeps the previous version
+  // and lists every path that may be touched, so a failed run can be rerun cleanly.
+  const compare = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+  const touched = [...new Set([...previousFiles, ...plan.keys()])].sort(compare);
   mkdirSync(dirname(manifestPath), { recursive: true });
+  writeFileSync(
+    manifestPath,
+    JSON.stringify({ version: previous?.version ?? 'none', status: 'incomplete', files: touched }, null, 2) + '\n',
+  );
+
+  let current = null;
+  try {
+    for (const [homePath, sourcePath] of plan) {
+      current = homePath;
+      const target = join(home, homePath);
+      const content = readFileSync(join(sourceRoot, sourcePath));
+      if (!previousFiles.has(homePath)) {
+        installed += 1;
+      } else if (!existsSync(target) || !readFileSync(target).equals(content)) {
+        replaced += 1;
+      }
+      mkdirSync(dirname(target), { recursive: true });
+      writeFileSync(target, content);
+    }
+
+    for (const homePath of previousFiles) {
+      if (plan.has(homePath)) continue;
+      current = homePath;
+      const target = join(home, homePath);
+      if (existsSync(target)) {
+        rmSync(target);
+        removeEmptyParents(home, target);
+      }
+      removed += 1;
+    }
+  } catch {
+    console.log(`update failed: copy-failed: ${current}`);
+    process.exitCode = 1;
+    return;
+  }
+
   writeFileSync(manifestPath, JSON.stringify({ version, status: 'complete', files: [...plan.keys()] }, null, 2) + '\n');
 
   console.log(`Home Repo: ${home}`);
