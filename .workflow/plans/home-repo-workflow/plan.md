@@ -2,7 +2,7 @@
 
 - Spec: [home-repo-workflow-spec.md](../../specs/home-repo-workflow-spec.md)
 - Lane: standard
-- Next: plan P02
+- Next: phase review P02
 - Tests locked: `725b02c`
 - Oracle: `tests/home-repo-workflow`
 - Phase base: `67787b5`
@@ -26,7 +26,7 @@
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
 | P01 | Guard both Harnesses in the copy layout | completed | R35, Q-ordering | [phase-01](phase-01.md) |
-| P02 | Update Script fills a Home Repo offline | planned | R36, R37, Q-version-identity, Q-offline (update) | |
+| P02 | Update Script fills a Home Repo offline | planned | R36, R37, Q-version-identity, Q-offline (update) | [phase-02](phase-02.md) |
 | P03 | Launch Script with stack add-ons and Home-layout guard | planned | R38, R39, R40, R41, Q-offline (launch), Q-seamless-relay | |
 | P04 | Workflow Core parity across layouts and Harnesses | planned | R42, R43 | |
 | P05 | Authoring skills, Coordination Playbook, README | planned | R44, R45, R46, R47 | |
