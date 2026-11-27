@@ -2,10 +2,10 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: phase review P02
-- Tests locked: `28fbd6e`
+- Next: P02 S01
+- Tests locked: `95e9f1f`
 - Oracle: `tests/skill-review`
-- Phase base: `28fbd6e`
+- Phase base: `95e9f1f`
 - Reconciled: `0c7a2b317a2d2c0d38cf3dfcfc4fc4e86549b2e8`
 
 ## Current state
@@ -32,8 +32,16 @@
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
 | P01 | Prepare finds unreviewed skill uses | completed | R52 (read side), R53 (failure, filter), R54 (read side), R61 (read side), R65, R67 (failure) | [phase-01](phase-01.md) |
-| P02 | Depth 0 signals, flags, slices, tokens | planned | R62 (Conversation Log side), Q-model-reading | [phase-02](phase-02.md) |
+| P02 | Depth 0 signals, flags, slices, tokens | in progress | R62 (Conversation Log side), Q-model-reading | [phase-02](phase-02.md) |
 | P03 | Finish: Observations, lifecycle, installs, Review Record | planned | R54 (write side), R57, R58, R59, R61 | |
 | P04 | Executive Summary, Ledger, STE check, commit | planned | R52 (commit-failed, Reviewed line), R60, R63, R64, Q-readability, Q-ste, Q-privacy, Q-offline | |
 | P05 | Handoffs, skill-review skill, cleanup | planned | R55, R56, R62 (Workflow Folder and git signals), R66, R67 (removal) | |
 | P06 | /apply-observation | planned | R68, R69, R70, R71, R72, R73 | |
+
+## P02 slices
+
+| # | Slice | Status |
+|---|-------|--------|
+| S01 | Signals and flags in the compact record | ready |
+| S02 | Flagged slices | ready |
+| S03 | Model tokens per Depth | ready |
