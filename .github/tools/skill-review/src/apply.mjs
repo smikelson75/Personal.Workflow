@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { compareIds } from './observations.mjs';
 import { renderLedger } from './ledger.mjs';
 import { markChanged, recordInstall } from './installs.mjs';
-import { homeFor, readRecord } from './record.mjs';
+import { homeFor, readRecord, writeRecord } from './record.mjs';
 import { formatNextPartChange } from './summary.mjs';
 
 export function fail(category, detail) {
@@ -204,4 +204,90 @@ export function applyList(_args, env, cwd) {
     return { lines: ['apply-observation: nothing to apply'], code: 0 };
   }
   return { lines: matches.map(formatNextPartChange), code: 0 };
+}
+
+const UNDO_CHECK_USAGE = 'undo-check <O-id>';
+const UNDO_USAGE = 'undo <O-id>';
+
+// Shared gate for undo-check and undo: preflight, then the target Observation must exist and be applied.
+function undoTarget(args, env, cwd, usage) {
+  const pre = preflight(env, cwd);
+  if (pre.failure) return { failure: pre.failure };
+  const { home, record } = pre;
+
+  const id = args[0];
+  if (!id) return { failure: fail('usage', usage) };
+  const obs = (record.observations ?? []).find((o) => o.id === id);
+  if (!obs) return { failure: fail('unknown-observation', id) };
+  if (!obs.changeCommit) return { failure: fail('not-applied', id) };
+  return { home, record, obs };
+}
+
+// args: [O-id]. Validates that the Observation can be undone; changes nothing.
+export function undoCheck(args, env, cwd) {
+  const target = undoTarget(args, env, cwd, UNDO_CHECK_USAGE);
+  if (target.failure) return target.failure;
+  const { obs } = target;
+  return { lines: [`undo-ready: ${obs.id} ${obs.part} ${obs.changeCommit}`], code: 0 };
+}
+
+// args: [O-id]. Reverts the Observation's change commit, marks it confirmed, runs the Update Script,
+// rewrites the Ledger, and commits the Home Repo's skill-review/ folder.
+export function undo(args, env, cwd) {
+  const target = undoTarget(args, env, cwd, UNDO_USAGE);
+  if (target.failure) return target.failure;
+  const { home, record, obs } = target;
+
+  const rev = git(cwd, ['revert', '--no-commit', obs.changeCommit]);
+  if (rev.status !== 0) {
+    const conflicted = nonEmptyLines(git(cwd, ['diff', '--name-only', '--diff-filter=U']).stdout);
+    git(cwd, ['reset', '--hard', 'HEAD']);
+    const detail = conflicted.length > 0 ? conflicted.join(', ') : firstLine(rev.stderr);
+    return fail('revert-conflict', detail);
+  }
+
+  const made = git(cwd, ['commit', '-m', `revert(${obs.part}): undo ${obs.id}`]);
+  if (made.status !== 0) {
+    git(cwd, ['reset', '--hard', 'HEAD']);
+    return fail('commit-failed', firstLine(made.stderr));
+  }
+
+  obs.state = 'confirmed';
+  obs.chances = 0;
+  obs.changeCommit = null;
+  writeRecord(home, record);
+
+  const lines = [];
+  const update = spawnSync(process.execPath, [join(cwd, 'scripts', 'update-home.mjs'), home], {
+    cwd,
+    encoding: 'utf8',
+  });
+  lines.push(...nonEmptyLines(update.stdout), ...nonEmptyLines(update.stderr));
+  const updateCode = update.status ?? 1;
+
+  if (updateCode === 0) {
+    const m = UPDATE_VERSION.exec(update.stdout ?? '');
+    if (m) {
+      const head = git(cwd, ['rev-parse', '--short=7', 'HEAD']).stdout.trim();
+      lines.push(...recordInstall([m[1], head], env, cwd).lines);
+    }
+  }
+
+  const now = env.SKILL_REVIEW_NOW ? new Date(env.SKILL_REVIEW_NOW) : new Date();
+  writeLedgerFile(home, renderLedger({ record: readRecord(home), now }));
+
+  const status = git(home, ['status', '--porcelain', '--', FOLDER]);
+  if (status.status !== 0) return { lines: [...lines, `apply-observation failed: commit-failed: ${firstLine(status.stderr)}`], code: 1 };
+  if (status.stdout.trim() !== '') {
+    const added = git(home, ['add', '-A', '--', FOLDER]);
+    if (added.status !== 0) return { lines: [...lines, `apply-observation failed: commit-failed: ${firstLine(added.stderr)}`], code: 1 };
+    const madeHome = git(home, ['commit', '-m', `docs(skill-review): undo ${obs.id}`, '--', FOLDER]);
+    if (madeHome.status !== 0) return { lines: [...lines, `apply-observation failed: commit-failed: ${firstLine(madeHome.stderr)}`], code: 1 };
+  }
+
+  if (updateCode !== 0) {
+    lines.push(`apply-observation failed: update-home-failed: exit ${updateCode}`);
+    return { lines, code: 1 };
+  }
+  return { lines, code: 0 };
 }

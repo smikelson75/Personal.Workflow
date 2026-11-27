@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from 'nod
 import { homedir, tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { CLAUDE_TYPES, COPILOT_TYPES, findClaudeConversations, findCopilotConversations } from './logs.mjs';
-import { applyCheck, applyFinish, applyList } from './apply.mjs';
+import { applyCheck, applyFinish, applyList, undo, undoCheck } from './apply.mjs';
 import { commit } from './commit.mjs';
 import { finish } from './finish.mjs';
 import { findHandoffs } from './handoffs.mjs';
@@ -78,6 +78,8 @@ export function main(argv, env, cwd) {
   if (command === 'apply-list') return applyList(rest, env, cwd);
   if (command === 'apply-check') return applyCheck(rest, env, cwd);
   if (command === 'apply-finish') return applyFinish(rest, env, cwd);
+  if (command === 'undo-check') return undoCheck(rest, env, cwd);
+  if (command === 'undo') return undo(rest, env, cwd);
   if (command !== 'prepare') return fail('usage', USAGE);
   const args = parsePrepareArgs(rest);
 
