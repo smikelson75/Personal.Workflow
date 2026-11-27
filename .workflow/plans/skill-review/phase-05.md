@@ -73,7 +73,7 @@
   - R55-22: Given the Review Record holds Positions for `c1` and `k1` at their last lines, so neither has an unreviewed use, and the Handoff has both ends, then `prepare` still lists the entry and writes the compact record with `conversations` `[]` and prints `skill-review: prepared 0 skill uses in 0 Conversations` (R54 Handoff evidence)
   - R55-23: Given a pending Handoff (no using end) and no unreviewed use, when `prepare` runs, then it prints `skill-review: nothing to review` and writes no compact record (boundary)
   - R55-24: Given a Review Record Handoff `{id:"work-planner:.workflow/plans/x/", ..., "state":"reviewed"}`, then `prepare` omits that entry (boundary)
-  - R53-03: Given the three Handoffs `incubate -> brain-storm`, `brain-storm -> behavior-spec`, `behavior-spec -> work-planner` all written, when `prepare brain-storm` runs, then `handoffs` holds the first two and no third; `prepare work-planner` holds the last two
+  - R53-03: Given the three Handoffs `incubate -> brain-storm`, `brain-storm -> behavior-spec`, `behavior-spec -> work-planner` all written, when `prepare brain-storm` runs, then `handoffs` holds the first two and no third; `prepare work-planner` holds only the third
 - **Acceptance tests:** `tests/skill-review/p05-s02.test.mjs`
 - **Files:** edit `.github/tools/skill-review/src/handoffs.mjs`; edit `.github/tools/skill-review/src/cli.mjs`
 - **Patterns:** `.github/tools/skill-review/src/handoffs.mjs:1 - findHandoffs and the touch matching from S01`; `.github/tools/skill-review/src/cli.mjs:142 - the nothing-to-review check`
