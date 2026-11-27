@@ -2,7 +2,7 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: P06 S03 S04 S05
+- Next: P06 S04 S05
 - Tests locked: `f15f47e`
 - Oracle: `tests/skill-review`
 - Phase base: `4b7543f`
@@ -43,7 +43,7 @@
 |---|-------|--------|
 | S01 | Fix glossary-size baseline | completed |
 | S02 | Offer confirmed part changes (apply-list) | completed |
-| S03 | Check and restore failed pick (apply-check) | ready |
+| S03 | Check and restore failed pick (apply-check) | completed |
 | S04 | Mark changed, install, and commit Home Repo (apply-finish) | ready |
 | S05 | Undo applied Observation (undo-check and undo) | ready |
 | S06 | /apply-observation skill | ready |

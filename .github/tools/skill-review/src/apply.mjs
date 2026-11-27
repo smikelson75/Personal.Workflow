@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { compareIds } from './observations.mjs';
 import { homeFor, readRecord } from './record.mjs';
@@ -35,6 +35,69 @@ export function preflight(env, cwd, { checkDirty = true } = {}) {
     if (err.category) return { failure: fail(err.category, err.detail) };
     throw err;
   }
+}
+
+const SUITE_ROOTS = [
+  'tests',
+  join('.github', 'tools', 'workflow-check', 'tests'),
+  join('.github', 'tools', 'workflow-core', 'tests'),
+];
+
+function findTestFiles(dir, out) {
+  if (!existsSync(dir)) return out;
+  const entries = readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  for (const entry of entries) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) findTestFiles(full, out);
+    else if (entry.isFile() && entry.name.endsWith('.test.mjs')) out.push(full);
+  }
+  return out;
+}
+
+// An outer `node --test` sets NODE_TEST_CONTEXT, which makes a nested `node --test`
+// report into the parent and exit 0 on failures; children must run standalone.
+function childEnv(env) {
+  const out = { ...env };
+  delete out.NODE_TEST_CONTEXT;
+  return out;
+}
+
+function restoreTree(cwd) {
+  git(cwd, ['checkout', '--', '.']);
+  git(cwd, ['clean', '-fd']);
+}
+
+export function applyCheck(args, env, cwd) {
+  const pre = preflight(env, cwd, { checkDirty: false });
+  if (pre.failure) return pre.failure;
+
+  const id = args[0];
+  if (!id) return fail('usage', 'apply-check <O-id>');
+
+  const failWith = (reason) => {
+    restoreTree(cwd);
+    return { lines: [`check-failed: ${id}: ${reason}`], code: 1 };
+  };
+
+  const check = spawnSync(process.execPath, [join(cwd, '.github', 'tools', 'workflow-check', 'bin', 'workflow-check.mjs')], {
+    cwd,
+    encoding: 'utf8',
+    env: childEnv(process.env),
+  });
+  if (check.status !== 0) return failWith('workflow-check failed');
+
+  const files = [];
+  for (const root of SUITE_ROOTS) findTestFiles(join(cwd, root), files);
+  if (files.length > 0) {
+    const suites = spawnSync(process.execPath, ['--test', '--test-reporter=tap', ...files], {
+      cwd,
+      encoding: 'utf8',
+      env: childEnv(process.env),
+    });
+    if (suites.status !== 0) return failWith('test suite failed');
+  }
+
+  return { lines: [], code: 0 };
 }
 
 export function applyList(_args, env, cwd) {
