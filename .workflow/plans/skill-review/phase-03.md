@@ -178,3 +178,22 @@
 - **Do not:** edit `tests/skill-review/**`; count Handoffs or non-skill parts (P05); add dependencies.
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/skill-review/*.test.mjs"` exits 0; targets R58-16 to R58-24, R59-08; 10 target tests run
 - **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.
+
+## S06 - One follower per improved Observation per run
+
+- **Kind:** build
+- **Goal:** cases on the same improved Observation in one run share one new follower Observation.
+- **Depends on:** S05
+- **Tier:** delegate - a pinned fix to one function; follows the S02 `refs` pattern
+- **Review:** none
+- **Scenarios:** fixture: O03 `improved` (`part` `pull-work`), `nextObservation` 4, Copilot `c2` with a `pull-work` use 2-10; case `H(n)` is `{"match":"O03","conversation":"Copilot CLI:c2","line":n}`
+  - R58-25: Given `{cases:[H(5), H(6)]}`, when `finish` runs, then the Observations are O03 (still `improved`) and O04 `{follows:"O03", cases:2, state:"confirmed"}`, `nextObservation` is 5, and stdout has `observation: O04 new` then `observation: O04 confirmed`
+  - R58-26: Given a run with `H(5)` and then a later run with `H(6)`, when both ran, then O04 and O05 both exist with `follows` `O03` and `cases` 1 (boundary: the follower is per run)
+- **Acceptance tests:** `tests/skill-review/p03-s06.test.mjs`
+- **Files:** edit `.github/tools/skill-review/src/observations.mjs`
+- **Patterns:** `.github/tools/skill-review/src/observations.mjs:1 - the per-run refs map for new Observations`
+- **Decisions:**
+  - Keep a per-run map from the improved Observation ID to its follower. A matched case on an `improved` Observation reuses the follower when the map has one; otherwise it creates the follower (as S05) and stores it. The normal case counting and the `confirmed` transition then apply to the follower.
+- **Do not:** edit `tests/skill-review/**`; change output order rules; add dependencies.
+- **Done when:** `node --test --test-reporter=tap "tests/skill-review/*.test.mjs"` exits 0; targets R58-25, R58-26; 2 target tests run
+- **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.

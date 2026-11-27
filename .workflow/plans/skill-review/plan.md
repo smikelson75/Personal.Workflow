@@ -2,11 +2,10 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: review P03
+- Next: phase review P03
 - Tests locked: `01fe3cd`
 - Oracle: `tests/skill-review`
 - Phase base: `01fe3cd`
-- Review pending: S01, S02, S03, S04, S05
 - Reconciled: `0c7a2b317a2d2c0d38cf3dfcfc4fc4e86549b2e8`
 
 ## Current state
@@ -25,6 +24,7 @@
 - Harness locations are overridable for tests with `SKILL_REVIEW_COPILOT_HOME` (default `~/.copilot`) and `SKILL_REVIEW_CLAUDE_HOME` (default `~/.claude`).
 
 ## Carry-forward
+- P06: `mark-changed` stores the commit as given without checking it exists in a repo; `/apply-observation` must pass a real commit (a typo leaves the Observation `changed` and never installed).
 - P02-P04: real Claude logs hold record types outside CLAUDE_TYPES (e.g. api-request-shape), so they print unknown-record notices; revisit the known-type list if noisy. A skill invoked inside another skill ends the outer use at that start (P01 behavior).
 - P05: Depth 0 also extracts Workflow Folder artifact and git-history signals for Handoff review (R62); P02 covers Conversation Log signals only.
 - P06: the baseline glossary-size failures (47 Terms over cap 40) are `Known failures` owned by P06 so P01-P05 gates stay meaningful; raise them to the Developer when P06 is planned (setup card or accept).
@@ -35,7 +35,7 @@
 |---|-------|--------|--------|--------|
 | P01 | Prepare finds unreviewed skill uses | completed | R52 (read side), R53 (failure, filter), R54 (read side), R61 (read side), R65, R67 (failure) | [phase-01](phase-01.md) |
 | P02 | Depth 0 signals, flags, slices, tokens | completed | R62 (Conversation Log side), Q-model-reading | [phase-02](phase-02.md) |
-| P03 | Finish: Observations, lifecycle, installs, Review Record | gating | R54 (write side), R57, R58, R59, R61 | [phase-03](phase-03.md) |
+| P03 | Finish: Observations, lifecycle, installs, Review Record | in progress | R54 (write side), R57, R58, R59, R61 | [phase-03](phase-03.md) |
 | P04 | Executive Summary, Ledger, STE check, commit | planned | R52 (commit-failed, Reviewed line), R60, R63, R64, Q-readability, Q-ste, Q-privacy, Q-offline | |
 | P05 | Handoffs, skill-review skill, cleanup | planned | R55, R56, R62 (Workflow Folder and git signals), R66, R67 (removal) | |
 | P06 | /apply-observation | planned | R68, R69, R70, R71, R72, R73 | |
@@ -49,3 +49,4 @@
 | S03 | Dismissal, requirements miss, question gap | completed |
 | S04 | Change commits, install records, version notice | completed |
 | S05 | Changed Observations: improved or unchanged | completed |
+| S06 | One follower per improved Observation per run | planned |
