@@ -186,6 +186,7 @@ Every skill below lists recommended models from **Anthropic**, **OpenAI**, and *
 | [`behavior-spec`](./.github/skills/behavior-spec/README.md) | `claude-opus-5.5` | `gpt-6.2-sol` | `gemini-4-neon` | `medium` | Many requirements, security/destructive rules, or long Session Chains (`high`) |
 | [`work-planner`](./.github/skills/work-planner/README.md) | `claude-sonnet-5.5` | `gpt-6.1-terra` | `gemini-4-neon` | `medium` | Large or architecture-heavy first plan — use the `planner` agent (`claude-opus-5.5` / `gpt-6.1-sol` / `gemini-4-neon`) at `high` |
 | [`pull-work`](./.github/skills/pull-work/README.md) | `claude-sonnet-5.5` | `gpt-6.1-terra` | `gemini-4-neon` | `medium` | Complex `main`-tier Cards or multi-failure Gate triage (`high`) |
+| [`skill-review`](./.github/skills/skill-review/README.md) | `claude-sonnet-5.5` | `gpt-6.1-terra` | `gemini-4-neon` | `medium` | Phases with many flagged slices or Handoffs (`high`) |
 | [`adr-writer`](./.github/skills/adr-writer/README.md) | `claude-sonnet-5.5` | `gpt-6.1-terra` | `gemini-4-neon` | `medium` | Inherits calling session during planning; use `high` for standalone high-impact architecture decisions |
 | [`conventional-commit`](./.github/skills/conventional-commit/README.md) | `claude-haiku-5.5` | `gpt-6-luna` | `gemini-3.8-flash` | `low` | Large, mixed working trees that need careful commit splitting (`medium`) |
 
@@ -213,6 +214,7 @@ See [`language-addons/README.md`](./language-addons/README.md) for stack details
 - **[Behavior Spec](./.github/skills/behavior-spec/README.md)** — black-box behavioral contract generation and assumption review.
 - **[Work Planner](./.github/skills/work-planner/README.md)** — Phase planning, vertical Slices, Cards, Tiers, Lanes, and Gate structure.
 - **[Pull Work](./.github/skills/pull-work/README.md)** — single-command execution loop, automated commits, and locked-test safety nets.
+- **[Skill Review](./.github/skills/skill-review/README.md)** — post-phase review of skill uses and Handoffs in the Home layout.
 - **[ADR Writer](./.github/skills/adr-writer/README.md)** — capturing approved, hard-to-reverse architecture decisions.
 - **[Conventional Commit](./.github/skills/conventional-commit/README.md)** — commitlint-compatible Conventional Commits 1.0.0.
 - **[Agents Md](./.github/skills/agents-md/SKILL.md)** (`/agents-md`) — writes or amends a Project Repo's `AGENTS.md`, always with one `Stack:` line.
