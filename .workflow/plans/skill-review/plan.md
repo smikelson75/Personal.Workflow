@@ -2,7 +2,7 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: P03 S02
+- Next: P03 S03 S04
 - Tests locked: `01fe3cd`
 - Oracle: `tests/skill-review`
 - Phase base: `01fe3cd`
@@ -44,7 +44,7 @@
 | # | Slice | Status |
 |---|-------|--------|
 | S01 | finish writes the reviewed Positions | completed |
-| S02 | Cases become Observations | ready |
+| S02 | Cases become Observations | completed |
 | S03 | Dismissal, requirements miss, question gap | ready |
 | S04 | Change commits, install records, version notice | ready |
 | S05 | Changed Observations: improved or unchanged | ready |

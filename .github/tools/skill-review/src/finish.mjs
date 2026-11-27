@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { applyCases } from './observations.mjs';
 import { homeFor, readRecord, writeRecord } from './record.mjs';
 
 const USAGE = 'skill-review finish <compact-record-file> <judgement-file>';
@@ -37,6 +38,14 @@ export function finish(args, env) {
   const judgement = readJson(judgementFile);
   if (!Array.isArray(judgement?.cases)) return fail('judgement-unreadable', judgementFile);
 
+  let observationLines;
+  try {
+    observationLines = applyCases(record, compact, judgement.cases);
+  } catch (err) {
+    if (err.category) return fail(err.category, err.detail);
+    throw err;
+  }
+
   let uses = 0;
   record.conversations ??= {};
   for (const conv of compact.conversations) {
@@ -49,5 +58,8 @@ export function finish(args, env) {
   }
 
   writeRecord(home, record);
-  return { lines: [`skill-review: reviewed ${uses} skill uses in ${compact.conversations.length} Conversations`], code: 0 };
+  return {
+    lines: [...observationLines, `skill-review: reviewed ${uses} skill uses in ${compact.conversations.length} Conversations`],
+    code: 0,
+  };
 }
