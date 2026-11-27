@@ -31,6 +31,10 @@ function entryHead(o) {
   return desc ? `- ${o.id} ${o.part}: ${desc}` : `- ${o.id} ${o.part}`;
 }
 
+export function formatNextPartChange(o) {
+  return `${entryHead(o)} Fix type: ${o.fixType}.`;
+}
+
 // Map of Observation ID -> Set of event names, from `observation: <id> <event>` lines.
 function eventsById(observationLines) {
   const byId = new Map();
@@ -60,7 +64,7 @@ function sectionBodies(record, observationLines) {
 
   const partChanges = sortById(
     observations.filter((o) => o.state === 'confirmed' && o.outcome === 'part change'),
-  ).map((o) => `${entryHead(o)} Fix type: ${o.fixType}.`);
+  ).map(formatNextPartChange);
   const devNotes = sortById(
     observations.filter(
       (o) => o.outcome === 'Developer note' && (o.state === 'watching' || o.state === 'confirmed') && events.has(o.id),
