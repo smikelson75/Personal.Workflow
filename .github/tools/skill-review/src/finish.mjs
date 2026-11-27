@@ -5,6 +5,7 @@ import { renderLedger } from './ledger.mjs';
 import { homeFor, readRecord, writeRecord } from './record.mjs';
 import { renderSummary, stamp } from './summary.mjs';
 import { steFailures } from './ste.mjs';
+import { checkPrivacy } from './privacy.mjs';
 
 const USAGE = 'skill-review finish <compact-record-file> <judgement-file>';
 
@@ -96,6 +97,9 @@ export function finish(args, env, cwd = process.cwd()) {
 
   const judgement = readJson(judgementFile);
   if (!Array.isArray(judgement?.cases)) return fail('judgement-unreadable', judgementFile);
+
+  const privacy = checkPrivacy(judgement.cases, compact);
+  if (privacy) return fail('privacy-check', `case ${privacy.case} ${privacy.field}`);
 
   const notice = unrecordedInstall(home, record);
   const noticeLines = notice ? [`notice: unrecorded-install: ${notice}`] : [];

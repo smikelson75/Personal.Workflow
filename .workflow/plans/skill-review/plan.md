@@ -2,7 +2,7 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: P04 S06
+- Next: P04 S07
 - Tests locked: `490cb97`
 - Oracle: `tests/skill-review`
 - Phase base: `490cb97`
@@ -50,6 +50,6 @@
 | S03 | Summary sections: Changed, Improved, Same, Next | completed |
 | S04 | Ledger | completed |
 | S05 | STE check | completed |
-| S06 | No copied Conversation Log text or secrets in records | ready |
+| S06 | No copied Conversation Log text or secrets in records | completed |
 | S07 | Commit the records in the Home Repo | ready |
 | S08 | Offline | ready |
