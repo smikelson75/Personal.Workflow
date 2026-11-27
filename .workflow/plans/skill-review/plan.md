@@ -6,7 +6,7 @@
 - Tests locked: `8b05f9e`
 - Oracle: `tests/skill-review`
 - Phase base: `95e9f1f`
-- Review pending: S01, S02, S03
+- Review pending: S04
 - Reconciled: `0c7a2b317a2d2c0d38cf3dfcfc4fc4e86549b2e8`
 
 ## Current state
@@ -46,3 +46,4 @@
 | S01 | Signals and flags in the compact record | completed |
 | S02 | Flagged slices | completed |
 | S03 | Model tokens per Depth | completed |
+| S04 | Review fixes (records and slice write) | completed |

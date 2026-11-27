@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { parseLine, splitLines } from './logs.mjs';
 import { renderParts } from './records.mjs';
 import { tokensOf } from './tokens.mjs';
@@ -65,7 +65,9 @@ export function slice(args) {
   const depth2 = tokensOf(slices.reduce((n, s) => n + (s.chars ?? 0), 0));
   const updated = { ...record, slices, tokens: { ...(record.tokens ?? {}), depth2 } };
   try {
-    writeFileSync(recordFile, JSON.stringify(updated, null, 2));
+    const temp = `${recordFile}.tmp`;
+    writeFileSync(temp, JSON.stringify(updated, null, 2));
+    renameSync(temp, recordFile);
   } catch {
     return fail('record-unwritable', recordFile);
   }

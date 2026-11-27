@@ -20,6 +20,13 @@ function classifyCopilot(rec) {
   }
 }
 
+// A string, or the joined text items of a content array.
+function contentText(content) {
+  if (typeof content === 'string') return content;
+  if (!Array.isArray(content)) return '';
+  return content.filter((i) => i?.type === 'text').map((i) => str(i.text)).join('');
+}
+
 function classifyClaude(rec) {
   const content = rec.message?.content;
   if (rec.type === 'user') {
@@ -29,11 +36,12 @@ function classifyClaude(rec) {
       if (results.length) {
         return {
           role: 'tool-result',
-          text: str(results[0].content),
+          text: contentText(results[0].content),
           tools: [],
           toolError: results.some((i) => i.is_error === true),
         };
       }
+      return { role: 'user', text: contentText(content), tools: [], toolError: false };
     }
     return OTHER;
   }

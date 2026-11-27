@@ -106,3 +106,12 @@
 - **Do not:** edit `tests/skill-review/**`; count anything but `prepare`'s record and slice bodies; add dependencies.
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/skill-review/*.test.mjs"` exits 0; targets R62-13 to R62-16; 4 target tests run
 - **Stop and report if:** a file outside Files must change; a locked test looks wrong; the same failure after 3 attempts.
+
+## S04 - Review fixes (records and slice write)
+
+- **Kind:** fix
+- **Restores:** review - Claude user array-content messages and array-valued tool_result text were dropped (records.mjs); slice rewrote the record non-atomically (slice.mjs)
+- **Tier:** main
+- **Review:** required - re-review of the fixes
+- **Files:** edit .github/tools/skill-review/src/records.mjs; edit .github/tools/skill-review/src/slice.mjs
+- **Done when:** the full suite passes
