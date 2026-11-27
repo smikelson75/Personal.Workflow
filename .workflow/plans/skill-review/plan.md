@@ -2,10 +2,10 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: phase review P01
-- Tests locked: none
+- Next: P01 S01
+- Tests locked: `28fbd6e`
 - Oracle: `tests/skill-review`
-- Phase base: none
+- Phase base: `28fbd6e`
 - Reconciled: `0c7a2b317a2d2c0d38cf3dfcfc4fc4e86549b2e8`
 
 ## Current state
@@ -29,7 +29,7 @@
 
 | # | Phase | Status | Covers | Detail |
 |---|-------|--------|--------|--------|
-| P01 | Prepare finds unreviewed skill uses | planned | R52 (read side), R53 (failure, filter), R54 (read side), R61 (read side), R65, R67 (failure) | [phase-01](phase-01.md) |
+| P01 | Prepare finds unreviewed skill uses | in progress | R52 (read side), R53 (failure, filter), R54 (read side), R61 (read side), R65, R67 (failure) | [phase-01](phase-01.md) |
 | P02 | Depth 0 signals, flags, slices, tokens | planned | R62, Q-model-reading | |
 | P03 | Finish: Observations, lifecycle, installs, Review Record | planned | R54 (write side), R57, R58, R59, R61 | |
 | P04 | Executive Summary, Ledger, STE check, commit | planned | R52 (commit-failed, Reviewed line), R60, R63, R64, Q-readability, Q-ste, Q-privacy, Q-offline | |
@@ -40,7 +40,7 @@
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | CLI skeleton, layout gate, failures, empty run | planned |
-| S02 | Copilot CLI skill uses in the Project Repo | planned |
-| S03 | Claude Code skill uses and unknown-record notices | planned |
-| S04 | Reviewed Positions from the Review Record | planned |
+| S01 | CLI skeleton, layout gate, failures, empty run | ready |
+| S02 | Copilot CLI skill uses in the Project Repo | ready |
+| S03 | Claude Code skill uses and unknown-record notices | ready |
+| S04 | Reviewed Positions from the Review Record | ready |
