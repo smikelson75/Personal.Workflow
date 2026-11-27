@@ -2,11 +2,10 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: gate P04
+- Next: plan P05
 - Tests locked: `490cb97`
 - Oracle: `tests/skill-review`
 - Phase base: `490cb97`
-- Review pending: S09, S10
 - Reconciled: `0c7a2b317a2d2c0d38cf3dfcfc4fc4e86549b2e8`
 
 ## Current state
@@ -14,8 +13,8 @@
 - harness: `node --test --test-reporter=tap "tests/skill-review/*.test.mjs"` - drives the CLI `.github/tools/skill-review/bin/skill-review.mjs` as a child process against temp Home Repos, Project Repos, and fixture Conversation Logs; `.github/tools/workflow-core/support/harness.mjs` (`tempRepo`, `read`, `lines`) is the only shared test helper; runs (the CLI is not built yet, so the new tests fail until built)
 - suite baseline: failing: `[R29-01] Glossary defines the 13 added terms` and `[Q-zero-workflow-check-errors]` in `tests/glossary-alignment/p01-s01.test.mjs` (47 Terms, cap 40); 374 of 376 pass
 - mutation: unsupported for node - no mutation Language Add-on installed
-- in place: `scripts/update-home.mjs` (installs `.github/tools/**` to `.workflow-core/tools/**` and skills to `.claude/skills/**`, prints `Workflow version: <old> -> <new>`), `home/launch.mjs` (sets `WORKFLOW_HOME`), `.github/tools/workflow-check`, `.github/prompts/review-incubate.prompt.md` (removed in P05); no skill-review or apply-observation code
-- gap to spec: R52 partial, R53 partial, R54 partial, R55, R56, R60, R62 partial, R63, R64, R66, R67 partial, R68, R69, R70, R71, R72, R73, Q-readability, Q-ste, Q-privacy, Q-offline
+- in place: `scripts/update-home.mjs` (installs `.github/tools/**` to `.workflow-core/tools/**` and skills to `.claude/skills/**`, prints `Workflow version: <old> -> <new>`), `home/launch.mjs` (sets `WORKFLOW_HOME`), `.github/tools/workflow-check`, `.github/prompts/review-incubate.prompt.md` (removed in P05); `skill-review` CLI (prepare, slice, finish, commit, mark-changed, record-install) with summary, ledger, STE and privacy checks; no apply-observation code
+- gap to spec: R52 partial, R53 partial, R54 partial, R55 partial, R56, R62 partial, R66, R67 partial, R68, R69, R70, R71, R72, R73
 
 ## Decisions pinned by the plan
 - One CLI, `.github/tools/skill-review/bin/skill-review.mjs`, does all deterministic work in steps the `skill-review` skill runs around the model: `prepare` (Depth 0; writes only the compact-record file), `slice` (P02; serves one flagged slice and keeps the token totals in the compact record), `finish` (P03-P04, writes records, Executive Summary, and Ledger) and `commit` (P04, commits only `skill-review/` in the Home Repo). The model only judges between them and never opens a Conversation Log. `.github/tools/**` installs to the Home Repo, so the Home layout runs it from `$WORKFLOW_HOME/.workflow-core/tools/skill-review/bin/skill-review.mjs`.
@@ -29,6 +28,7 @@
 - P02-P04: real Claude logs hold record types outside CLAUDE_TYPES (e.g. api-request-shape), so they print unknown-record notices; revisit the known-type list if noisy. A skill invoked inside another skill ends the outer use at that start (P01 behavior).
 - P05: Depth 0 also extracts Workflow Folder artifact and git-history signals for Handoff review (R62); P02 covers Conversation Log signals only.
 - P05: Handoff records in the Review Record use `{id, writingSkill, usingSkill, artifact, state: pending|reviewed, writtenAt}` (P04 Ledger and summary read them); `finish` counts `judgement.handoffs` for the `Reviewed:` line; the `skill-review` skill runs `prepare`, `slice`, `finish` (looping `--attempt 1-3` on `ste-check` and `privacy-check` failures), then `commit <compact-record>`.
+- P05-P06: Handoff and later code must use compareIds/idText from observations.mjs for Observation IDs; inish writes the Review Record first, then the summary and ledger.
 - P06: the baseline glossary-size failures (47 Terms over cap 40) are `Known failures` owned by P06 so P01-P05 gates stay meaningful; raise them to the Developer when P06 is planned (setup card or accept).
 
 ## Phases
@@ -38,21 +38,7 @@
 | P01 | Prepare finds unreviewed skill uses | completed | R52 (read side), R53 (failure, filter), R54 (read side), R61 (read side), R65, R67 (failure) | [phase-01](phase-01.md) |
 | P02 | Depth 0 signals, flags, slices, tokens | completed | R62 (Conversation Log side), Q-model-reading | [phase-02](phase-02.md) |
 | P03 | Finish: Observations, lifecycle, installs, Review Record | completed | R54 (write side), R57, R58, R59, R61 | [phase-03](phase-03.md) |
-| P04 | Executive Summary, Ledger, STE check, commit | gating | R52 (commit-failed, Reviewed line), R55 (pending count and Ledger listing), R59 (Ledger wording), R60, R61 (Ledger), R62 (Model tokens line), R63, R64, R65 (Notices), Q-readability, Q-ste, Q-privacy, Q-offline | [phase-04](phase-04.md) |
+| P04 | Executive Summary, Ledger, STE check, commit | completed | R52 (commit-failed, Reviewed line), R55 (pending count and Ledger listing), R59 (Ledger wording), R60, R61 (Ledger), R62 (Model tokens line), R63, R64, R65 (Notices), Q-readability, Q-ste, Q-privacy, Q-offline | [phase-04](phase-04.md) |
 | P05 | Handoffs, skill-review skill, cleanup | planned | R55, R56, R62 (Workflow Folder and git signals), R66, R67 (removal) | |
 | P06 | /apply-observation | planned | R68, R69, R70, R71, R72, R73 | |
 
-## P04 slices
-
-| # | Slice | Status |
-|---|-------|--------|
-| S01 | R61-02 expects the new record files | completed |
-| S02 | Summary file with header, version, Reviewed, tokens, Notices | completed |
-| S03 | Summary sections: Changed, Improved, Same, Next | completed |
-| S04 | Ledger | completed |
-| S05 | STE check | completed |
-| S06 | No copied Conversation Log text or secrets in records | completed |
-| S07 | Commit the records in the Home Repo | completed |
-| S08 | Offline | completed |
-| S09 | Review fix: write the Review Record first | completed |
-| S10 | Review fix: order Observation IDs by number | completed |

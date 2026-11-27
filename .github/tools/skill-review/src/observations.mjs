@@ -216,7 +216,7 @@ export function applyCases(record, compact, cases) {
 
   settleChances(record, compact, hits, events);
 
-  const order = (a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+  const order = (a, b) => compareIds(a.id, b.id);
   return events
     .map((e, i) => ({ ...e, i }))
     .sort((a, b) => order(a, b) || a.i - b.i)
