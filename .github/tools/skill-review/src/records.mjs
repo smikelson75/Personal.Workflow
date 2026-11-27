@@ -1,20 +1,27 @@
-const OTHER = { role: 'other', text: '', tools: [], toolError: false };
+const OTHER = { role: 'other', text: '', tools: [], toolError: false, touches: [] };
 
 function str(v) {
   return typeof v === 'string' ? v : '';
 }
 
+const COPILOT_WRITES = new Set(['create', 'edit']);
+const CLAUDE_WRITES = new Set(['Write', 'Edit', 'MultiEdit']);
+
 function classifyCopilot(rec) {
   const data = rec.data ?? {};
   switch (rec.type) {
     case 'user.message':
-      return { role: 'user', text: str(data.content), tools: [], toolError: false };
+      return { role: 'user', text: str(data.content), tools: [], toolError: false, touches: [] };
     case 'assistant.message':
-      return { role: 'assistant', text: str(data.content), tools: [], toolError: false };
-    case 'tool.execution_start':
-      return { role: 'tool-start', text: '', tools: typeof data.toolName === 'string' ? [data.toolName] : [], toolError: false };
+      return { role: 'assistant', text: str(data.content), tools: [], toolError: false, touches: [] };
+    case 'tool.execution_start': {
+      const toolName = typeof data.toolName === 'string' ? data.toolName : null;
+      const path = typeof data.arguments?.path === 'string' ? data.arguments.path : null;
+      const touches = path ? [{ path, write: toolName !== null && COPILOT_WRITES.has(toolName) }] : [];
+      return { role: 'tool-start', text: '', tools: toolName ? [toolName] : [], toolError: false, touches };
+    }
     case 'tool.execution_complete':
-      return { role: 'tool-result', text: str(data.result?.content), tools: [], toolError: data.success === false };
+      return { role: 'tool-result', text: str(data.result?.content), tools: [], toolError: data.success === false, touches: [] };
     default:
       return OTHER;
   }
@@ -30,7 +37,7 @@ function contentText(content) {
 function classifyClaude(rec) {
   const content = rec.message?.content;
   if (rec.type === 'user') {
-    if (typeof content === 'string') return { role: 'user', text: content, tools: [], toolError: false };
+    if (typeof content === 'string') return { role: 'user', text: content, tools: [], toolError: false, touches: [] };
     if (Array.isArray(content)) {
       const results = content.filter((i) => i?.type === 'tool_result');
       if (results.length) {
@@ -39,19 +46,27 @@ function classifyClaude(rec) {
           text: contentText(results[0].content),
           tools: [],
           toolError: results.some((i) => i.is_error === true),
+          touches: [],
         };
       }
-      return { role: 'user', text: contentText(content), tools: [], toolError: false };
+      return { role: 'user', text: contentText(content), tools: [], toolError: false, touches: [] };
     }
     return OTHER;
   }
   if (rec.type === 'assistant') {
     const items = Array.isArray(content) ? content : [];
+    const touches = [];
+    for (const item of items) {
+      if (item?.type === 'tool_use' && typeof item.input?.file_path === 'string') {
+        touches.push({ path: item.input.file_path, write: typeof item.name === 'string' && CLAUDE_WRITES.has(item.name) });
+      }
+    }
     return {
       role: 'assistant',
       text: items.filter((i) => i?.type === 'text').map((i) => str(i.text)).join(''),
       tools: items.filter((i) => i?.type === 'tool_use' && typeof i.name === 'string').map((i) => i.name),
       toolError: false,
+      touches,
     };
   }
   return OTHER;

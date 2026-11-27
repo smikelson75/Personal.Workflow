@@ -5,6 +5,7 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { CLAUDE_TYPES, COPILOT_TYPES, findClaudeConversations, findCopilotConversations } from './logs.mjs';
 import { commit } from './commit.mjs';
 import { finish } from './finish.mjs';
+import { findHandoffs } from './handoffs.mjs';
 import { markChanged, recordInstall } from './installs.mjs';
 import { readRecord } from './record.mjs';
 import { classify } from './records.mjs';
@@ -138,6 +139,7 @@ export function main(argv, env, cwd) {
     uses: uses.map((u) => ({ ...u, ...useSignals(conv, u, classify) })),
   }));
   conversations.sort((a, b) => (a.harness === b.harness ? (a.id < b.id ? -1 : a.id > b.id ? 1 : 0) : a.harness < b.harness ? -1 : 1));
+  const handoffs = findHandoffs({ projectRoot, groups, skill: args.skill });
 
   if (!conversations.length) {
     lines.push('skill-review: nothing to review');
@@ -146,9 +148,9 @@ export function main(argv, env, cwd) {
 
   const outFile = resolve(args.outFile ?? join(tmpdir(), `skill-review-${basename(projectRoot)}.json`));
   const project = basename(projectRoot);
-  const depth1 = tokensOf(JSON.stringify({ project, conversations }, null, 2).length);
+  const depth1 = tokensOf(JSON.stringify(handoffs.length ? { project, conversations, handoffs } : { project, conversations }, null, 2).length);
   mkdirSync(dirname(outFile), { recursive: true });
-  writeFileSync(outFile, JSON.stringify({ project, conversations, tokens: { depth1, depth2: 0 }, notices: lines.filter((l) => l.startsWith('notice: ')) }, null, 2));
+  writeFileSync(outFile, JSON.stringify({ project, conversations, handoffs, tokens: { depth1, depth2: 0 }, notices: lines.filter((l) => l.startsWith('notice: ')) }, null, 2));
   const total = conversations.reduce((n, c) => n + c.uses.length, 0);
   lines.push(`skill-review: model tokens: depth 1: ${depth1}`);
   lines.push(`skill-review: prepared ${total} skill uses in ${conversations.length} Conversations`);

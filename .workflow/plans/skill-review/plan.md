@@ -2,7 +2,7 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: P05 S01, S08, S09, S10
+- Next: P05 S02
 - Tests locked: `4d36549`
 - Oracle: `tests/skill-review`
 - Phase base: `4d36549`
@@ -46,13 +46,13 @@
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Pending Handoffs in prepare | ready |
+| S01 | Pending Handoffs in prepare | completed |
 | S02 | Using end, named skill, Handoff-only run | ready |
 | S03 | Workflow Folder and git signals | ready |
 | S04 | Slice serves Handoff ends | ready |
 | S05 | Finish records Handoffs | ready |
 | S06 | Handoff cases and sides | ready |
 | S07 | The skill-review skill | ready |
-| S08 | pull-work suggests a review | ready |
-| S09 | /review-incubate removed | ready |
-| S10 | incubate is reviewed like any skill | ready |
+| S08 | pull-work suggests a review | completed |
+| S09 | /review-incubate removed | completed |
+| S10 | incubate is reviewed like any skill | completed |
