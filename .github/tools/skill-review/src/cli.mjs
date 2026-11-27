@@ -4,6 +4,8 @@ import { homedir, tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { CLAUDE_TYPES, COPILOT_TYPES, findClaudeConversations, findCopilotConversations } from './logs.mjs';
 import { readRecord } from './record.mjs';
+import { classify } from './records.mjs';
+import { useSignals } from './signals.mjs';
 import { claudeSkillStart, copilotSkillStart, resumeUse, segmentUses, unknownRecords } from './uses.mjs';
 
 
@@ -119,7 +121,12 @@ export function main(argv, env, cwd) {
     }
   }
 
-  const conversations = kept.map(({ conv, uses }) => ({ harness: conv.harness, id: conv.id, file: conv.file, uses }));
+  const conversations = kept.map(({ conv, uses }) => ({
+    harness: conv.harness,
+    id: conv.id,
+    file: conv.file,
+    uses: uses.map((u) => ({ ...u, ...useSignals(conv, u, classify) })),
+  }));
   conversations.sort((a, b) => (a.harness === b.harness ? (a.id < b.id ? -1 : a.id > b.id ? 1 : 0) : a.harness < b.harness ? -1 : 1));
 
   if (!conversations.length) {
