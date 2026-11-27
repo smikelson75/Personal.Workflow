@@ -2,7 +2,8 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: gate P05
+- Next: review P05
+- Review pending: S13
 - Tests locked: `97a7d2f`
 - Oracle: `tests/skill-review`
 - Phase base: `4d36549`
@@ -58,3 +59,4 @@
 | S10 | incubate is reviewed like any skill | completed |
 | S11 | Repair R53-03 fixture in p05-s02 | completed |
 | S12 | Update R55-10 assertion for S03 signals and flags | completed |
+| S13 | Index Handoff logs in privacy check | completed |

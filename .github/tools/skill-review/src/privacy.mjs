@@ -48,15 +48,18 @@ function logStrings(file) {
   return out;
 }
 
-// Indexes the log text of every Conversation in the compact record.
+// Indexes the log text of every Conversation in the compact record (including Handoff ends).
 function logIndex(compact) {
   const windows = new Set();
   const tokens = new Set();
   const ids = new Set();
-  for (const conv of compact.conversations) {
-    if (conv?.id !== undefined && conv?.id !== null) ids.add(String(conv.id));
-    if (typeof conv?.file !== 'string') continue;
-    for (const text of logStrings(conv.file)) {
+  const seenFiles = new Set();
+
+  function indexSource(id, file) {
+    if (id !== undefined && id !== null) ids.add(String(id));
+    if (typeof file !== 'string' || seenFiles.has(file)) return;
+    seenFiles.add(file);
+    for (const text of logStrings(file)) {
       const w = words(text);
       for (let i = 0; i + WINDOW <= w.length; i++) windows.add(w.slice(i, i + WINDOW).join(' '));
       for (const raw of text.split(/\s+/)) {
@@ -64,6 +67,12 @@ function logIndex(compact) {
         if (token !== '') tokens.add(token);
       }
     }
+  }
+
+  for (const conv of compact.conversations ?? []) indexSource(conv?.id, conv?.file);
+  for (const h of compact.handoffs ?? []) {
+    if (h?.writing) indexSource(h.writing.conversation, h.writing.file);
+    if (h?.using) indexSource(h.using.conversation, h.using.file);
   }
   return { windows, tokens, ids };
 }

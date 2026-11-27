@@ -304,3 +304,18 @@
 - **Do not:** weaken other assertions in `p05-s01.test.mjs`; change product code.
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/skill-review/*.test.mjs"` exits 0; target R55-10; 1 target test runs
 - **Stop and report if:** the user rejects the assertion change at Phase Review.
+
+## S13 - Index Handoff logs in privacy check
+
+- **Kind:** fix
+- **Goal:** `checkPrivacy` indexes Conversation IDs and log files of `compact.handoffs[*].writing` and `.using`, even when absent from `compact.conversations`.
+- **Depends on:** none
+- **Tier:** main - review-driven fix card
+- **Review:** required - security and trust-boundary check
+- **Restores:** `review - privacy check misses Handoff Conversation Logs`
+- **Files:** edit `.github/tools/skill-review/src/privacy.mjs`
+- **Patterns:** `.github/tools/skill-review/src/privacy.mjs:46 - logIndex`
+- **Decisions:** in `logIndex(compact)`, also iterate `compact.handoffs ?? []` and for each `writing` and `using` end, add `end.conversation` to `ids` and index `end.file` (deduplicating file paths).
+- **Do not:** edit `tests/skill-review/**`; weaken existing privacy checks.
+- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/**/*.test.mjs" ".github/tools/workflow-check/tests/acceptance/*.test.mjs" ".github/tools/workflow-core/tests/acceptance/*.test.mjs"` exits 0
+- **Stop and report if:** a file outside Files must change; a locked test fails.
