@@ -16,8 +16,8 @@
   - count: the `# pass N` line of the tap output
   - assert: `^\s*assert|\btest\(`
 - **Known failures:**
-  - `[R29-01] Glossary defines the 13 added terms` - owner P06
-  - `[Q-zero-workflow-check-errors]` - owner P06
+  - `[R29-01] Glossary defines the 13 added terms with Slice and Card separate` - owner P06
+  - `[Q-zero-workflow-check-errors] workflow-check passes on repo .workflow/ with zero errors and no Glossary findings` - owner P06
 - **Not expressible:**
   - R52 "reads the full local history" on a first run beyond fixtures - S02 tests a fixture with an old Conversation (2026-01-01); no time limit exists in code
   - R63 and Q-offline (no network calls) - tested in P04 by absence of network modules and `fetch` in the tool sources
