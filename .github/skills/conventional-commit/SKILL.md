@@ -18,7 +18,7 @@ When a workflow skill commits (`pull-work`, `work-planner`, the `planner` agent)
 1. Inspect `git status --short`, then `git diff` and `git diff --staged`.
 2. Keep unrelated changes separate. Stage one coherent slice or group of files; preserve existing staged scope unless it is mixed. Repeat for additional groups.
 3. Choose one type from [./references/types.md](./references/types.md) based on primary intent and an optional noun scope.
-4. Propose the commit message below and ask for explicit user approval before running `git commit`.
+4. Propose the commit message below and ask for explicit user approval before running `git commit`. Show the message and ask the approval question in plain chat; never call `ask_user` or any structured form for this question.
 5. Report the commit output and resulting SHA. If hooks reject it, fix the issue and retry.
 
 ```text
