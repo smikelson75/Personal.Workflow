@@ -2,8 +2,8 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: blocked S01
-- Tests locked: `95e9f1f`
+- Next: P02 S01
+- Tests locked: `8b05f9e`
 - Oracle: `tests/skill-review`
 - Phase base: `95e9f1f`
 - Reconciled: `0c7a2b317a2d2c0d38cf3dfcfc4fc4e86549b2e8`
@@ -42,6 +42,6 @@
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Signals and flags in the compact record | blocked: locked tests contradict the card. (1) `[R62-07]` fixture line 6 is a failing `tool.execution_complete` inside `from`..`end` (6-8), so Decisions require a `tool-error` flag at 6, but the test expects only `long-message` at 7. (2) `[R54-01]`, `[R54-03]`, `[R54-04]` (P01, `p01-s04.test.mjs`) `deepEqual` the whole use object, so adding `signals`/`flags` breaks them. |
+| S01 | Signals and flags in the compact record | ready |
 | S02 | Flagged slices | ready |
 | S03 | Model tokens per Depth | ready |

@@ -39,7 +39,7 @@
   - R62-04: Given Copilot `c1` with `skill.invoked` at line 2 and `tool.execution_start` `ask_user` on lines 3-8, when it runs, then `flags` is `[{kind:"many-questions",line:7}]` and `signals.questions` is 6
   - R62-05: Given the same with `ask_user` on lines 3-6 only (4 questions), when it runs, then `flags` is `[]` (boundary)
   - R62-06: Given `skill.invoked` at line 2 and `tool.execution_complete` with success false on lines 3-9, when it runs, then `flags` holds 5 entries, `tool-error` on lines 3-7 (cap)
-  - R62-07: Given R62-01's fixture with a second long `assistant.message` (4001 characters) at line 7 and a review record `{"Copilot CLI:c1":{"pull-work":5}}`, when it runs, then `from` is 6, `signals.records` is 3 and `flags` is `[{kind:"long-message",line:7}]` (boundary)
+  - R62-07: Given R62-01's fixture with a second long `assistant.message` (4001 characters) at line 7 and a review record `{"Copilot CLI:c1":{"pull-work":5}}`, when it runs, then `from` is 6, `signals.records` is 3 and `flags` is `[{kind:"tool-error",line:6},{kind:"long-message",line:7}]` (boundary)
 - **Acceptance tests:** `tests/skill-review/p02-s01.test.mjs`
 - **Files:** create `.github/tools/skill-review/src/records.mjs`; create `.github/tools/skill-review/src/signals.mjs`; edit `.github/tools/skill-review/src/cli.mjs`
 - **Patterns:** `.github/tools/skill-review/src/uses.mjs:30 - claudeSkillStart and the Claude record shapes`; `.github/tools/skill-review/src/uses.mjs:26 - copilotSkillStart`
