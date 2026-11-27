@@ -2,7 +2,7 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: P05 S02
+- Next: fixture repair S11
 - Tests locked: `4d36549`
 - Oracle: `tests/skill-review`
 - Phase base: `4d36549`
@@ -47,7 +47,7 @@
 | # | Slice | Status |
 |---|-------|--------|
 | S01 | Pending Handoffs in prepare | completed |
-| S02 | Using end, named skill, Handoff-only run | ready |
+| S02 | Using end, named skill, Handoff-only run | blocked |
 | S03 | Workflow Folder and git signals | ready |
 | S04 | Slice serves Handoff ends | ready |
 | S05 | Finish records Handoffs | ready |
@@ -56,3 +56,4 @@
 | S08 | pull-work suggests a review | completed |
 | S09 | /review-incubate removed | completed |
 | S10 | incubate is reviewed like any skill | completed |
+| S11 | Repair R53-03 fixture in p05-s02 | planned |

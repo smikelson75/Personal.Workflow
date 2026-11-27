@@ -270,3 +270,20 @@
 - **Do not:** edit any file.
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/skill-review/*.test.mjs"` exits 0; target R67-05; 1 target test runs
 - **Stop and report if:** the target test fails.
+
+## S11 - Repair R53-03 fixture in p05-s02
+
+- **Kind:** test-fix
+- **Scope:** fixture
+- **Goal:** add a `work-planner` read of `x-spec.md` to `R53-03`'s fixture so `prepare('work-planner')` writes a compact record without changing any expectation.
+- **Depends on:** none
+- **Tier:** main - fixture repair routed to `test-author` and `test-reviewer`
+- **Review:** none
+- **Restores:** `R53-03` - `c1` has no `work-planner` use or read, so `prepare('work-planner')` exits with `nothing to review` (per `R55-23`) and `fx.compact()` reads the stale `brain-storm` file.
+- **Acceptance tests:** `tests/skill-review/p05-s02.test.mjs`
+- **Files:** edit `tests/skill-review/p05-s02.test.mjs`
+- **Patterns:** `tests/skill-review/p05-s02.test.mjs:266 - R53-03 fixture setup`
+- **Decisions:** in `[R53-03]`, add `startCopilot('work-planner', '2026-11-20T12:00:00.000Z')` and `copilotTouch('view', fx.path('.workflow', 'specs', 'x-spec.md'), '2026-11-20T12:01:00.000Z')` to `c1`; keep all assertions and test titles unchanged.
+- **Do not:** change any `assert` or `test(` line; change product code.
+- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/skill-review/*.test.mjs"` exits 0; target R53-03; 1 target test runs
+- **Stop and report if:** `test-reviewer` rejects the repair; any assertion line changes.
