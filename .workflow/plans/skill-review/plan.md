@@ -2,7 +2,7 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: P01 S01
+- Next: P01 S02
 - Tests locked: `28fbd6e`
 - Oracle: `tests/skill-review`
 - Phase base: `28fbd6e`
@@ -40,7 +40,7 @@
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | CLI skeleton, layout gate, failures, empty run | ready |
+| S01 | CLI skeleton, layout gate, failures, empty run | completed |
 | S02 | Copilot CLI skill uses in the Project Repo | ready |
 | S03 | Claude Code skill uses and unknown-record notices | ready |
 | S04 | Reviewed Positions from the Review Record | ready |
