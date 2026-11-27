@@ -2,7 +2,7 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: P06 S01
+- Next: phase review P06
 - Tests locked: `97a7d2f`
 - Oracle: `tests/skill-review`
 - Phase base: `4b7543f`
@@ -11,7 +11,7 @@
 ## Current state
 - stack: Node ES modules (`.mjs`, built-in `node:test`, zero dependencies, ADR 0001); node v25.9.0; no root `package.json`.
 - `harness: node --test --test-reporter=tap "tests/skill-review/*.test.mjs"` - drives the CLI `.github/tools/skill-review/bin/skill-review.mjs` as a child process against temp Home Repos, Project Repos, and fixture Conversation Logs; `.github/tools/workflow-core/support/harness.mjs` (`tempRepo`, `read`, `lines`) is the only shared test helper; runs
-- `suite baseline:` failing: `[R29-01] Glossary defines the 13 added terms with Slice and Card separate` and `[Q-zero-workflow-check-errors] workflow-check passes on repo .workflow/ with zero errors and no Glossary findings` in `tests/glossary-alignment/p01-s01.test.mjs` (47 Terms, cap 40); 512 of 514 pass
+- `suite baseline:` passing (all suites in `tests/` pass)
 - `mutation: unsupported for node - no mutation Language Add-on installed`
 - `in place:` `scripts/update-home.mjs` (installs `.github/tools/**` to `.workflow-core/tools/**` and skills to `.claude/skills/**`, prints `Workflow version: <old> -> <new>`), `home/launch.mjs` (sets `WORKFLOW_HOME`), `.github/tools/workflow-check`, `skill-review` CLI (`prepare`, `slice`, `finish`, `commit`, `mark-changed`, `record-install`) with Handoffs, summary, ledger, STE and privacy checks, and `.github/skills/skill-review/SKILL.md`; no `/apply-observation` CLI subcommands or skill yet
 - `gap to spec:` R56 (live run), R68, R69, R70, R71, R72, R73
@@ -41,7 +41,7 @@
 
 | # | Slice | Status |
 |---|-------|--------|
-| S01 | Fix glossary-size baseline | ready |
+| S01 | Fix glossary-size baseline | completed |
 | S02 | Offer confirmed part changes (apply-list) | planned |
 | S03 | Check and restore failed pick (apply-check) | planned |
 | S04 | Mark changed, install, and commit Home Repo (apply-finish) | planned |

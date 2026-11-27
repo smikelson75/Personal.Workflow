@@ -7,10 +7,8 @@
 - `Severity` - how serious a Finding is: `error` fails the run; `warning` is reported but passes. Avoid: level, priority.
 - `Category` - a group of Rules: `structure`, `chain`, `vocabulary`, `excess`.
 - `Session` - one brain-storm session file in `.workflow/sessions/`. States: draft -> final.
-- `Session Chain` - the final, non-superseded Sessions that together hold current truth for a product.
 - `Requirement` - a numbered `R#` observable behavior with an Accept signal; ID unique across the Session Chain. States: active -> retired.
 - `Glossary` - the single shared list of canonical terms. Avoid: dictionary, language file. Code: `.workflow/language.md`
-- `Workflow Folder` - the `.workflow/` directory a run reads. Code: `.workflow/`
 - `Workflow Core` - the `.github/` skills, agents, hooks, and tools copied into a Project Repo or a Home Repo; workflow-check is one tool inside it. Excludes this repository's AGENTS.md and Language Add-ons. Avoid: toolkit, target repository. Code: `.github/`
 - `Language Add-on` - an optional stack-specific skill (harness, lint, mutation) the Developer copies into `.github/skills/` per project. Avoid: language skill, adapter. Code: `language-addons/`
 - `Stall` - an unplanned stop that needs a hand fix to workflow files before the run can continue. Avoid: blocker, hang.
@@ -30,11 +28,7 @@
 - `Traceability` - the Gate verification that every Scenario owned by the Phase has a tagged acceptance case that ran and passed.
 - `Home Repo` - the one folder per machine, attached to every session, holding copied Workflow Core, all Language Add-ons (loaded only by stack), and Project Pointers; copied workflow files stay out of its git history. Avoid: hub, home directory.
 - `Project Repo` - a repository where the Developer builds or changes one stack of an application; its own AGENTS.md names its stack and it owns its Workflow Folder. Avoid: sibling repo, child repo.
-- `Project Pointer` - one entry in the Home Repo's AGENTS.md naming a Project Repo and its role: `co-changed`, `read-only reference`, or `peer-impact`. Avoid: sibling pointer.
 - `Harness` - an agent CLI that runs the workflow: Copilot CLI or Claude Code. Avoid: client.
-- `Launch Script` - the Home Repo script that starts a Harness in a Project Repo with the Home Repo and the stack's Language Add-on, or prints the workflow version. Avoid: wrapper, start script.
-- `Update Script` - the script shipped in `Personal.Workflow` that copies Workflow Core and Language Add-ons into a Home Repo and prints the version. Avoid: sync script, installer.
-- `Coordination Playbook` - the Workflow Core document describing needs-first ordering of changes across Project Repos with existing skills. Avoid: runbook.
 - `ADR` - a point-in-time record of an approved, hard-to-reverse build decision and its trade-offs (`ADR candidate` before approval). Code: `.workflow/adr/`
 - `Conversation` - one agent chat in one Harness, identified by its Harness ID; distinct from a `Session` file. Avoid: chat, transcript.
 - `Conversation Log` - a Harness's local record of one Conversation (Copilot CLI `events.jsonl`, Claude Code project `.jsonl`).
@@ -46,7 +40,13 @@
 - `Fix Filter` - the questions every proposed change passes: can a check or script do it; can an existing rule be clarified or removed; where does it cost the least context.
 - `Depth` - how deeply Skill Review reads, 0 to 3: extract by script, triage the compact record, read flagged slices, judge; go one Depth deeper only when the Depth above flags it.
 - `Executive Summary` - the Developer's short STE report of one Skill Review run: what changed, what improved, what stayed the same, what to do next.
-- `Ledger` - the Developer's STE list of every Observation and its state, kept in the Home Repo. Avoid: tracker.
 - `Review Record` - Skill Review's fixed-layout record for agents of reviewed state, Observations, and installed version, kept in the Home Repo.
 
 ## Retired
+- `Coordination Playbook` -> `Workflow Core` - document inside Workflow Core.
+- `Project Pointer` -> `Home Repo` - entry inside the Home Repo AGENTS.md.
+- `Launch Script` -> `Home Repo` - script inside the Home Repo.
+- `Update Script` -> `Home Repo` - script that updates the Home Repo.
+- `Session Chain` -> `Session` - sequence of final Sessions.
+- `Ledger` -> `Review Record` - human-readable view of Review Record.
+- `Workflow Folder` -> `Workflow Core` - folder holding workflow artifacts.
