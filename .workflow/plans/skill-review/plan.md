@@ -2,7 +2,7 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: P03 S05
+- Next: gate P03
 - Tests locked: `01fe3cd`
 - Oracle: `tests/skill-review`
 - Phase base: `01fe3cd`
@@ -34,7 +34,7 @@
 |---|-------|--------|--------|--------|
 | P01 | Prepare finds unreviewed skill uses | completed | R52 (read side), R53 (failure, filter), R54 (read side), R61 (read side), R65, R67 (failure) | [phase-01](phase-01.md) |
 | P02 | Depth 0 signals, flags, slices, tokens | completed | R62 (Conversation Log side), Q-model-reading | [phase-02](phase-02.md) |
-| P03 | Finish: Observations, lifecycle, installs, Review Record | in progress | R54 (write side), R57, R58, R59, R61 | [phase-03](phase-03.md) |
+| P03 | Finish: Observations, lifecycle, installs, Review Record | gating | R54 (write side), R57, R58, R59, R61 | [phase-03](phase-03.md) |
 | P04 | Executive Summary, Ledger, STE check, commit | planned | R52 (commit-failed, Reviewed line), R60, R63, R64, Q-readability, Q-ste, Q-privacy, Q-offline | |
 | P05 | Handoffs, skill-review skill, cleanup | planned | R55, R56, R62 (Workflow Folder and git signals), R66, R67 (removal) | |
 | P06 | /apply-observation | planned | R68, R69, R70, R71, R72, R73 | |
@@ -47,4 +47,4 @@
 | S02 | Cases become Observations | completed |
 | S03 | Dismissal, requirements miss, question gap | completed |
 | S04 | Change commits, install records, version notice | completed |
-| S05 | Changed Observations: improved or unchanged | in progress |
+| S05 | Changed Observations: improved or unchanged | completed |

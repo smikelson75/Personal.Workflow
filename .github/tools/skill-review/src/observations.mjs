@@ -2,6 +2,8 @@ export const KINDS = ['rule adherence', 'Developer contribution', 'growth withou
 export const LABELS = ['capture miss', 'decomposition miss', 'translation miss', 'requirements miss'];
 export const OUTCOMES = ['part change', 'Developer note', 'no action'];
 export const FIX_TYPES = ['check or script', 'clarified rule', 'removed rule', 'new prose'];
+import { settleChances } from './lifecycle.mjs';
+
 const DISMISSAL_CAUSES = ['model habit', 'harness limit'];
 const ASKERS = ['brain-storm', 'incubate'];
 
@@ -68,9 +70,32 @@ function create(record, c) {
   return o;
 }
 
+// Records a matched case against an existing Observation, for the changed-lifecycle walk.
+function note(hits, id, c) {
+  if (!hits.has(id)) hits.set(id, []);
+  hits.get(id).push({ key: String(c.conversation), line: c.line });
+}
+
+// A matched case on an improved Observation opens a new watching Observation that follows it.
+function follow(record, prior) {
+  const o = create(record, {
+    part: prior.part,
+    kind: prior.kind,
+    label: prior.label,
+    side: prior.side,
+    area: prior.area,
+    outcome: prior.outcome,
+    fixType: prior.fixType,
+    fixReason: prior.fixReason,
+    description: prior.description,
+  });
+  o.follows = prior.id;
+  return o;
+}
+
 // A requirements-miss case joins the Observation with its label and area (ignoring match),
 // never leaves `watching`, and opens one confirmed question gap when its area reaches two cases.
-function applyRequirementsMiss(record, c, n, events) {
+function applyRequirementsMiss(record, c, n, events, hits) {
   validateNew(c, n);
   if (blank(c.area)) throw invalid(n, 'area missing');
   if (blank(c.asker)) throw invalid(n, 'asker missing');
@@ -90,6 +115,8 @@ function applyRequirementsMiss(record, c, n, events) {
   if (!obs) {
     obs = create(record, c);
     isNew = true;
+  } else {
+    note(hits, obs.id, c);
   }
   obs.cases += 1;
   events.push({ id: obs.id, event: isNew ? 'new' : 'case' });
@@ -118,6 +145,7 @@ export function applyCases(record, compact, cases) {
   record.nextObservation ??= 1;
   const refs = new Map();
   const events = [];
+  const hits = new Map();
 
   cases.forEach((c, index) => {
     const n = index + 1;
@@ -129,7 +157,7 @@ export function applyCases(record, compact, cases) {
     }
 
     if (c.label === 'requirements miss') {
-      applyRequirementsMiss(record, c, n, events);
+      applyRequirementsMiss(record, c, n, events, hits);
       return;
     }
 
@@ -139,6 +167,12 @@ export function applyCases(record, compact, cases) {
     if (!blank(c.match)) {
       obs = record.observations.find((o) => o.id === c.match);
       if (!obs) throw invalid(n, `unknown observation ${c.match}`);
+      if (obs.state === 'improved') {
+        obs = follow(record, obs);
+        isNew = true;
+      } else {
+        note(hits, obs.id, c);
+      }
     } else {
       validateNew(c, n);
       obs = refs.get(c.ref);
@@ -168,6 +202,8 @@ export function applyCases(record, compact, cases) {
       events.push({ id: obs.id, event: 'confirmed' });
     }
   });
+
+  settleChances(record, compact, hits, events);
 
   const order = (a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
   return events
