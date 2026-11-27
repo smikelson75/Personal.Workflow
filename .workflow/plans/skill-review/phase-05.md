@@ -223,7 +223,7 @@
 - **Goal:** the `pull-work` Phase-completion brief ends with the review suggestion in the Home layout only.
 - **Depends on:** none
 - **Tier:** delegate - one pinned edit in one section
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:** fixture: `brief = section(read('.github/skills/pull-work/SKILL.md'), '## Brief')`
   - R66-01: Given `brief`, then it has a line exactly `Next: run /skill-review to review this Phase's Conversations.`
   - R66-02: Given `brief`, then the sentence before that line says to end the brief with it when a Phase completes and `WORKFLOW_HOME` is set, and says the line is not printed in the copy layout

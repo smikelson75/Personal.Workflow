@@ -164,3 +164,6 @@ Setup-card approval, Phase Review, and an ADR candidate from Revise are Checkpoi
 ## Brief
 
 At every stop, report: slices completed with their commits, fixture repairs, review findings and what became of them, blocked slices with reasons, and the `Next` line. Define any workflow term the user hasn't seen in this session.
+
+In the Home layout (`WORKFLOW_HOME` is set), end the brief of a completed Phase with this line; in the copy layout, do not print it:
+Next: run /skill-review to review this Phase's Conversations.
