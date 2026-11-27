@@ -2,10 +2,10 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: phase review P04
-- Tests locked: `4cea114`
+- Next: P04 S02
+- Tests locked: `490cb97`
 - Oracle: `tests/skill-review`
-- Phase base: `01fe3cd`
+- Phase base: `490cb97`
 - Reconciled: `0c7a2b317a2d2c0d38cf3dfcfc4fc4e86549b2e8`
 
 ## Current state
@@ -37,6 +37,19 @@
 | P01 | Prepare finds unreviewed skill uses | completed | R52 (read side), R53 (failure, filter), R54 (read side), R61 (read side), R65, R67 (failure) | [phase-01](phase-01.md) |
 | P02 | Depth 0 signals, flags, slices, tokens | completed | R62 (Conversation Log side), Q-model-reading | [phase-02](phase-02.md) |
 | P03 | Finish: Observations, lifecycle, installs, Review Record | completed | R54 (write side), R57, R58, R59, R61 | [phase-03](phase-03.md) |
-| P04 | Executive Summary, Ledger, STE check, commit | planned | R52 (commit-failed, Reviewed line), R55 (pending count and Ledger listing), R59 (Ledger wording), R60, R61 (Ledger), R62 (Model tokens line), R63, R64, R65 (Notices), Q-readability, Q-ste, Q-privacy, Q-offline | [phase-04](phase-04.md) |
+| P04 | Executive Summary, Ledger, STE check, commit | in progress | R52 (commit-failed, Reviewed line), R55 (pending count and Ledger listing), R59 (Ledger wording), R60, R61 (Ledger), R62 (Model tokens line), R63, R64, R65 (Notices), Q-readability, Q-ste, Q-privacy, Q-offline | [phase-04](phase-04.md) |
 | P05 | Handoffs, skill-review skill, cleanup | planned | R55, R56, R62 (Workflow Folder and git signals), R66, R67 (removal) | |
 | P06 | /apply-observation | planned | R68, R69, R70, R71, R72, R73 | |
+
+## P04 slices
+
+| # | Slice | Status |
+|---|-------|--------|
+| S01 | R61-02 expects the new record files | completed |
+| S02 | Summary file with header, version, Reviewed, tokens, Notices | ready |
+| S03 | Summary sections: Changed, Improved, Same, Next | ready |
+| S04 | Ledger | ready |
+| S05 | STE check | ready |
+| S06 | No copied Conversation Log text or secrets in records | ready |
+| S07 | Commit the records in the Home Repo | ready |
+| S08 | Offline | ready |
