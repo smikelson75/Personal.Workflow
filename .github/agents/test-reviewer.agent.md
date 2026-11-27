@@ -4,9 +4,9 @@ description: "Read-only check that a fixture repair to locked acceptance tests c
 tools: ['read', 'search', 'execute', 'Read', 'Grep', 'Glob', 'Bash']
 user-invocable: false
 model:
+  - Gemini 4 Hydrogen (copilot)
   - Claude Sonnet 5.5 (copilot)
   - GPT-6.1 Terra (copilot)
-  - Gemini 4 Neon (copilot)
 reasoning-effort: medium
 ---
 

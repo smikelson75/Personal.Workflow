@@ -4,9 +4,9 @@ description: "Optional: run work-planner's Plan mode on the strongest model for 
 argument-hint: "What to plan (e.g. 'plan v1')."
 tools: ['read', 'search', 'edit', 'execute', 'agent', 'todo', 'Read', 'Grep', 'Glob', 'Edit', 'Write', 'Bash', 'Agent', 'TodoWrite']
 model:
+  - Gemini 4 Neon (copilot)
   - Claude Opus 5.5 (copilot)
   - GPT-6.1 Sol (copilot)
-  - Gemini 4 Neon (copilot)
 reasoning-effort: high
 ---
 
