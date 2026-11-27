@@ -1,5 +1,18 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+
+export function homeFor(env) {
+  const home = env.WORKFLOW_HOME;
+  return home && existsSync(home) && statSync(home).isDirectory() ? home : null;
+}
+
+export function writeRecord(homePath, record) {
+  const file = recordPath(homePath);
+  mkdirSync(dirname(file), { recursive: true });
+  const temp = `${file}.${process.pid}.tmp`;
+  writeFileSync(temp, JSON.stringify(record, null, 2) + '\n');
+  renameSync(temp, file);
+}
 
 export function recordPath(homePath) {
   return resolve(join(homePath, 'skill-review', 'review-record.json'));
