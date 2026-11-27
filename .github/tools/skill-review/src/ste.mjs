@@ -1,3 +1,4 @@
+import { compareIds } from './observations.mjs';
 // Simplified Technical English limits for the sentences a run writes.
 const ENTRY_MAX_SENTENCES = 3;
 const PARAGRAPH_MAX_SENTENCES = 6;
@@ -17,7 +18,7 @@ export function wordCount(sentence) {
   return sentence.split(/\s+/).filter((w) => w !== '').length;
 }
 
-const byId = (a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+const byId = (a, b) => compareIds(a.id, b.id);
 
 // Failure lines for the Observations this run created (`new` events), in ID order.
 // An Observation listed in ## Next (confirmed, part change) has the lower word limit.

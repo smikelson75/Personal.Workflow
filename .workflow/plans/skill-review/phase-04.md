@@ -231,3 +231,21 @@
 - **Do not:** edit `tests/skill-review/**`; add dependencies.
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/skill-review/*.test.mjs"` exits 0; targets Q-offline, R63-05; 2 target tests run
 - **Stop and report if:** the scenarios fail (Revise adds a `fix` card); a locked test looks wrong; the same failure after 3 attempts.
+
+## S09 - Review fix: write the Review Record before the summary and ledger
+
+- **Kind:** fix
+- **Tier:** main
+- **Review:** required
+- **Restores:** review - a failed Review Record write left a summary and ledger that disagreed with it
+- **Files:** edit `.github/tools/skill-review/src/finish.mjs`
+- **Done when:** the full suite passes (512 pass, 0 fail excluding Known failures)
+
+## S10 - Review fix: order Observation IDs by number
+
+- **Kind:** fix
+- **Tier:** main
+- **Review:** required
+- **Restores:** review - IDs of 100 or more sorted before O11 in the ledger, summary, and STE check
+- **Files:** edit `.github/tools/skill-review/src/observations.mjs`, `ledger.mjs`, `summary.mjs`, `ste.mjs`, `finish.mjs` under `.github/tools/skill-review/src/`
+- **Done when:** the full suite passes (512 pass, 0 fail excluding Known failures)

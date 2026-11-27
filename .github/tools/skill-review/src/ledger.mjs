@@ -1,10 +1,11 @@
+import { compareIds } from './observations.mjs';
 import { installOf } from './installs.mjs';
 
 const STATES = ['confirmed', 'changed', 'watching', 'improved', 'dismissed'];
 const DAY_MS = 86400000;
 
 function sortById(list) {
-  return [...list].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  return [...list].sort((a, b) => compareIds(a.id, b.id));
 }
 
 function stateLine(record, o) {

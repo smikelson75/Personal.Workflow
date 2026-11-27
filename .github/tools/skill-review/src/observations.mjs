@@ -16,7 +16,12 @@ function invalid(n, message) {
   return err;
 }
 
-function idText(number) {
+// Orders Observation IDs by their number, so O100 follows O99.
+export function compareIds(a, b) {
+  return Number(a.slice(1)) - Number(b.slice(1));
+}
+
+export function idText(number) {
   return `O${String(number).padStart(2, '0')}`;
 }
 

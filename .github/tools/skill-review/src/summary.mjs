@@ -1,3 +1,4 @@
+import { compareIds } from './observations.mjs';
 const MAX_NOTICES = 10;
 const SECTIONS = ['Changed', 'Improved', 'Same', 'Next'];
 
@@ -43,7 +44,7 @@ function eventsById(observationLines) {
 }
 
 function sortById(list) {
-  return [...list].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  return [...list].sort((a, b) => compareIds(a.id, b.id));
 }
 
 // Changed, Improved, Same, Next bodies, keyed by section name.

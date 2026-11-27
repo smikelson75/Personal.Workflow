@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
-import { applyCases } from './observations.mjs';
+import { applyCases, idText } from './observations.mjs';
 import { renderLedger } from './ledger.mjs';
 import { homeFor, readRecord, writeRecord } from './record.mjs';
 import { renderSummary, stamp } from './summary.mjs';
@@ -118,7 +118,7 @@ export function finish(args, env, cwd = process.cwd()) {
     if (parsed.attempt < 3) {
       return { lines: [...failures, `skill-review failed: ste-check: ${failures.length} sentences`], code: 1 };
     }
-    const id = `O${String(record.nextObservation).padStart(2, '0')}`;
+    const id = idText(record.nextObservation);
     record.observations.push({
       id,
       part: 'skill-review',
@@ -156,6 +156,9 @@ export function finish(args, env, cwd = process.cwd()) {
 
   const now = env.SKILL_REVIEW_NOW ? new Date(env.SKILL_REVIEW_NOW) : new Date();
   let summaryLines = [];
+  let summaryText = null;
+  let ledgerText = null;
+  let summaryProject = null;
   if (uses > 0) {
     const version = manifestVersion(home);
     const source = (record.installs ?? []).find((i) => i.version === version)?.source ?? 'unknown';
@@ -171,11 +174,17 @@ export function finish(args, env, cwd = process.cwd()) {
       notices: [...(compact.notices ?? []), ...noticeLines, ...steNotices],
       handoffsReviewed: Array.isArray(judgement.handoffs) ? judgement.handoffs.length : 0,
     });
-    summaryLines = [`skill-review: summary: ${writeSummary(home, project, now, text)}`];
-    writeLedger(home, renderLedger({ record, now }));
+    ledgerText = renderLedger({ record, now });
+    summaryText = text;
+    summaryProject = project;
   }
 
+  // The Review Record is the source of truth, so it is written first.
   writeRecord(home, record);
+  if (summaryText !== null) {
+    summaryLines = [`skill-review: summary: ${writeSummary(home, summaryProject, now, summaryText)}`];
+    writeLedger(home, ledgerText);
+  }
   return {
     lines: [...noticeLines, ...observationLines, ...summaryLines, `skill-review: reviewed ${uses} skill uses in ${compact.conversations.length} Conversations`],
     code: 0,

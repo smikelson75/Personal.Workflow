@@ -2,11 +2,11 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: review P04
+- Next: gate P04
 - Tests locked: `490cb97`
 - Oracle: `tests/skill-review`
 - Phase base: `490cb97`
-- Review pending: S02, S03, S04, S06, S07
+- Review pending: S09, S10
 - Reconciled: `0c7a2b317a2d2c0d38cf3dfcfc4fc4e86549b2e8`
 
 ## Current state
@@ -54,3 +54,5 @@
 | S06 | No copied Conversation Log text or secrets in records | completed |
 | S07 | Commit the records in the Home Repo | completed |
 | S08 | Offline | completed |
+| S09 | Review fix: write the Review Record first | completed |
+| S10 | Review fix: order Observation IDs by number | completed |
