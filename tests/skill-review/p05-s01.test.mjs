@@ -100,6 +100,8 @@ test('[R55-10] a graduated incubation written by incubate is a pending Handoff t
         writtenAt: WRITTEN,
         writing: { harness: 'Copilot CLI', conversation: 'c1', file, line: 3 },
         using: null,
+        signals: { bytes: 26, sections: 0, revisionsAfterWrite: 0, readsInUse: 0 },
+        flags: [],
       },
     ]);
   } finally {
