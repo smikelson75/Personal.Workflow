@@ -2,7 +2,7 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: P05 S03
+- Next: gate P05
 - Tests locked: `97a7d2f`
 - Oracle: `tests/skill-review`
 - Phase base: `4d36549`
@@ -39,7 +39,7 @@
 | P02 | Depth 0 signals, flags, slices, tokens | completed | R62 (Conversation Log side), Q-model-reading | [phase-02](phase-02.md) |
 | P03 | Finish: Observations, lifecycle, installs, Review Record | completed | R54 (write side), R57, R58, R59, R61 | [phase-03](phase-03.md) |
 | P04 | Executive Summary, Ledger, STE check, commit | completed | R52 (commit-failed, Reviewed line), R55 (pending count and Ledger listing), R59 (Ledger wording), R60, R61 (Ledger), R62 (Model tokens line), R63, R64, R65 (Notices), Q-readability, Q-ste, Q-privacy, Q-offline | [phase-04](phase-04.md) |
-| P05 | Handoffs, skill-review skill, cleanup | in progress | R55, R56 (not expressible), R62 (Workflow Folder and git signals), R66, R67 (removal, incubate) | [phase-05](phase-05.md) |
+| P05 | Handoffs, skill-review skill, cleanup | gating | R55, R56 (not expressible), R62 (Workflow Folder and git signals), R66, R67 (removal, incubate) | [phase-05](phase-05.md) |
 | P06 | /apply-observation | planned | R68, R69, R70, R71, R72, R73 | |
 
 ## P05 slices
@@ -48,7 +48,7 @@
 |---|-------|--------|
 | S01 | Pending Handoffs in prepare | completed |
 | S02 | Using end, named skill, Handoff-only run | completed |
-| S03 | Workflow Folder and git signals | ready |
+| S03 | Workflow Folder and git signals | completed |
 | S04 | Slice serves Handoff ends | completed |
 | S05 | Finish records Handoffs | completed |
 | S06 | Handoff cases and sides | completed |

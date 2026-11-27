@@ -1,4 +1,5 @@
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { parseLine } from './logs.mjs';
 import { classify } from './records.mjs';
@@ -86,6 +87,52 @@ function touchesIn({ projectRoot, uses, skill, art, write }) {
   return found;
 }
 
+// Files whose bytes and sections make up the artifact: the file itself, or the .md files directly inside a folder.
+function artifactFiles(projectRoot, art) {
+  const abs = join(projectRoot, art.artifact);
+  if (!art.isFolder) return [abs];
+  return listMdFiles(abs).map((name) => join(abs, name));
+}
+
+function artifactSize(projectRoot, art) {
+  let bytes = 0;
+  let sections = 0;
+  for (const file of artifactFiles(projectRoot, art)) {
+    bytes += statSync(file).size;
+    sections += (readFileSync(file, 'utf8').match(/^## /gm) ?? []).length;
+  }
+  return { bytes, sections };
+}
+
+// Commits touching the artifact whose committer date is after writtenAt; 0 when git fails.
+function revisionsAfter(projectRoot, artifact, writtenAt) {
+  const res = spawnSync('git', ['log', '--format=%cI', '--', artifact], { cwd: projectRoot, encoding: 'utf8' });
+  if (res.status !== 0) return 0;
+  const written = Date.parse(writtenAt);
+  return res.stdout
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l && Date.parse(l) > written).length;
+}
+
+// Read touches of the artifact inside the using use (the use holding using.line); 0 when there is no using.
+function readsInUse({ projectRoot, uses, art, using }) {
+  if (!using) return 0;
+  const hit = uses.find(
+    ({ conv, use }) =>
+      conv.harness === using.harness && conv.id === using.conversation && use.start <= using.line && using.line <= use.end,
+  );
+  if (!hit) return 0;
+  let n = 0;
+  for (let line = hit.use.start; line <= hit.use.end; line++) {
+    const rec = parseLine(hit.conv.lines[line - 1]);
+    if (!rec || typeof rec.timestamp !== 'string' || !rec.timestamp) continue;
+    const { touches } = classify(rec, hit.conv.harness);
+    if (touches.some((t) => !t.write && matchesArtifact(projectRoot, t.path, art))) n++;
+  }
+  return n;
+}
+
 export function findHandoffs({ projectRoot, groups, skill = null, handoffs = [] }) {
   if (!projectRoot) return [];
   const artifacts = collectArtifacts(projectRoot);
@@ -119,6 +166,14 @@ export function findHandoffs({ projectRoot, groups, skill = null, handoffs = [] 
     reads.sort(compareEnd);
     const r = reads[0];
 
+    const using = r ? { harness: r.harness, conversation: r.conversation, file: r.file, line: r.line } : null;
+    const { bytes, sections } = artifactSize(projectRoot, art);
+    const revisionsAfterWrite = revisionsAfter(projectRoot, art.artifact, w.timestamp);
+    const inUse = readsInUse({ projectRoot, uses, art, using });
+    const flags = [];
+    if (revisionsAfterWrite >= 1) flags.push({ kind: 'artifact-revised' });
+    if (inUse >= 3) flags.push({ kind: 'artifact-reread' });
+
     entries.push({
       id,
       writingSkill: art.writingSkill,
@@ -127,7 +182,9 @@ export function findHandoffs({ projectRoot, groups, skill = null, handoffs = [] 
       state: 'pending',
       writtenAt: w.timestamp,
       writing: { harness: w.harness, conversation: w.conversation, file: w.file, line: w.line },
-      using: r ? { harness: r.harness, conversation: r.conversation, file: r.file, line: r.line } : null,
+      using,
+      signals: { bytes, sections, revisionsAfterWrite, readsInUse: inUse },
+      flags,
     });
   }
 
