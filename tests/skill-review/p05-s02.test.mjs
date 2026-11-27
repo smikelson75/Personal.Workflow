@@ -269,6 +269,8 @@ test('[R53-03] a named skill keeps the Handoffs it writes or uses', () => {
       copilotTouch('edit', fx.path('.workflow', 'sessions', 'context-a.md'), '2026-11-20T10:01:00.000Z'),
       startCopilot('behavior-spec', '2026-11-20T11:00:00.000Z'),
       copilotTouch('create', fx.path('.workflow', 'specs', 'x-spec.md'), '2026-11-20T11:01:00.000Z'),
+            startCopilot('work-planner', '2026-11-20T12:00:00.000Z'),
+            copilotTouch('view', fx.path('.workflow', 'specs', 'x-spec.md'), '2026-11-20T12:01:00.000Z'),
     ]);
     const first = 'incubate:.workflow/incubations/idea.md';
     const second = 'brain-storm:.workflow/sessions/context-a.md';
