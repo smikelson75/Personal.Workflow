@@ -183,14 +183,14 @@ test('[R54-08] finish never lowers a Position', () => {
   }
 });
 
-test('[R61-02] finish writes no summaries folder and no ledger', () => {
+test('[R61-02] finish writes only record files in the skill-review folder', () => {
   const fx = makeFixture({ record: baseRecord({ 'Copilot CLI:c1': { 'pull-work': 400 } }) });
   try {
     fx.compact([conv('Copilot CLI', 'c1', [{ skill: 'pull-work', start: 2, end: 520, from: 401 }])]);
     fx.judgement();
     const res = fx.finish([fx.compactFile, fx.judgementFile]);
     assert.equal(res.status, 0, res.stdout);
-    assert.deepEqual(readdirSync(join(fx.home, 'skill-review')), ['review-record.json']);
+    assert.deepEqual(readdirSync(join(fx.home, 'skill-review')),     ['ledger.md', 'review-record.json', 'summaries']);
   } finally {
     fx.cleanup();
   }
