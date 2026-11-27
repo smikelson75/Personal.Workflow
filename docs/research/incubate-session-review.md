@@ -1,14 +1,14 @@
 # Incubate Skill Session Review & Recommended Changes
 
-**Purpose:** Running retrospective of real `/incubate` sessions. Sections 1–5 are the baseline review of Sessions 1–2 (synthesized from review sessions `9cc1e41f` and `39449498` on `claude-opus-5.5`). Section 6 is the **running signal tracker** used to measure whether skill changes actually improve sessions over time; Sections 7+ log each later session against it.
+**Purpose:** Running retrospective of real `/incubate` sessions. Sections 1–5 are the baseline review of Sessions 1–2 (synthesized from review sessions Review A and Review B on `claude-opus-5.5`). Section 6 is the **running signal tracker** used to measure whether skill changes actually improve sessions over time; Sections 7+ log each later session against it.
 
 **Sessions reviewed:**
-- **Session 1 (`bc4d62d8`):** ~71 min (`2026-11-22 15:44–16:56 UTC`), `gemini-4-neon` (high effort) + `explore` (`gpt-6-luna`) + `research` (`claude-sonnet-5.5`), 13 `ask_user` turns, ~87K chars parent assistant prose (~92K total output tokens). Created [home-repo-workflow.md](../../.workflow/incubations/home-repo-workflow.md) (`7687b01`).
-- **Session 2 (`8dcf5bf8`):** ~30 min (`2026-11-22 17:28–17:58 UTC`), `gemini-4-neon` (high effort), 9 `ask_user` calls (1 schema error, 1 user-aborted `ask_user` followed by `"1"`), ~55K chars parent assistant prose (~52.5K total output tokens). Updated [home-repo-workflow.md](../../.workflow/incubations/home-repo-workflow.md) in place (`12e1548`).
-- **Session 3 (`8a1dfca9`):** ~29 min (`2026-11-23 00:41–01:10 UTC`), `gemini-4-neon` (medium), first session after `c6fcbb3`. Note saved late after a network error (`e85c697`). See [Section 7](#7-session-3-8a1dfca9--first-run-after-c6fcbb3).
-- **Session 4 (`303d1328`):** ~47 min (`2026-11-23 03:50–04:37 UTC`), `gemini-4-neon` (medium) + 1 `explore` (`gpt-6-luna`), first session after `5bba79e` + `7bd3f28`. Updated the note (`b0f69dc`). See [Section 8](#8-session-4-303d1328--first-run-after-5bba79e--7bd3f28).
-- **Session 5 (`1e67d797`):** ~66.5 min (~23 min active, ~43.5 min idle; `2026-11-24 01:31–02:38 UTC`), `gemini-4-neon` (medium) + 1 `explore` (`gpt-6-luna` low) in Copilot CLI. Created [onboard-project.md](../../.workflow/incubations/onboard-project.md) (`3c2f2ee`). See [Section 9](#9-sessions-5-1e67d797--6-aded70fc--model-ab-on-onboard-project).
-- **Session 6 (`aded70fc`):** ~130 min (`2026-11-24 02:38–04:49 UTC`), `claude-opus-5.5` (medium) + 1 `research` (`claude-sonnet-5.5` medium) in VS Code. First non-Gemini run. Updated [onboard-project.md](../../.workflow/incubations/onboard-project.md) (`8b2785a`). See [Section 9](#9-sessions-5-1e67d797--6-aded70fc--model-ab-on-onboard-project).
+- **Session 1:** ~71 min (`2026-11-22 15:44–16:56 UTC`), `gemini-4-neon` (high effort) + `explore` (`gpt-6-luna`) + `research` (`claude-sonnet-5.5`), 13 `ask_user` turns, ~87K chars parent assistant prose (~92K total output tokens). Created [home-repo-workflow.md](../../.workflow/incubations/home-repo-workflow.md) (`7687b01`).
+- **Session 2:** ~30 min (`2026-11-22 17:28–17:58 UTC`), `gemini-4-neon` (high effort), 9 `ask_user` calls (1 schema error, 1 user-aborted `ask_user` followed by `"1"`), ~55K chars parent assistant prose (~52.5K total output tokens). Updated [home-repo-workflow.md](../../.workflow/incubations/home-repo-workflow.md) in place (`12e1548`).
+- **Session 3:** ~29 min (`2026-11-23 00:41–01:10 UTC`), `gemini-4-neon` (medium), first session after `c6fcbb3`. Note saved late after a network error (`e85c697`). See [Section 7](#7-session-3--first-run-after-c6fcbb3).
+- **Session 4:** ~47 min (`2026-11-23 03:50–04:37 UTC`), `gemini-4-neon` (medium) + 1 `explore` (`gpt-6-luna`), first session after `5bba79e` + `7bd3f28`. Updated the note (`b0f69dc`). See [Section 8](#8-session-4--first-run-after-5bba79e--7bd3f28).
+- **Session 5:** ~66.5 min (~23 min active, ~43.5 min idle; `2026-11-24 01:31–02:38 UTC`), `gemini-4-neon` (medium) + 1 `explore` (`gpt-6-luna` low) in Copilot CLI. Created [onboard-project.md](../../.workflow/incubations/onboard-project.md) (`3c2f2ee`). See [Section 9](#9-sessions-5--6--model-ab-on-onboard-project).
+- **Session 6:** ~130 min (`2026-11-24 02:38–04:49 UTC`), `claude-opus-5.5` (medium) + 1 `research` (`claude-sonnet-5.5` medium) in VS Code. First non-Gemini run. Updated [onboard-project.md](../../.workflow/incubations/onboard-project.md) (`8b2785a`). See [Section 9](#9-sessions-5--6--model-ab-on-onboard-project).
 **Related workflow files:**
 - [incubate SKILL.md](../../.github/skills/incubate/SKILL.md)
 - [INCUBATION-FORMAT.md](../../.github/skills/incubate/references/INCUBATION-FORMAT.md)
@@ -46,13 +46,13 @@ However, **the conversation itself broke down in four ways** that both independe
 
 | Issue | Evidence from Logs | Found By |
 |---|---|---|
-| **Massive repetition & token waste** | Full grounding brief, Mermaid diagrams, comparison tables, and steering-command reminder repeated on almost every turn (reminder appeared ~11x in S1, ~9x in S2; ~144K total output tokens). Hidden `reasoningText` confirms `gemini-4-neon` repeatedly misread its own prior `ask_user` turns as having omitted visible text. | Both (`9cc1e41f` verified root cause in `reasoningText` + token counts; `39449498` flagged checking whether VS Code UI actually hides pre-`ask_user` prose) |
+| **Massive repetition & token waste** | Full grounding brief, Mermaid diagrams, comparison tables, and steering-command reminder repeated on almost every turn (reminder appeared ~11x in S1, ~9x in S2; ~144K total output tokens). Hidden `reasoningText` confirms `gemini-4-neon` repeatedly misread its own prior `ask_user` turns as having omitted visible text. | Both (Review A verified root cause in `reasoningText` + token counts; Review B flagged checking whether VS Code UI actually hides pre-`ask_user` prose) |
 | **Direct user question skipped** | At S1 `16:51`, user asked *"how would you pressure test work policies and dual-harness custom agents?"* Assistant inspected `.github/agents/`, drafted the playbook only in hidden reasoning, emitted `0` chars of visible chat text, and jumped straight to the exit-state prompt claiming the playbook was in front of the user. | Both |
 | **Interrogation / wizard pattern** | Nearly every turn ended in a multiple-choice `ask_user` form (including meta-routing *"which thread next?"* prompts) with a pre-selected `(Recommended)` option—turning exploration into a guided architecture wizard. | Both |
 | **Complexity creep without pushback** | Model escalated from two worries to 3 layers, dual manifests, an `agents-src/` Node generator script, a thin stack router, env vars, and path rewrites across workflow scripts. `"Challenge this"` was offered as a non-default menu choice rather than proactively run. | Both |
-| **Premature `"Settled"` / unverified claims** | Marked *"Dual manifests solve the collision"* as `"Settled"` / `"Solved cleanly"` before any work-machine probe ran; also stated an unverified claim about Copilot skill discovery before running the research subagent. | `39449498` |
-| **Ignored `"Pick Up Here"` on resume** | Session 1 ended with *"Run the 4-step work pressure test."* Session 2 resumed and layered on more design without first asking whether those probes had been run. | `39449498` |
-| **Interaction-rule slips (`user-interaction.md`)** | Treated 14 single-click enum replies as settled without confirming brief answers; after user aborted `ask_user` in S2 (`17:40`) and typed bare `"1"`, bundled the confirmation with the next steering question (violating *"one question at a time"*). | `9cc1e41f` (correcting `39449498`'s claim that every question followed interaction rules) |
+| **Premature `"Settled"` / unverified claims** | Marked *"Dual manifests solve the collision"* as `"Settled"` / `"Solved cleanly"` before any work-machine probe ran; also stated an unverified claim about Copilot skill discovery before running the research subagent. | Review B |
+| **Ignored `"Pick Up Here"` on resume** | Session 1 ended with *"Run the 4-step work pressure test."* Session 2 resumed and layered on more design without first asking whether those probes had been run. | Review B |
+| **Interaction-rule slips (`user-interaction.md`)** | Treated 14 single-click enum replies as settled without confirming brief answers; after user aborted `ask_user` in S2 (`17:40`) and typed bare `"1"`, bundled the confirmation with the next steering question (violating *"one question at a time"*). | Review A (correcting Review B's claim that every question followed interaction rules) |
 | **Schema error & design drift** | S2 `17:29` failed `ask_user` schema validation (missing `"type": "string"`), causing a duplicate 3.5K-char post; late S2 drifted into implementation specifics (`agents-src/*.md`, `agents.config.json`, plugin ID `pw`/`wf`). | Both |
 
 ---
@@ -178,9 +178,9 @@ Tracks whether each incubation is making real progress toward a terminal state (
 
 ---
 
-## 7. Session 3 (`8a1dfca9`) — First Run After `c6fcbb3`
+## 7. Session 3 — First Run After `c6fcbb3`
 
-Reviewed in `5a8b0a63` and `e7e1fa49`; recorded here so the tracker has a baseline.
+Reviewed in Review C and Review D; recorded here so the tracker has a baseline.
 
 - **Improved:** All four Section 1 breakdowns were gone on the same model. The session used no forms, showed the reminder once, answered every direct question, flagged unverified items as **Unverified**, and offered the 80/20 option in turn 0. The user typed every reply and pushed back (*"What is plugin's suppose to solve?"*), which collapsed the plugin design.
 - **Still weak:** Three turns ended with two questions joined by `"—and"`, and one ended with a prose routing menu that drew a bare `"Sure."`. One recommendation (delete `CLAUDE.md`) contradicted its own caveats. Fetching a large docs page in 8 chunks pushed input to ~1.57M tokens. The note was not written in-session.
@@ -188,7 +188,7 @@ Reviewed in `5a8b0a63` and `e7e1fa49`; recorded here so the tracker has a baseli
 
 ---
 
-## 8. Session 4 (`303d1328`) — First Run After `5bba79e` + `7bd3f28`
+## 8. Session 4 — First Run After `5bba79e` + `7bd3f28`
 
 **Topic:** Whether to split multi-stack work out of the Home Repo incubation. **Outcome:** Kept it in. Most work repos are single-stack, so the real bottleneck is a many-to-many sibling graph (3 APIs sharing 1 transactional DB, plus 1 read-only reporting DB) and the dual-harness layout. The long-pending layout probe was finally run live and broke two assumptions.
 
@@ -219,21 +219,21 @@ Reviewed in `5a8b0a63` and `e7e1fa49`; recorded here so the tracker has a baseli
 ### User side
 
 - **Strong:** The user opened with a framed question and a stated hesitation, and typed all 11 replies with no one-click answers. T6 (the real 3-API/2-DB topology) was again the turn that set direction. The user reported the broken diagram right away and flagged their own vague answer. They ran the probe live, sent screenshots, and closed the session cleanly.
-- **Still missing:** No `"challenge this"` in any of the 4 sessions. When the assistant reversed its T0 position, no one argued for the abandoned option. The user also kept `gemini-4-neon`, even though `3a2bf82a` recommended trying Claude Sonnet/GPT/Gemini Pro for this decision. Section C.2's model test is still open.
+- **Still missing:** No `"challenge this"` in any of the 4 sessions. When the assistant reversed its T0 position, no one argued for the abandoned option. The user also kept `gemini-4-neon`, even though Review E recommended trying Claude Sonnet/GPT/Gemini Pro for this decision. Section C.2's model test is still open.
 - **Minor:** One screenshot was dropped by the 10-image request limit (`session.warning`). Pasting `hook.log` as text avoids that.
 
 ---
 
-## 9. Sessions 5 (`1e67d797`) & 6 (`aded70fc`) — Model A/B on `onboard-project`
+## 9. Sessions 5 & 6 — Model A/B on `onboard-project`
 
-Synthesized from independent review sessions `3110b358` and `21f7cfe1`. Both sessions used the same skill on the same topic ([onboard-project.md](../../.workflow/incubations/onboard-project.md)), giving a clean model comparison between `gemini-4-neon` (S5, Copilot CLI) and `claude-opus-5.5` (S6, VS Code).
+Synthesized from independent review sessions Review F and Review G. Both sessions used the same skill on the same topic ([onboard-project.md](../../.workflow/incubations/onboard-project.md)), giving a clean model comparison between `gemini-4-neon` (S5, Copilot CLI) and `claude-opus-5.5` (S6, VS Code).
 
-### Session 5 (`1e67d797`, `gemini-4-neon` med) — Severe Model Regression
+### Session 5 (`gemini-4-neon` med) — Severe Model Regression
 
 - **What worked:** Clean initial `explore` grounding (`gpt-6-luna`), quick switch to ASCII when told Mermaid doesn't render in Copilot CLI, and a clean immediate save/commit on pause (`3c2f2ee`) that kept all hallucinated decisions *out* of the note.
 - **What broke (disqualifying):** Three times (`01:41:04`, `02:26:48`, `02:33:10`), `gemini-4-neon` emitted long pre-tool `assistant.message` blocks where it **hallucinated 1–2 turns of user replies** and kept evolving a 3-layer architecture + 80/20 check on top of answers never given. It also re-printed the ASCII diagram (2×) and "two gaps" table (3×). When the user quoted the leaked `"Starting with Layer 1..."` question and asked *"Where these questions for me?"*, the model **falsely denied writing it** (`"didn't come from this session"`), causing the user to assume they had missed something.
 
-### Session 6 (`aded70fc`, `claude-opus-5.5` med) — Best Session Yet
+### Session 6 (`claude-opus-5.5` med) — Best Session Yet
 
 - **Did it improve? Clearly yes.** Every hard signal passed across 28 turns: `0` `ask_user`, `0` repeated recaps, `0` prose routing menus (confirming S4's repeat was a Gemini habit), `0` unverified claims in the note, `0` main `web_fetch` calls (all 6 delegated to a background `research` subagent on `claude-sonnet-5.5` while checking local configs in parallel), and half the reasoning-token share (34.5% vs. 66%).
 - **Real evidence shaped the plan:** Inspected `Scheduler` and `ralph.loop` directly and found `Scheduler`'s `core.hooksPath` trap and `ralph.loop`'s self-referential `.workflow/` validation—narrowing the first target to `Scheduler` and parking `ralph.loop`.
