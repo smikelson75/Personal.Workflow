@@ -50,3 +50,74 @@ export function findCopilotConversations(copilotHome, projectRoot) {
   }
   return found;
 }
+
+export function findClaudeConversations(claudeHome, projectRoot) {
+  const base = join(claudeHome, 'projects');
+  if (!existsSync(base)) return [];
+  const found = [];
+  for (const dir of readdirSync(base, { withFileTypes: true })) {
+    if (!dir.isDirectory()) continue;
+    const folder = join(base, dir.name);
+    for (const entry of readdirSync(folder, { withFileTypes: true })) {
+      if (!entry.isFile() || !entry.name.endsWith('.jsonl')) continue;
+      const file = join(folder, entry.name);
+      const lines = splitLines(readFileSync(file, 'utf8'));
+      let cwd = null;
+      for (const line of lines) {
+        const rec = parseLine(line);
+        if (rec && typeof rec.cwd === 'string') {
+          cwd = rec.cwd;
+          break;
+        }
+      }
+      if (cwd !== null && isInside(cwd, projectRoot)) {
+        found.push({ harness: 'Claude Code', id: entry.name.slice(0, -'.jsonl'.length), file, lines });
+      }
+    }
+  }
+  return found;
+}
+
+export const COPILOT_TYPES = new Set([
+  'session.start',
+  'session.info',
+  'session.model_change',
+  'session.permissions_changed',
+  'session.tool_baseline',
+  'session.context_changed',
+  'session.usage_record',
+  'session.error',
+  'session.shutdown',
+  'skill.invoked',
+  'user.message',
+  'assistant.message',
+  'assistant.turn_start',
+  'assistant.turn_end',
+  'system.message',
+  'instruction.update',
+  'hook.start',
+  'hook.end',
+  'tool.execution_start',
+  'tool.execution_complete',
+  'subagent.selected',
+  'subagent.configured',
+  'subagent.started',
+  'subagent.completed',
+  'subagent.failed',
+]);
+
+export const CLAUDE_TYPES = new Set([
+  'user',
+  'assistant',
+  'system',
+  'summary',
+  'file-history-snapshot',
+  'last-prompt',
+  'mode',
+  'permission-mode',
+  'session-owner',
+  'cost-state',
+  'data-flow-records',
+  'attachment',
+  'queue-operation',
+]);

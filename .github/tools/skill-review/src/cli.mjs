@@ -1,10 +1,11 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { homedir, tmpdir } from 'node:os';
-import { basename, join, resolve } from 'node:path';
-import { findCopilotConversations } from './logs.mjs';
+import { basename, dirname, join, resolve } from 'node:path';
+import { CLAUDE_TYPES, COPILOT_TYPES, findClaudeConversations, findCopilotConversations } from './logs.mjs';
 import { readRecord } from './record.mjs';
-import { copilotSkillStart, segmentUses } from './uses.mjs';
+import { claudeSkillStart, copilotSkillStart, segmentUses, unknownRecords } from './uses.mjs';
+
 
 const USAGE = 'skill-review prepare [<skill>] [--out <file>]';
 
@@ -54,6 +55,10 @@ function hasLog(dir) {
   return existsSync(dir) && statSync(dir).isDirectory() && readdirSync(dir).length > 0;
 }
 
+function byId(a, b) {
+  return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+}
+
 export function main(argv, env, cwd) {
   const [command, ...rest] = argv;
   if (command !== 'prepare') return fail('usage', USAGE);
@@ -84,19 +89,35 @@ export function main(argv, env, cwd) {
   const projectRoot = gitToplevel(cwd);
 
   const copilot = projectRoot ? findCopilotConversations(copilotHome, projectRoot) : [];
-  const conversations = [];
-  for (const conv of copilot) {
-    const uses = segmentUses(conv, copilotSkillStart)
-      .filter((u) => u.skill !== 'skill-review' && known.includes(u.skill))
-      .filter((u) => args.skill === null || u.skill === args.skill)
-      .map((u) => ({ ...u, from: u.start }));
-    if (uses.length) conversations.push({ harness: conv.harness, id: conv.id, file: conv.file, uses });
+  const claude = projectRoot ? findClaudeConversations(claudeHome, projectRoot) : [];
+  const groups = [
+    { convs: [...copilot].sort(byId), start: copilotSkillStart, types: COPILOT_TYPES },
+    { convs: [...claude].sort(byId), start: claudeSkillStart, types: CLAUDE_TYPES },
+  ];
+
+  // kept: Conversations with at least one kept skill use, in notice order (Copilot then Claude, by ID).
+  const kept = [];
+  for (const { convs, start, types } of groups) {
+    for (const conv of convs) {
+      const uses = segmentUses(conv, start)
+        .filter((u) => u.skill !== 'skill-review' && known.includes(u.skill))
+        .filter((u) => args.skill === null || u.skill === args.skill)
+        .map((u) => ({ ...u, from: u.start }));
+      if (uses.length) kept.push({ conv, uses, types });
+    }
   }
-  conversations.sort((a, b) => (a.harness === b.harness ? (a.id < b.id ? -1 : a.id > b.id ? 1 : 0) : a.harness < b.harness ? -1 : 1));
 
   const lines = [];
   if (!copilot.length) lines.push('notice: no-conversation-log: Copilot CLI');
-  if (!hasLog(join(claudeHome, 'projects'))) lines.push('notice: no-conversation-log: Claude Code');
+  if (!claude.length) lines.push('notice: no-conversation-log: Claude Code');
+  for (const { conv, types } of kept) {
+    for (const u of unknownRecords(conv, types)) {
+      lines.push(`notice: unknown-record: ${conv.harness} ${conv.id} line ${u.line}: type "${u.type}"`);
+    }
+  }
+
+  const conversations = kept.map(({ conv, uses }) => ({ harness: conv.harness, id: conv.id, file: conv.file, uses }));
+  conversations.sort((a, b) => (a.harness === b.harness ? (a.id < b.id ? -1 : a.id > b.id ? 1 : 0) : a.harness < b.harness ? -1 : 1));
 
   if (!conversations.length) {
     lines.push('skill-review: nothing to review');
@@ -104,6 +125,7 @@ export function main(argv, env, cwd) {
   }
 
   const outFile = resolve(args.outFile ?? join(tmpdir(), `skill-review-${basename(projectRoot)}.json`));
+  mkdirSync(dirname(outFile), { recursive: true });
   writeFileSync(outFile, JSON.stringify({ project: basename(projectRoot), conversations }, null, 2));
   const total = conversations.reduce((n, c) => n + c.uses.length, 0);
   lines.push(`skill-review: prepared ${total} skill uses in ${conversations.length} Conversations`);
