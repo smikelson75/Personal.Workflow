@@ -2,6 +2,8 @@ export const KINDS = ['rule adherence', 'Developer contribution', 'growth withou
 export const LABELS = ['capture miss', 'decomposition miss', 'translation miss', 'requirements miss'];
 export const OUTCOMES = ['part change', 'Developer note', 'no action'];
 export const FIX_TYPES = ['check or script', 'clarified rule', 'removed rule', 'new prose'];
+const DISMISSAL_CAUSES = ['model habit', 'harness limit'];
+const ASKERS = ['brain-storm', 'incubate'];
 
 const blank = (v) => v === null || v === undefined || (typeof v === 'string' && v.trim() === '');
 
@@ -66,6 +68,49 @@ function create(record, c) {
   return o;
 }
 
+// A requirements-miss case joins the Observation with its label and area (ignoring match),
+// never leaves `watching`, and opens one confirmed question gap when its area reaches two cases.
+function applyRequirementsMiss(record, c, n, events) {
+  validateNew(c, n);
+  if (blank(c.area)) throw invalid(n, 'area missing');
+  if (blank(c.asker)) throw invalid(n, 'asker missing');
+  if (!ASKERS.includes(c.asker)) throw invalid(n, `unknown asker "${c.asker}"`);
+  if (c.outcome === 'no action' && DISMISSAL_CAUSES.includes(c.cause)) {
+    throw invalid(n, 'requirements miss cannot be dismissed');
+  }
+
+  let obs = record.observations.find((o) => o.label === 'requirements miss' && o.area === c.area);
+  const gapExists = record.observations.some((o) => o.kind === 'question gap' && o.area === c.area);
+  const opensGap = obs !== undefined && obs.cases === 1 && !gapExists;
+  if (opensGap && (!FIX_TYPES.includes(c.fixType) || blank(c.fixReason))) {
+    throw invalid(n, 'fix filter missing');
+  }
+
+  let isNew = false;
+  if (!obs) {
+    obs = create(record, c);
+    isNew = true;
+  }
+  obs.cases += 1;
+  events.push({ id: obs.id, event: isNew ? 'new' : 'case' });
+
+  if (opensGap) {
+    const gap = create(record, {
+      part: c.asker,
+      kind: 'question gap',
+      label: null,
+      area: c.area,
+      outcome: 'part change',
+      fixType: c.fixType,
+      fixReason: c.fixReason,
+      description: c.description,
+    });
+    gap.state = 'confirmed';
+    gap.cases = obs.cases;
+    events.push({ id: gap.id, event: 'new' }, { id: gap.id, event: 'confirmed' });
+  }
+}
+
 // Mutates `record`; throws an error with category `judgement-invalid` before any change is kept by the caller.
 // Returns the `observation: <id> <event>` lines, in Observation ID order and event order.
 export function applyCases(record, compact, cases) {
@@ -83,6 +128,12 @@ export function applyCases(record, compact, cases) {
       throw invalid(n, known ? `line ${c.line} is not in a new Position` : `unknown conversation ${c.conversation}`);
     }
 
+    if (c.label === 'requirements miss') {
+      applyRequirementsMiss(record, c, n, events);
+      return;
+    }
+
+    const dismisses = c.outcome === 'no action' && DISMISSAL_CAUSES.includes(c.cause);
     let obs;
     let isNew = false;
     if (!blank(c.match)) {
@@ -97,9 +148,21 @@ export function applyCases(record, compact, cases) {
         isNew = true;
       }
     }
+    if (dismisses && blank(c.model)) throw invalid(n, 'model missing');
+    if (dismisses && obs.label === 'requirements miss') {
+      throw invalid(n, 'requirements miss cannot be dismissed');
+    }
 
     obs.cases += 1;
     events.push({ id: obs.id, event: isNew ? 'new' : 'case' });
+    if (obs.state === 'dismissed') return;
+    if (dismisses) {
+      obs.state = 'dismissed';
+      obs.cause = c.cause;
+      obs.model = c.model;
+      events.push({ id: obs.id, event: 'dismissed' });
+      return;
+    }
     if (obs.state === 'watching' && obs.cases >= 2) {
       obs.state = 'confirmed';
       events.push({ id: obs.id, event: 'confirmed' });

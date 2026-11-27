@@ -96,7 +96,7 @@
 - **Goal:** an Observation is dismissed only for a model habit or a Harness limit; a requirements miss stays watching under its area; two cases in one area make one confirmed `question gap` Observation.
 - **Depends on:** S02
 - **Tier:** delegate - extends the S02 case rules; every state change is pinned
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:** fixture: S02's fixture and case `K`
   - R58-06: Given `K` with `outcome` `no action`, `cause` `model habit`, `model` `gpt-5.5`, when `finish` runs, then the Observation is `dismissed` with `cause` `model habit` and `model` `gpt-5.5`, and stdout has `observation: O01 new` then `observation: O01 dismissed`
   - R58-07: Given a Review Record with O01 `dismissed` and `cases` 1, and a case `{"match":"O01","conversation":"Copilot CLI:c1","line":6}`, when it runs, then O01 has `cases` 2 and state `dismissed`, and stdout has `observation: O01 case` and no `confirmed` line
