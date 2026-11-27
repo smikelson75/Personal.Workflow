@@ -4,6 +4,7 @@ import { applyCases } from './observations.mjs';
 import { renderLedger } from './ledger.mjs';
 import { homeFor, readRecord, writeRecord } from './record.mjs';
 import { renderSummary, stamp } from './summary.mjs';
+import { steFailures } from './ste.mjs';
 
 const USAGE = 'skill-review finish <compact-record-file> <judgement-file>';
 
@@ -57,10 +58,27 @@ function writeLedger(home, text) {
   renameSync(temp, file);
 }
 
-// args: [compact-record-file, judgement-file]. Writes the summary and Ledger, then the Review Record.
+// Positional paths plus an optional `--attempt <1|2|3>` anywhere after them; null when the arguments are invalid.
+function parseArgs(args) {
+  const paths = [];
+  let attempt = 1;
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--attempt') {
+      const value = args[++i];
+      if (!['1', '2', '3'].includes(value)) return null;
+      attempt = Number(value);
+    } else {
+      paths.push(args[i]);
+    }
+  }
+  return paths.length === 2 ? { paths, attempt } : null;
+}
+
+// args: [compact-record-file, judgement-file, --attempt <n>?]. Writes the summary and Ledger, then the Review Record.
 export function finish(args, env, cwd = process.cwd()) {
-  if (args.length !== 2) return fail('usage', USAGE);
-  const [compactFile, judgementFile] = args;
+  const parsed = parseArgs(args);
+  if (!parsed) return fail('usage', USAGE);
+  const [compactFile, judgementFile] = parsed.paths;
 
   const home = homeFor(env);
   if (!home) return fail('home-layout-required', 'start the Harness with the Launch Script');
@@ -90,6 +108,37 @@ export function finish(args, env, cwd = process.cwd()) {
     throw err;
   }
 
+  const failures = steFailures(record, observationLines);
+  let steNotices = [];
+  if (failures.length) {
+    if (parsed.attempt < 3) {
+      return { lines: [...failures, `skill-review failed: ste-check: ${failures.length} sentences`], code: 1 };
+    }
+    const id = `O${String(record.nextObservation).padStart(2, '0')}`;
+    record.observations.push({
+      id,
+      part: 'skill-review',
+      state: 'watching',
+      kind: 'rule adherence',
+      label: null,
+      side: null,
+      area: null,
+      outcome: 'part change',
+      cause: null,
+      model: null,
+      fixType: 'clarified rule',
+      fixReason: 'The text rules need a clearer example.',
+      description: 'The Executive Summary failed the STE check three times.',
+      cases: 1,
+      chances: 0,
+      changeCommit: null,
+      follows: null,
+    });
+    record.nextObservation += 1;
+    observationLines.push(`observation: ${id} new`);
+    steNotices = [`STE check failed: ${failures.length} sentences`];
+  }
+
   let uses = 0;
   record.conversations ??= {};
   for (const conv of compact.conversations) {
@@ -115,7 +164,7 @@ export function finish(args, env, cwd = process.cwd()) {
       compact,
       record,
       observationLines,
-      notices: [...(compact.notices ?? []), ...noticeLines],
+      notices: [...(compact.notices ?? []), ...noticeLines, ...steNotices],
       handoffsReviewed: Array.isArray(judgement.handoffs) ? judgement.handoffs.length : 0,
     });
     summaryLines = [`skill-review: summary: ${writeSummary(home, project, now, text)}`];
