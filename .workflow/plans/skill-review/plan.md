@@ -2,8 +2,8 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: phase review P03
-- Tests locked: `01fe3cd`
+- Next: P03 S06
+- Tests locked: `4cea114`
 - Oracle: `tests/skill-review`
 - Phase base: `01fe3cd`
 - Reconciled: `0c7a2b317a2d2c0d38cf3dfcfc4fc4e86549b2e8`
@@ -49,4 +49,4 @@
 | S03 | Dismissal, requirements miss, question gap | completed |
 | S04 | Change commits, install records, version notice | completed |
 | S05 | Changed Observations: improved or unchanged | completed |
-| S06 | One follower per improved Observation per run | planned |
+| S06 | One follower per improved Observation per run | ready |
