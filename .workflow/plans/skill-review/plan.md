@@ -2,7 +2,7 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: P04 S03
+- Next: P04 S04
 - Tests locked: `490cb97`
 - Oracle: `tests/skill-review`
 - Phase base: `490cb97`
@@ -47,7 +47,7 @@
 |---|-------|--------|
 | S01 | R61-02 expects the new record files | completed |
 | S02 | Summary file with header, version, Reviewed, tokens, Notices | completed |
-| S03 | Summary sections: Changed, Improved, Same, Next | ready |
+| S03 | Summary sections: Changed, Improved, Same, Next | completed |
 | S04 | Ledger | ready |
 | S05 | STE check | ready |
 | S06 | No copied Conversation Log text or secrets in records | ready |
