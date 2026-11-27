@@ -53,3 +53,32 @@ export function classify(rec, harness) {
   if (rec === null || typeof rec !== 'object') return OTHER;
   return harness === 'Claude Code' ? classifyClaude(rec) : classifyCopilot(rec);
 }
+
+function flat(text) {
+  return text.replace(/\r\n|\r|\n/g, ' ');
+}
+
+// Splits a rendered record into its label and content; `rec` is null for an unparseable line.
+export function renderParts(rec, harness) {
+  if (rec === null) return { label: 'other', content: 'unparseable' };
+  const { role, text, tools, toolError } = classify(rec, harness);
+  const type = typeof rec.type === 'string' ? rec.type : '';
+  switch (role) {
+    case 'user':
+      return { label: 'user', content: flat(text) };
+    case 'assistant':
+      if (text === '' && tools.length) return { label: 'tool', content: tools.join(', ') };
+      return { label: 'assistant', content: flat(text) + (tools.length ? ` [tools: ${tools.join(', ')}]` : '') };
+    case 'tool-start':
+      return { label: 'tool', content: tools.join(', ') };
+    case 'tool-result':
+      return { label: 'tool-result', content: `${toolError ? 'ERROR ' : ''}${flat(text)}` };
+    default:
+      return { label: 'other', content: type };
+  }
+}
+
+export function renderRecord(rec, harness) {
+  const { label, content } = renderParts(rec, harness);
+  return `${label}: ${content}`;
+}
