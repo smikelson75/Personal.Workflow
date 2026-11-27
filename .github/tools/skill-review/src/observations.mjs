@@ -6,6 +6,12 @@ import { settleChances } from './lifecycle.mjs';
 
 const DISMISSAL_CAUSES = ['model habit', 'harness limit'];
 const ASKERS = ['brain-storm', 'incubate'];
+// Kinds a Handoff case accepts on top of KINDS.
+const HANDOFF_KINDS = ['restated or re-verified', 'section never used'];
+const WRITING_LABELS = ['capture miss', 'decomposition miss'];
+const WRITING_KINDS = ['section never used'];
+const USING_LABELS = ['translation miss'];
+const USING_KINDS = ['restated or re-verified'];
 
 const blank = (v) => v === null || v === undefined || (typeof v === 'string' && v.trim() === '');
 
@@ -33,13 +39,14 @@ function inNewPosition(compact, conversation, line) {
   return (conv.uses ?? []).some((u) => line >= (u.from ?? u.start) && line <= u.end);
 }
 
-function validateNew(c, n) {
+function validateNew(c, n, handoff = false) {
   if (blank(c.ref)) throw invalid(n, 'ref missing');
-  if (blank(c.part)) throw invalid(n, 'part missing');
+  if (!handoff && blank(c.part)) throw invalid(n, 'part missing');
   const hasKind = !blank(c.kind);
   const hasLabel = !blank(c.label);
   if (hasKind === hasLabel) throw invalid(n, 'exactly one of kind or label is required');
-  if (hasKind && !KINDS.includes(c.kind)) throw invalid(n, `unknown kind "${c.kind}"`);
+  const kinds = handoff ? [...KINDS, ...HANDOFF_KINDS] : KINDS;
+  if (hasKind && !kinds.includes(c.kind)) throw invalid(n, `unknown kind "${c.kind}"`);
   if (hasLabel && !LABELS.includes(c.label)) throw invalid(n, `unknown label "${c.label}"`);
   if (blank(c.outcome)) throw invalid(n, 'outcome missing');
   if (!OUTCOMES.includes(c.outcome)) throw invalid(n, `unknown outcome "${c.outcome}"`);
@@ -143,19 +150,98 @@ function applyRequirementsMiss(record, c, n, events, hits) {
   }
 }
 
+// The skill side of a Handoff case: `both` when given, else from the label or kind; null when neither applies.
+function handoffSide(c) {
+  if (c.side === 'both') return 'both';
+  if (WRITING_LABELS.includes(c.label) || WRITING_KINDS.includes(c.kind)) return 'writing';
+  if (USING_LABELS.includes(c.label) || USING_KINDS.includes(c.kind)) return 'using';
+  return null;
+}
+
+function handoffPart(side, ch) {
+  if (side === 'writing') return ch.writingSkill;
+  if (side === 'using') return ch.usingSkill;
+  return `${ch.writingSkill} + ${ch.usingSkill}`;
+}
+
+// Counts a case on its Observation: dismissals, then watching -> confirmed at two cases.
+// An Observation with side `both` never leaves `watching`.
+function tally(obs, c, n, isNew, events) {
+  const dismisses = c.outcome === 'no action' && DISMISSAL_CAUSES.includes(c.cause);
+  if (dismisses && blank(c.model)) throw invalid(n, 'model missing');
+  if (dismisses && obs.label === 'requirements miss') {
+    throw invalid(n, 'requirements miss cannot be dismissed');
+  }
+
+  obs.cases += 1;
+  events.push({ id: obs.id, event: isNew ? 'new' : 'case' });
+  if (obs.state === 'dismissed') return;
+  if (dismisses) {
+    obs.state = 'dismissed';
+    obs.cause = c.cause;
+    obs.model = c.model;
+    events.push({ id: obs.id, event: 'dismissed' });
+    return;
+  }
+  if (obs.state === 'watching' && obs.cases >= 2 && obs.side !== 'both') {
+    obs.state = 'confirmed';
+    events.push({ id: obs.id, event: 'confirmed' });
+  }
+}
+
+// A Handoff case is against the writing or using skill of a judged Handoff; it adds nothing to `hits`.
+function applyHandoff(record, compact, handoffIds, c, n, refs, followers, events) {
+  if (!blank(c.conversation)) throw invalid(n, 'handoff and conversation are both set');
+  const ch = (compact.handoffs ?? []).find((h) => h.id === c.handoff);
+  if (!ch || !handoffIds.has(c.handoff)) throw invalid(n, `handoff ${c.handoff} is not judged`);
+  if (c.label === 'requirements miss') throw invalid(n, 'requirements miss has no Handoff');
+
+  let obs;
+  let isNew = false;
+  if (!blank(c.match)) {
+    obs = record.observations.find((o) => o.id === c.match);
+    if (!obs) throw invalid(n, `unknown observation ${c.match}`);
+    if (obs.state === 'improved') {
+      if (followers.has(obs.id)) {
+        obs = followers.get(obs.id);
+      } else {
+        obs = follow(record, obs);
+        followers.set(c.match, obs);
+        isNew = true;
+      }
+    }
+  } else {
+    validateNew(c, n, true);
+    const side = handoffSide(c);
+    if (!side) throw invalid(n, 'kind or label has no skill side');
+    obs = refs.get(c.ref);
+    if (!obs) {
+      obs = create(record, { ...c, side, part: handoffPart(side, ch) });
+      refs.set(c.ref, obs);
+      isNew = true;
+    }
+  }
+  tally(obs, c, n, isNew, events);
+}
+
 // Mutates `record`; throws an error with category `judgement-invalid` before any change is kept by the caller.
-// Returns the `observation: <id> <event>` lines, in Observation ID order and event order.
-export function applyCases(record, compact, cases) {
+// `handoffIds` are the judged Handoff IDs. Returns the `observation: <id> <event>` lines, in Observation ID order and event order.
+export function applyCases(record, compact, cases, handoffIds = []) {
   record.observations ??= [];
   record.nextObservation ??= 1;
   const refs = new Map();
   const followers = new Map();
   const events = [];
   const hits = new Map();
+  const judged = new Set(handoffIds);
 
   cases.forEach((c, index) => {
     const n = index + 1;
     if (c === null || typeof c !== 'object') throw invalid(n, 'not an object');
+    if (typeof c.handoff === 'string') {
+      applyHandoff(record, compact, judged, c, n, refs, followers, events);
+      return;
+    }
     if (!inNewPosition(compact, c.conversation, c.line)) {
       const [harness, ...rest] = String(c.conversation).split(':');
       const known = compact.conversations.some((x) => x.harness === harness && x.id === rest.join(':'));
@@ -167,7 +253,6 @@ export function applyCases(record, compact, cases) {
       return;
     }
 
-    const dismisses = c.outcome === 'no action' && DISMISSAL_CAUSES.includes(c.cause);
     let obs;
     let isNew = false;
     if (!blank(c.match)) {
@@ -193,25 +278,7 @@ export function applyCases(record, compact, cases) {
         isNew = true;
       }
     }
-    if (dismisses && blank(c.model)) throw invalid(n, 'model missing');
-    if (dismisses && obs.label === 'requirements miss') {
-      throw invalid(n, 'requirements miss cannot be dismissed');
-    }
-
-    obs.cases += 1;
-    events.push({ id: obs.id, event: isNew ? 'new' : 'case' });
-    if (obs.state === 'dismissed') return;
-    if (dismisses) {
-      obs.state = 'dismissed';
-      obs.cause = c.cause;
-      obs.model = c.model;
-      events.push({ id: obs.id, event: 'dismissed' });
-      return;
-    }
-    if (obs.state === 'watching' && obs.cases >= 2) {
-      obs.state = 'confirmed';
-      events.push({ id: obs.id, event: 'confirmed' });
-    }
+    tally(obs, c, n, isNew, events);
   });
 
   settleChances(record, compact, hits, events);

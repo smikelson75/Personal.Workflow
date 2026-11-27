@@ -2,7 +2,7 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: P05 S06
+- Next: P05 S07
 - Tests locked: `03d535b`
 - Oracle: `tests/skill-review`
 - Phase base: `4d36549`
@@ -51,7 +51,7 @@
 | S03 | Workflow Folder and git signals | blocked |
 | S04 | Slice serves Handoff ends | completed |
 | S05 | Finish records Handoffs | completed |
-| S06 | Handoff cases and sides | ready |
+| S06 | Handoff cases and sides | completed |
 | S07 | The skill-review skill | ready |
 | S08 | pull-work suggests a review | completed |
 | S09 | /review-incubate removed | completed |

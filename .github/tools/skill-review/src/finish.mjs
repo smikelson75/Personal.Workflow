@@ -118,7 +118,7 @@ export function finish(args, env, cwd = process.cwd()) {
 
   let observationLines;
   try {
-    observationLines = applyCases(record, compact, judgement.cases);
+    observationLines = applyCases(record, compact, judgement.cases, [...judgedIds]);
   } catch (err) {
     if (err.category) return fail(err.category, err.detail);
     throw err;
