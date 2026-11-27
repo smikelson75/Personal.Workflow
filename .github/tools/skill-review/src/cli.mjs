@@ -4,6 +4,7 @@ import { homedir, tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { CLAUDE_TYPES, COPILOT_TYPES, findClaudeConversations, findCopilotConversations } from './logs.mjs';
 import { finish } from './finish.mjs';
+import { markChanged, recordInstall } from './installs.mjs';
 import { readRecord } from './record.mjs';
 import { classify } from './records.mjs';
 import { slice } from './slice.mjs';
@@ -68,6 +69,8 @@ export function main(argv, env, cwd) {
   const [command, ...rest] = argv;
   if (command === 'slice') return slice(rest);
   if (command === 'finish') return finish(rest, env, cwd);
+  if (command === 'mark-changed') return markChanged(rest, env);
+  if (command === 'record-install') return recordInstall(rest, env, cwd);
   if (command !== 'prepare') return fail('usage', USAGE);
   const args = parsePrepareArgs(rest);
 

@@ -1,4 +1,6 @@
 import { readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { applyCases } from './observations.mjs';
 import { homeFor, readRecord, writeRecord } from './record.mjs';
 
@@ -14,6 +16,16 @@ function readJson(file) {
   } catch {
     return null;
   }
+}
+
+// The Home Repo's manifest version when no install records it, else null. Unreadable manifests are ignored.
+function unrecordedInstall(home, record) {
+  const file = join(home, '.git', 'personal-workflow', 'manifest.json');
+  if (!existsSync(file)) return null;
+  const version = readJson(file)?.version;
+  if (typeof version !== 'string' || version === 'none') return null;
+  if ((record.installs ?? []).some((i) => i.version === version)) return null;
+  return version;
 }
 
 // args: [compact-record-file, judgement-file]. Writes the Review Record once, at the end.
@@ -38,6 +50,9 @@ export function finish(args, env) {
   const judgement = readJson(judgementFile);
   if (!Array.isArray(judgement?.cases)) return fail('judgement-unreadable', judgementFile);
 
+  const notice = unrecordedInstall(home, record);
+  const noticeLines = notice ? [`notice: unrecorded-install: ${notice}`] : [];
+
   let observationLines;
   try {
     observationLines = applyCases(record, compact, judgement.cases);
@@ -59,7 +74,7 @@ export function finish(args, env) {
 
   writeRecord(home, record);
   return {
-    lines: [...observationLines, `skill-review: reviewed ${uses} skill uses in ${compact.conversations.length} Conversations`],
+    lines: [...noticeLines, ...observationLines, `skill-review: reviewed ${uses} skill uses in ${compact.conversations.length} Conversations`],
     code: 0,
   };
 }
