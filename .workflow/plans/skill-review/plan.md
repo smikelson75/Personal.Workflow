@@ -2,19 +2,19 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: plan P06
+- Next: P06 S01
 - Tests locked: `97a7d2f`
 - Oracle: `tests/skill-review`
-- Phase base: `4d36549`
+- Phase base: `4b7543f`
 - Reconciled: `0c7a2b317a2d2c0d38cf3dfcfc4fc4e86549b2e8`
 
 ## Current state
 - stack: Node ES modules (`.mjs`, built-in `node:test`, zero dependencies, ADR 0001); node v25.9.0; no root `package.json`.
-- harness: `node --test --test-reporter=tap "tests/skill-review/*.test.mjs"` - drives the CLI `.github/tools/skill-review/bin/skill-review.mjs` as a child process against temp Home Repos, Project Repos, and fixture Conversation Logs; `.github/tools/workflow-core/support/harness.mjs` (`tempRepo`, `read`, `lines`) is the only shared test helper; runs (prepare, slice, finish, commit are built; P05 tests fail until built)
-- suite baseline: failing: `[R29-01] Glossary defines the 13 added terms` and `[Q-zero-workflow-check-errors]` in `tests/glossary-alignment/p01-s01.test.mjs` (47 Terms, cap 40); 512 of 514 pass
-- mutation: unsupported for node - no mutation Language Add-on installed
-- in place: `scripts/update-home.mjs` (installs `.github/tools/**` to `.workflow-core/tools/**` and skills to `.claude/skills/**`, prints `Workflow version: <old> -> <new>`), `home/launch.mjs` (sets `WORKFLOW_HOME`), `.github/tools/workflow-check`, `.github/prompts/review-incubate.prompt.md` (removed in P05); `skill-review` CLI (prepare, slice, finish, commit, mark-changed, record-install) with summary, ledger, STE and privacy checks; no Handoff detection, no `skill-review` skill, no apply-observation code
-- gap to spec: R52 partial, R53 partial, R54 partial, R56 partial, R62 partial, R67 partial, R68, R69, R70, R71, R72, R73
+- `harness: node --test --test-reporter=tap "tests/skill-review/*.test.mjs"` - drives the CLI `.github/tools/skill-review/bin/skill-review.mjs` as a child process against temp Home Repos, Project Repos, and fixture Conversation Logs; `.github/tools/workflow-core/support/harness.mjs` (`tempRepo`, `read`, `lines`) is the only shared test helper; runs
+- `suite baseline:` failing: `[R29-01] Glossary defines the 13 added terms with Slice and Card separate` and `[Q-zero-workflow-check-errors] workflow-check passes on repo .workflow/ with zero errors and no Glossary findings` in `tests/glossary-alignment/p01-s01.test.mjs` (47 Terms, cap 40); 512 of 514 pass
+- `mutation: unsupported for node - no mutation Language Add-on installed`
+- `in place:` `scripts/update-home.mjs` (installs `.github/tools/**` to `.workflow-core/tools/**` and skills to `.claude/skills/**`, prints `Workflow version: <old> -> <new>`), `home/launch.mjs` (sets `WORKFLOW_HOME`), `.github/tools/workflow-check`, `skill-review` CLI (`prepare`, `slice`, `finish`, `commit`, `mark-changed`, `record-install`) with Handoffs, summary, ledger, STE and privacy checks, and `.github/skills/skill-review/SKILL.md`; no `/apply-observation` CLI subcommands or skill yet
+- `gap to spec:` R56 (live run), R68, R69, R70, R71, R72, R73
 
 ## Decisions pinned by the plan
 - One CLI, `.github/tools/skill-review/bin/skill-review.mjs`, does all deterministic work in steps the `skill-review` skill runs around the model: `prepare` (Depth 0; writes only the compact-record file), `slice` (P02; serves one flagged slice and keeps the token totals in the compact record), `finish` (P03-P04, writes records, Executive Summary, and Ledger) and `commit` (P04, commits only `skill-review/` in the Home Repo). The model only judges between them and never opens a Conversation Log. `.github/tools/**` installs to the Home Repo, so the Home layout runs it from `$WORKFLOW_HOME/.workflow-core/tools/skill-review/bin/skill-review.mjs`.
@@ -24,12 +24,7 @@
 - Harness locations are overridable for tests with `SKILL_REVIEW_COPILOT_HOME` (default `~/.copilot`) and `SKILL_REVIEW_CLAUDE_HOME` (default `~/.claude`).
 
 ## Carry-forward
-- P06: `mark-changed` stores the commit as given without checking it exists in a repo; `/apply-observation` must pass a real commit (a typo leaves the Observation `changed` and never installed).
 - P02-P04: real Claude logs hold record types outside CLAUDE_TYPES (e.g. api-request-shape), so they print unknown-record notices; revisit the known-type list if noisy. A skill invoked inside another skill ends the outer use at that start (P01 behavior).
-- P06: later code must use compareIds/idText from observations.mjs for Observation IDs; inish writes the Review Record first, then the summary and ledger.
-- P06: the baseline glossary-size failures (47 Terms over cap 40) are `Known failures` owned by P06 so P01-P05 gates stay meaningful; raise them to the Developer when P06 is planned (setup card or accept).
-- P06: settleChances counts uses of the Observation's part only; a separate Handoff chance count (R58) is not built, and Handoff Observations settle through their part's uses.
-- P05: The compact record's handoffs array holds the pair-based Handoff entries (phase-05 Invariants); P06 does not read it.
 
 ## Phases
 
@@ -40,4 +35,15 @@
 | P03 | Finish: Observations, lifecycle, installs, Review Record | completed | R54 (write side), R57, R58, R59, R61 | [phase-03](phase-03.md) |
 | P04 | Executive Summary, Ledger, STE check, commit | completed | R52 (commit-failed, Reviewed line), R55 (pending count and Ledger listing), R59 (Ledger wording), R60, R61 (Ledger), R62 (Model tokens line), R63, R64, R65 (Notices), Q-readability, Q-ste, Q-privacy, Q-offline | [phase-04](phase-04.md) |
 | P05 | Handoffs, skill-review skill, cleanup | completed | R55, R56 (not expressible), R62 (Workflow Folder and git signals), R66, R67 (removal, incubate) | [phase-05](phase-05.md) |
-| P06 | /apply-observation | planned | R68, R69, R70, R71, R72, R73 | |
+| P06 | /apply-observation | in progress | R68, R69, R70, R71, R72, R73, Q-ste | [phase-06](phase-06.md) |
+
+## P06 slices
+
+| # | Slice | Status |
+|---|-------|--------|
+| S01 | Fix glossary-size baseline | ready |
+| S02 | Offer confirmed part changes (apply-list) | planned |
+| S03 | Check and restore failed pick (apply-check) | planned |
+| S04 | Mark changed, install, and commit Home Repo (apply-finish) | planned |
+| S05 | Undo applied Observation (undo-check and undo) | planned |
+| S06 | /apply-observation skill | planned |
