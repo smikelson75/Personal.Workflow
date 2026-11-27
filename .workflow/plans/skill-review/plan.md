@@ -2,7 +2,7 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: plan P03
+- Next: phase review P03
 - Tests locked: `8b05f9e`
 - Oracle: `tests/skill-review`
 - Phase base: `95e9f1f`
@@ -20,6 +20,7 @@
 - One CLI, `.github/tools/skill-review/bin/skill-review.mjs`, does all deterministic work in steps the `skill-review` skill runs around the model: `prepare` (Depth 0; writes only the compact-record file), `slice` (P02; serves one flagged slice and keeps the token totals in the compact record) and `finish` (P03-P04, writes records). The model only judges between them and never opens a Conversation Log. `.github/tools/**` installs to the Home Repo, so the Home layout runs it from `$WORKFLOW_HOME/.workflow-core/tools/skill-review/bin/skill-review.mjs`.
 - The Review Record is one JSON file, `<Home Repo>\skill-review\review-record.json` (agent layout, not STE).
 - Acceptance tests live in `tests/skill-review/` (not installed into a Home Repo); each test file is self-contained and builds its own fixtures.
+- The model writes one judgement file `{cases:[...]}` (one entry per case: Observation match or new `ref`, part, kind or Miss Label, outcome, Fix Filter, cause) and `finish` applies it; `finish`, `mark-changed`, and `record-install` are the only writers of the Review Record. `record-install` evaluates which change commits an install contains with `git merge-base --is-ancestor` in the source checkout it runs in, and stores them, so later runs need no source repo. Chances to recur are counted for skill parts only; Conversation start is the first Log `timestamp`.
 - Harness locations are overridable for tests with `SKILL_REVIEW_COPILOT_HOME` (default `~/.copilot`) and `SKILL_REVIEW_CLAUDE_HOME` (default `~/.claude`).
 
 ## Carry-forward
@@ -33,7 +34,7 @@
 |---|-------|--------|--------|--------|
 | P01 | Prepare finds unreviewed skill uses | completed | R52 (read side), R53 (failure, filter), R54 (read side), R61 (read side), R65, R67 (failure) | [phase-01](phase-01.md) |
 | P02 | Depth 0 signals, flags, slices, tokens | completed | R62 (Conversation Log side), Q-model-reading | [phase-02](phase-02.md) |
-| P03 | Finish: Observations, lifecycle, installs, Review Record | planned | R54 (write side), R57, R58, R59, R61 | |
+| P03 | Finish: Observations, lifecycle, installs, Review Record | planned | R54 (write side), R57, R58, R59, R61 | [phase-03](phase-03.md) |
 | P04 | Executive Summary, Ledger, STE check, commit | planned | R52 (commit-failed, Reviewed line), R60, R63, R64, Q-readability, Q-ste, Q-privacy, Q-offline | |
 | P05 | Handoffs, skill-review skill, cleanup | planned | R55, R56, R62 (Workflow Folder and git signals), R66, R67 (removal) | |
 | P06 | /apply-observation | planned | R68, R69, R70, R71, R72, R73 | |
