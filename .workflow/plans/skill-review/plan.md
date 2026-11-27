@@ -2,7 +2,7 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: gate P06
+- Next: review P06
 - Tests locked: `f15f47e`
 - Oracle: `tests/skill-review`
 - Phase base: `4b7543f`
