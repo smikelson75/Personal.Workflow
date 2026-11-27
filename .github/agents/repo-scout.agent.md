@@ -4,8 +4,8 @@ description: "Read-only repo survey for the planner: answers specific questions 
 tools: ['read', 'search', 'execute', 'Read', 'Grep', 'Glob', 'Bash']
 user-invocable: false
 model:
-  - Gemini 4 Hydrogen (copilot)
   - Claude Haiku 5.5 (copilot)
+  - Gemini 3.8 Flash (copilot)
   - GPT-6 Luna (copilot)
 reasoning-effort: low
 ---

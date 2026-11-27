@@ -5,7 +5,7 @@ argument-hint: "Paste one Card."
 tools: ['read', 'search', 'edit', 'execute', 'Read', 'Grep', 'Glob', 'Edit', 'Write', 'Bash']
 model:
   # Cheap cloud models run delegate cards today; put a local model ID first once one is configured.
-  - Gemini 4 Hydrogen (copilot)
+  - Claude Haiku 5.5 (copilot)
   - GPT-6 Luna (copilot)
   - Gemini 3.8 Flash (copilot)
 reasoning-effort: medium
