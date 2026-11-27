@@ -118,7 +118,7 @@
 - **Goal:** `slice` serves the record at a Handoff end line with its neighbours, capped at 8,000 characters, even when that Conversation has no unreviewed use.
 - **Depends on:** S02
 - **Tier:** delegate - extends one lookup in `slice.mjs`
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:** fixture: the compact record from `prepare` in S02's R55-22 fixture (Handoff with both ends, `conversations` `[]`); `c1` log has a 9,000-character `assistant` message at the writing line
   - R62-23: Given `slice <record> c1 <writing.line>`, when it runs, then it prints `slice: c1 line <n>`, the record with its neighbours as `[n] label: text` lines (flagged record cut to 5,800 characters with `...[truncated]`), and `skill-review: model tokens: depth 2: <n>`, and the compact record gains `slices` and `tokens.depth2`
   - R62-24: Given `slice <record> k1 <using.line>`, then the Claude record is served the same way
@@ -287,3 +287,20 @@
 - **Do not:** change any `assert` or `test(` line; change product code.
 - **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/skill-review/*.test.mjs"` exits 0; target R53-03; 1 target test runs
 - **Stop and report if:** `test-reviewer` rejects the repair; any assertion line changes.
+
+## S12 - Update R55-10 assertion for S03 signals and flags
+
+- **Kind:** test-fix
+- **Scope:** assertion
+- **Goal:** update `[R55-10]` in `tests/skill-review/p05-s01.test.mjs` so it expects the `signals` and `flags` keys added by S03.
+- **Depends on:** none
+- **Tier:** main - `Scope: assertion` test diff approved at Phase Review
+- **Review:** none
+- **Restores:** `R55-10` - `assert.deepEqual` on `compact.handoffs` omits `signals` and `flags` added by S03.
+- **Acceptance tests:** `tests/skill-review/p05-s01.test.mjs`
+- **Files:** edit `tests/skill-review/p05-s01.test.mjs`
+- **Patterns:** `tests/skill-review/p05-s01.test.mjs:87 - R55-10 deepEqual check`
+- **Decisions:** in `[R55-10]`, add `signals: { bytes: 26, sections: 0, revisionsAfterWrite: 0, readsInUse: 0 }` and `flags: []` to the expected entry.
+- **Do not:** weaken other assertions in `p05-s01.test.mjs`; change product code.
+- **Done when:** `node --test --test-reporter=tap --test-skip-pattern="{regression-exclude}" "tests/skill-review/*.test.mjs"` exits 0; target R55-10; 1 target test runs
+- **Stop and report if:** the user rejects the assertion change at Phase Review.
