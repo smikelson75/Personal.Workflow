@@ -144,6 +144,7 @@ export function applyCases(record, compact, cases) {
   record.observations ??= [];
   record.nextObservation ??= 1;
   const refs = new Map();
+  const followers = new Map();
   const events = [];
   const hits = new Map();
 
@@ -168,8 +169,13 @@ export function applyCases(record, compact, cases) {
       obs = record.observations.find((o) => o.id === c.match);
       if (!obs) throw invalid(n, `unknown observation ${c.match}`);
       if (obs.state === 'improved') {
-        obs = follow(record, obs);
-        isNew = true;
+        if (followers.has(obs.id)) {
+          obs = followers.get(obs.id);
+        } else {
+          obs = follow(record, obs);
+          followers.set(c.match, obs);
+          isNew = true;
+        }
       } else {
         note(hits, obs.id, c);
       }

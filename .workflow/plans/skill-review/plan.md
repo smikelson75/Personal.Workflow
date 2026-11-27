@@ -2,7 +2,7 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: P03 S06
+- Next: plan P04
 - Tests locked: `4cea114`
 - Oracle: `tests/skill-review`
 - Phase base: `01fe3cd`
@@ -14,7 +14,7 @@
 - suite baseline: failing: `[R29-01] Glossary defines the 13 added terms` and `[Q-zero-workflow-check-errors]` in `tests/glossary-alignment/p01-s01.test.mjs` (47 Terms, cap 40); 374 of 376 pass
 - mutation: unsupported for node - no mutation Language Add-on installed
 - in place: `scripts/update-home.mjs` (installs `.github/tools/**` to `.workflow-core/tools/**` and skills to `.claude/skills/**`, prints `Workflow version: <old> -> <new>`), `home/launch.mjs` (sets `WORKFLOW_HOME`), `.github/tools/workflow-check`, `.github/prompts/review-incubate.prompt.md` (removed in P05); no skill-review or apply-observation code
-- gap to spec: R52 partial, R53 partial, R54 partial, R55, R56, R57, R58, R59, R60, R61 partial, R62 partial, R63, R64, R66, R67 partial, R68, R69, R70, R71, R72, R73, Q-readability, Q-ste, Q-privacy, Q-offline
+- gap to spec: R52 partial, R53 partial, R54 partial, R55, R56, R60, R62 partial, R63, R64, R66, R67 partial, R68, R69, R70, R71, R72, R73, Q-readability, Q-ste, Q-privacy, Q-offline
 
 ## Decisions pinned by the plan
 - One CLI, `.github/tools/skill-review/bin/skill-review.mjs`, does all deterministic work in steps the `skill-review` skill runs around the model: `prepare` (Depth 0; writes only the compact-record file), `slice` (P02; serves one flagged slice and keeps the token totals in the compact record) and `finish` (P03-P04, writes records). The model only judges between them and never opens a Conversation Log. `.github/tools/**` installs to the Home Repo, so the Home layout runs it from `$WORKFLOW_HOME/.workflow-core/tools/skill-review/bin/skill-review.mjs`.
@@ -35,18 +35,7 @@
 |---|-------|--------|--------|--------|
 | P01 | Prepare finds unreviewed skill uses | completed | R52 (read side), R53 (failure, filter), R54 (read side), R61 (read side), R65, R67 (failure) | [phase-01](phase-01.md) |
 | P02 | Depth 0 signals, flags, slices, tokens | completed | R62 (Conversation Log side), Q-model-reading | [phase-02](phase-02.md) |
-| P03 | Finish: Observations, lifecycle, installs, Review Record | in progress | R54 (write side), R57, R58, R59, R61 | [phase-03](phase-03.md) |
+| P03 | Finish: Observations, lifecycle, installs, Review Record | completed | R54 (write side), R57, R58, R59, R61 | [phase-03](phase-03.md) |
 | P04 | Executive Summary, Ledger, STE check, commit | planned | R52 (commit-failed, Reviewed line), R60, R63, R64, Q-readability, Q-ste, Q-privacy, Q-offline | |
 | P05 | Handoffs, skill-review skill, cleanup | planned | R55, R56, R62 (Workflow Folder and git signals), R66, R67 (removal) | |
 | P06 | /apply-observation | planned | R68, R69, R70, R71, R72, R73 | |
-
-## P03 slices
-
-| # | Slice | Status |
-|---|-------|--------|
-| S01 | finish writes the reviewed Positions | completed |
-| S02 | Cases become Observations | completed |
-| S03 | Dismissal, requirements miss, question gap | completed |
-| S04 | Change commits, install records, version notice | completed |
-| S05 | Changed Observations: improved or unchanged | completed |
-| S06 | One follower per improved Observation per run | ready |
