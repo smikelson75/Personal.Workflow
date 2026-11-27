@@ -1,8 +1,8 @@
-import { readFileSync } from 'node:fs';
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { basename, join, resolve } from 'node:path';
 import { applyCases } from './observations.mjs';
 import { homeFor, readRecord, writeRecord } from './record.mjs';
+import { renderSummary, stamp } from './summary.mjs';
 
 const USAGE = 'skill-review finish <compact-record-file> <judgement-file>';
 
@@ -28,8 +28,26 @@ function unrecordedInstall(home, record) {
   return version;
 }
 
-// args: [compact-record-file, judgement-file]. Writes the Review Record once, at the end.
-export function finish(args, env) {
+function manifestVersion(home) {
+  const version = readJson(join(home, '.git', 'personal-workflow', 'manifest.json'))?.version;
+  return typeof version === 'string' && version !== 'none' ? version : null;
+}
+
+// Writes the summary under the first free name (suffix -2, -3, ...) and returns its path.
+function writeSummary(home, project, now, text) {
+  const dir = join(home, 'skill-review', 'summaries');
+  mkdirSync(dir, { recursive: true });
+  const base = `${stamp(now).file}-${project.replace(/[\\/:*?"<>|]/g, '-')}`;
+  let file = join(dir, `${base}.md`);
+  for (let n = 2; existsSync(file); n++) file = join(dir, `${base}-${n}.md`);
+  const temp = `${file}.${process.pid}.tmp`;
+  writeFileSync(temp, text);
+  renameSync(temp, file);
+  return resolve(file);
+}
+
+// args: [compact-record-file, judgement-file]. Writes the summary, then the Review Record.
+export function finish(args, env, cwd = process.cwd()) {
   if (args.length !== 2) return fail('usage', USAGE);
   const [compactFile, judgementFile] = args;
 
@@ -72,9 +90,29 @@ export function finish(args, env) {
     }
   }
 
+  let summaryLines = [];
+  if (uses > 0) {
+    const version = manifestVersion(home);
+    const source = (record.installs ?? []).find((i) => i.version === version)?.source ?? 'unknown';
+    const now = env.SKILL_REVIEW_NOW ? new Date(env.SKILL_REVIEW_NOW) : new Date();
+    const project = compact.project || basename(cwd);
+    const text = renderSummary({
+      project,
+      now,
+      version: version ?? 'unknown',
+      source,
+      compact,
+      record,
+      observationLines,
+      notices: [...(compact.notices ?? []), ...noticeLines],
+      handoffsReviewed: Array.isArray(judgement.handoffs) ? judgement.handoffs.length : 0,
+    });
+    summaryLines = [`skill-review: summary: ${writeSummary(home, project, now, text)}`];
+  }
+
   writeRecord(home, record);
   return {
-    lines: [...noticeLines, ...observationLines, `skill-review: reviewed ${uses} skill uses in ${compact.conversations.length} Conversations`],
+    lines: [...noticeLines, ...observationLines, ...summaryLines, `skill-review: reviewed ${uses} skill uses in ${compact.conversations.length} Conversations`],
     code: 0,
   };
 }

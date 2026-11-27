@@ -146,7 +146,7 @@ export function main(argv, env, cwd) {
   const project = basename(projectRoot);
   const depth1 = tokensOf(JSON.stringify({ project, conversations }, null, 2).length);
   mkdirSync(dirname(outFile), { recursive: true });
-  writeFileSync(outFile, JSON.stringify({ project, conversations, tokens: { depth1, depth2: 0 } }, null, 2));
+  writeFileSync(outFile, JSON.stringify({ project, conversations, tokens: { depth1, depth2: 0 }, notices: lines.filter((l) => l.startsWith('notice: ')) }, null, 2));
   const total = conversations.reduce((n, c) => n + c.uses.length, 0);
   lines.push(`skill-review: model tokens: depth 1: ${depth1}`);
   lines.push(`skill-review: prepared ${total} skill uses in ${conversations.length} Conversations`);
