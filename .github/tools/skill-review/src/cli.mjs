@@ -4,7 +4,7 @@ import { homedir, tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { CLAUDE_TYPES, COPILOT_TYPES, findClaudeConversations, findCopilotConversations } from './logs.mjs';
 import { readRecord } from './record.mjs';
-import { claudeSkillStart, copilotSkillStart, segmentUses, unknownRecords } from './uses.mjs';
+import { claudeSkillStart, copilotSkillStart, resumeUse, segmentUses, unknownRecords } from './uses.mjs';
 
 
 const USAGE = 'skill-review prepare [<skill>] [--out <file>]';
@@ -77,8 +77,9 @@ export function main(argv, env, cwd) {
     };
   }
 
+  let record;
   try {
-    readRecord(home);
+    record = readRecord(home);
   } catch (err) {
     if (err.category) return fail(err.category, err.detail);
     throw err;
@@ -99,10 +100,12 @@ export function main(argv, env, cwd) {
   const kept = [];
   for (const { convs, start, types } of groups) {
     for (const conv of convs) {
+      const reviewed = record.conversations?.[`${conv.harness}:${conv.id}`] ?? {};
       const uses = segmentUses(conv, start)
         .filter((u) => u.skill !== 'skill-review' && known.includes(u.skill))
         .filter((u) => args.skill === null || u.skill === args.skill)
-        .map((u) => ({ ...u, from: u.start }));
+        .map((u) => resumeUse(u, reviewed[u.skill]))
+        .filter((u) => u !== null);
       if (uses.length) kept.push({ conv, uses, types });
     }
   }

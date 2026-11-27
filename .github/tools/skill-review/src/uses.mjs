@@ -15,6 +15,14 @@ export function segmentUses(conversation, isStart) {
   }));
 }
 
+// lastReviewed is the recorded Position for this skill in this Conversation, or undefined.
+// Returns the use with `from` set to the first unreviewed line, or null when fully reviewed.
+export function resumeUse(use, lastReviewed) {
+  const reviewed = Number.isInteger(lastReviewed) ? lastReviewed : 0;
+  const from = Math.max(use.start, reviewed + 1);
+  return from <= use.end ? { ...use, from } : null;
+}
+
 export function copilotSkillStart(rec) {
   return rec.type === 'skill.invoked' && typeof rec.data?.name === 'string' ? rec.data.name : null;
 }
