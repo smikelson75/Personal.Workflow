@@ -257,7 +257,7 @@ test('[R62-07] signals and flags cover only the records after the last reviewed 
     const use = pullWork(fx, res, 'c1');
     assert.equal(use.from, 6);
     assert.equal(use.signals.records, 3);
-    assert.deepEqual(use.flags, [{ kind: 'long-message', line: 7 }]);
+    assert.deepEqual(use.flags, [{ kind: 'tool-error', line: 6 }, { kind: 'long-message', line: 7 }]);
   } finally {
     fx.cleanup();
   }

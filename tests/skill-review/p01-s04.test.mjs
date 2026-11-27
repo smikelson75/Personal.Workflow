@@ -114,7 +114,7 @@ test('[R54-01] a resumed Conversation lists only records after the last reviewed
     const c1 = json.conversations[0];
     assert.equal(c1.harness, 'Copilot CLI');
     assert.equal(c1.id, 'c1');
-    assert.deepEqual(c1.uses, [{ skill: 'pull-work', start: 2, end: 520, from: 401 }]);
+    assert.deepEqual(c1.uses.map(({ skill, start, end, from }) => ({ skill, start, end, from })), [{ skill: 'pull-work', start: 2, end: 520, from: 401 }]);
   } finally {
     fx.cleanup();
   }
@@ -143,7 +143,7 @@ test('[R54-03] only the skill with unreviewed records is listed', () => {
     assert.ok(res.stdoutLines.includes('skill-review: prepared 1 skill uses in 1 Conversations'));
     const json = compact(fx, res);
     assert.equal(json.conversations.length, 1);
-    assert.deepEqual(json.conversations[0].uses, [{ skill: 'pull-work', start: 10, end: 20, from: 10 }]);
+    assert.deepEqual(json.conversations[0].uses.map(({ skill, start, end, from }) => ({ skill, start, end, from })), [{ skill: 'pull-work', start: 10, end: 20, from: 10 }]);
   } finally {
     fx.cleanup();
   }
@@ -160,7 +160,7 @@ test('[R54-04] a record entry for another Conversation does not affect c1', () =
     const json = compact(fx, res);
     assert.equal(json.conversations.length, 1);
     assert.equal(json.conversations[0].id, 'c1');
-    assert.deepEqual(json.conversations[0].uses, [{ skill: 'pull-work', start: 2, end: 12, from: 2 }]);
+    assert.deepEqual(json.conversations[0].uses.map(({ skill, start, end, from }) => ({ skill, start, end, from })), [{ skill: 'pull-work', start: 2, end: 12, from: 2 }]);
   } finally {
     fx.cleanup();
   }
