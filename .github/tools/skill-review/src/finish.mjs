@@ -97,6 +97,18 @@ export function finish(args, env, cwd = process.cwd()) {
 
   const judgement = readJson(judgementFile);
   if (!Array.isArray(judgement?.cases)) return fail('judgement-unreadable', judgementFile);
+  const judgedHandoffs = judgement.handoffs ?? [];
+  if (!Array.isArray(judgedHandoffs)) return fail('judgement-unreadable', judgementFile);
+
+  const compactHandoffs = Array.isArray(compact.handoffs) ? compact.handoffs : [];
+  const compactById = new Map(compactHandoffs.map((h) => [h.id, h]));
+  const judgedIds = new Set();
+  for (const entry of judgedHandoffs) {
+    const id = typeof entry?.id === 'string' ? entry.id : '';
+    const ch = compactById.get(id);
+    if (!ch || ch.using == null) return fail('judgement-invalid', `handoff ${id}`);
+    judgedIds.add(id);
+  }
 
   const privacy = checkPrivacy(judgement.cases, compact);
   if (privacy) return fail('privacy-check', `case ${privacy.case} ${privacy.field}`);
@@ -154,12 +166,35 @@ export function finish(args, env, cwd = process.cwd()) {
     }
   }
 
+  record.handoffs ??= [];
+  const existingById = new Map(record.handoffs.map((h) => [h.id, h]));
+  for (const ch of compactHandoffs) {
+    const isJudged = judgedIds.has(ch.id);
+    const existing = existingById.get(ch.id);
+    const state = isJudged ? 'reviewed' : 'pending';
+    const writtenAt = !isJudged && existing?.state === 'pending' && existing.writtenAt ? existing.writtenAt : ch.writtenAt;
+    const next = {
+      id: ch.id,
+      writingSkill: ch.writingSkill,
+      usingSkill: ch.usingSkill,
+      artifact: ch.artifact,
+      state,
+      writtenAt,
+    };
+    if (existing) Object.assign(existing, next);
+    else {
+      record.handoffs.push(next);
+      existingById.set(ch.id, next);
+    }
+  }
+
   const now = env.SKILL_REVIEW_NOW ? new Date(env.SKILL_REVIEW_NOW) : new Date();
   let summaryLines = [];
   let summaryText = null;
   let ledgerText = null;
   let summaryProject = null;
-  if (uses > 0) {
+  const handoffsReviewed = judgedIds.size;
+  if (uses > 0 || handoffsReviewed > 0) {
     const version = manifestVersion(home);
     const source = (record.installs ?? []).find((i) => i.version === version)?.source ?? 'unknown';
     const project = compact.project || basename(cwd);
@@ -172,7 +207,7 @@ export function finish(args, env, cwd = process.cwd()) {
       record,
       observationLines,
       notices: [...(compact.notices ?? []), ...noticeLines, ...steNotices],
-      handoffsReviewed: Array.isArray(judgement.handoffs) ? judgement.handoffs.length : 0,
+      handoffsReviewed,
     });
     ledgerText = renderLedger({ record, now });
     summaryText = text;

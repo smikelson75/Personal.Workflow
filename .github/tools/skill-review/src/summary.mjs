@@ -85,7 +85,7 @@ export function renderSummary(ctx) {
   const lines = [
     `# Skill Review - ${project} - ${stamp(now).title}`,
     `Workflow version: ${version} (source ${source})`,
-    `Reviewed: ${convs} Conversations, ${uses} skill uses (${skills.join(', ')}), ${ctx.handoffsReviewed ?? 0} Handoffs; pending Handoffs: ${pending}`,
+    `Reviewed: ${convs} Conversations, ${uses} skill uses (${skills.length ? skills.join(', ') : 'none'}), ${ctx.handoffsReviewed ?? 0} Handoffs; pending Handoffs: ${pending}`,
     `Model tokens: ${depth1 + depth2} read (Depth 1: ${depth1}, Depth 2: ${depth2})`,
   ];
   for (const name of SECTIONS) lines.push(`## ${name}`, ...(bodies[name].length ? bodies[name] : ['None.']));
