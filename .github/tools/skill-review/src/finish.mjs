@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { applyCases } from './observations.mjs';
+import { renderLedger } from './ledger.mjs';
 import { homeFor, readRecord, writeRecord } from './record.mjs';
 import { renderSummary, stamp } from './summary.mjs';
 
@@ -46,7 +47,17 @@ function writeSummary(home, project, now, text) {
   return resolve(file);
 }
 
-// args: [compact-record-file, judgement-file]. Writes the summary, then the Review Record.
+// Replaces the whole Ledger file: temp file, then rename.
+function writeLedger(home, text) {
+  const dir = join(home, 'skill-review');
+  mkdirSync(dir, { recursive: true });
+  const file = join(dir, 'ledger.md');
+  const temp = `${file}.${process.pid}.tmp`;
+  writeFileSync(temp, text);
+  renameSync(temp, file);
+}
+
+// args: [compact-record-file, judgement-file]. Writes the summary and Ledger, then the Review Record.
 export function finish(args, env, cwd = process.cwd()) {
   if (args.length !== 2) return fail('usage', USAGE);
   const [compactFile, judgementFile] = args;
@@ -90,11 +101,11 @@ export function finish(args, env, cwd = process.cwd()) {
     }
   }
 
+  const now = env.SKILL_REVIEW_NOW ? new Date(env.SKILL_REVIEW_NOW) : new Date();
   let summaryLines = [];
   if (uses > 0) {
     const version = manifestVersion(home);
     const source = (record.installs ?? []).find((i) => i.version === version)?.source ?? 'unknown';
-    const now = env.SKILL_REVIEW_NOW ? new Date(env.SKILL_REVIEW_NOW) : new Date();
     const project = compact.project || basename(cwd);
     const text = renderSummary({
       project,
@@ -108,6 +119,7 @@ export function finish(args, env, cwd = process.cwd()) {
       handoffsReviewed: Array.isArray(judgement.handoffs) ? judgement.handoffs.length : 0,
     });
     summaryLines = [`skill-review: summary: ${writeSummary(home, project, now, text)}`];
+    writeLedger(home, renderLedger({ record, now }));
   }
 
   writeRecord(home, record);
