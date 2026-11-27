@@ -2,10 +2,11 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: gate P04
+- Next: review P04
 - Tests locked: `490cb97`
 - Oracle: `tests/skill-review`
 - Phase base: `490cb97`
+- Review pending: S02, S03, S04, S06, S07
 - Reconciled: `0c7a2b317a2d2c0d38cf3dfcfc4fc4e86549b2e8`
 
 ## Current state
