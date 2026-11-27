@@ -139,9 +139,9 @@ export function main(argv, env, cwd) {
     uses: uses.map((u) => ({ ...u, ...useSignals(conv, u, classify) })),
   }));
   conversations.sort((a, b) => (a.harness === b.harness ? (a.id < b.id ? -1 : a.id > b.id ? 1 : 0) : a.harness < b.harness ? -1 : 1));
-  const handoffs = findHandoffs({ projectRoot, groups, skill: args.skill });
+  const handoffs = findHandoffs({ projectRoot, groups, skill: args.skill, handoffs: record.handoffs });
 
-  if (!conversations.length) {
+  if (!conversations.length && !handoffs.some((h) => h.using !== null)) {
     lines.push('skill-review: nothing to review');
     return { lines, code: 0 };
   }

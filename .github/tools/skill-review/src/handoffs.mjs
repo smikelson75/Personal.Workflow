@@ -63,10 +63,35 @@ function compareEnd(a, b) {
   return a.conversation < b.conversation ? -1 : a.conversation > b.conversation ? 1 : 0;
 }
 
-export function findHandoffs({ projectRoot, groups, skill = null }) {
+// Touches of `art` inside uses of `skill`: write true for writes, false for reads.
+function touchesIn({ projectRoot, uses, skill, art, write }) {
+  const found = [];
+  for (const { conv, use } of uses) {
+    if (use.skill !== skill) continue;
+    for (let line = use.start; line <= use.end; line++) {
+      const rec = parseLine(conv.lines[line - 1]);
+      if (!rec || typeof rec.timestamp !== 'string' || !rec.timestamp) continue;
+      const { touches } = classify(rec, conv.harness);
+      if (touches.some((t) => Boolean(t.write) === write && matchesArtifact(projectRoot, t.path, art))) {
+        found.push({
+          timestamp: rec.timestamp,
+          harness: conv.harness,
+          conversation: conv.id,
+          file: conv.file,
+          line,
+        });
+      }
+    }
+  }
+  return found;
+}
+
+export function findHandoffs({ projectRoot, groups, skill = null, handoffs = [] }) {
   if (!projectRoot) return [];
   const artifacts = collectArtifacts(projectRoot);
   if (!artifacts.length) return [];
+
+  const reviewed = new Set((handoffs ?? []).filter((h) => h?.state === 'reviewed').map((h) => h.id));
 
   const uses = [];
   for (const { convs, start } of groups) {
@@ -79,36 +104,30 @@ export function findHandoffs({ projectRoot, groups, skill = null }) {
 
   const entries = [];
   for (const art of artifacts) {
-    const writes = [];
-    for (const { conv, use } of uses) {
-      if (use.skill !== art.writingSkill) continue;
-      for (let line = use.start; line <= use.end; line++) {
-        const rec = parseLine(conv.lines[line - 1]);
-        if (!rec || typeof rec.timestamp !== 'string' || !rec.timestamp) continue;
-        const { touches } = classify(rec, conv.harness);
-        if (touches.some((t) => t.write && matchesArtifact(projectRoot, t.path, art))) {
-          writes.push({
-            timestamp: rec.timestamp,
-            harness: conv.harness,
-            conversation: conv.id,
-            file: conv.file,
-            line,
-          });
-        }
-      }
-    }
+    const id = `${art.writingSkill}:${art.artifact}`;
+    if (reviewed.has(id)) continue;
+    if (skill !== null && art.writingSkill !== skill && art.usingSkill !== skill) continue;
+
+    const writes = touchesIn({ projectRoot, uses, skill: art.writingSkill, art, write: true });
     if (!writes.length) continue;
     writes.sort(compareEnd);
     const w = writes[0];
+
+    const writtenMs = Date.parse(w.timestamp);
+    const reads = touchesIn({ projectRoot, uses, skill: art.usingSkill, art, write: false })
+      .filter((r) => Date.parse(r.timestamp) > writtenMs);
+    reads.sort(compareEnd);
+    const r = reads[0];
+
     entries.push({
-      id: `${art.writingSkill}:${art.artifact}`,
+      id,
       writingSkill: art.writingSkill,
       usingSkill: art.usingSkill,
       artifact: art.artifact,
       state: 'pending',
       writtenAt: w.timestamp,
       writing: { harness: w.harness, conversation: w.conversation, file: w.file, line: w.line },
-      using: null,
+      using: r ? { harness: r.harness, conversation: r.conversation, file: r.file, line: r.line } : null,
     });
   }
 
