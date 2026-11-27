@@ -2,7 +2,7 @@
 
 - Spec: [skill-review-spec.md](../../specs/skill-review-spec.md)
 - Lane: standard
-- Next: P02 S03
+- Next: gate P02
 - Tests locked: `8b05f9e`
 - Oracle: `tests/skill-review`
 - Phase base: `95e9f1f`
@@ -44,4 +44,4 @@
 |---|-------|--------|
 | S01 | Signals and flags in the compact record | completed |
 | S02 | Flagged slices | completed |
-| S03 | Model tokens per Depth | ready |
+| S03 | Model tokens per Depth | completed |

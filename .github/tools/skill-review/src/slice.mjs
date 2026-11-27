@@ -1,6 +1,7 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { parseLine, splitLines } from './logs.mjs';
 import { renderParts } from './records.mjs';
+import { tokensOf } from './tokens.mjs';
 
 const USAGE = 'skill-review slice <compact-record-file> <Conversation ID> <line>';
 const NEIGHBOUR_CAP = 1000;
@@ -21,7 +22,7 @@ function isFlagged(conv, line) {
     (Array.isArray(u?.flags) ? u.flags : []).some((f) => f?.line === line));
 }
 
-// args: [compact-record-file, Conversation ID, line]. Writes nothing.
+// args: [compact-record-file, Conversation ID, line]. Rewrites the record file's slices and tokens.depth2 on success.
 export function slice(args) {
   if (args.length !== 3) return fail('usage', USAGE);
   const [recordFile, convId, lineText] = args;
@@ -54,8 +55,23 @@ export function slice(args) {
     body.push(`[${n}] ${label}: ${cap(content, n === line ? FLAGGED_CAP : NEIGHBOUR_CAP)}`);
   }
 
+  const chars = body.join('\n').length;
+  const prior = Array.isArray(record.slices) ? record.slices : [];
+  const slices = [...prior];
+  const at = slices.findIndex((s) => s?.id === convId && s?.line === line);
+  const entry = { id: convId, line, chars };
+  if (at === -1) slices.push(entry);
+  else slices[at] = entry;
+  const depth2 = tokensOf(slices.reduce((n, s) => n + (s.chars ?? 0), 0));
+  const updated = { ...record, slices, tokens: { ...(record.tokens ?? {}), depth2 } };
+  try {
+    writeFileSync(recordFile, JSON.stringify(updated, null, 2));
+  } catch {
+    return fail('record-unwritable', recordFile);
+  }
+
   return {
-    lines: [`slice: ${convId} line ${line}`, ...body, 'skill-review: model tokens: depth 2: 0'],
+    lines: [`slice: ${convId} line ${line}`, ...body, `skill-review: model tokens: depth 2: ${depth2}`],
     code: 0,
   };
 }

@@ -89,7 +89,7 @@
 - **Goal:** `prepare` and `slice` report the characters given to the model divided by 4, rounded up, per Depth, and keep the running totals in the compact record.
 - **Depends on:** S02
 - **Tier:** delegate - arithmetic and one record update, fully pinned
-- **Review:** none
+- **Review:** required - test literal in product code
 - **Scenarios:** fixture: S02's fixture
   - R62-13: Given R62-01's fixture, when `prepare` runs, then the stdout line just before `skill-review: prepared ...` is `skill-review: model tokens: depth 1: <n>`, where `<n>` is `ceil(L/4)` and `L` is the length of `JSON.stringify({project, conversations}, null, 2)` rebuilt from the record file; and the record file has `tokens` `{depth1:<n>, depth2:0}`
   - R62-14: Given that record, when `slice <record> c1 4` runs, then the last line is `skill-review: model tokens: depth 2: <m>`, `<m>` is `ceil(C/4)` with `C` the length of the body lines joined with `\n`, and the record file has `tokens` `{depth1:<n>, depth2:<m>}` and `slices` `[{id:"c1",line:4,chars:C}]`
