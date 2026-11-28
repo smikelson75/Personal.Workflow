@@ -78,13 +78,22 @@ cd C:\Projects\MyApp
 
 Harness arguments pass through (`<home>\launch claude --resume`). The Launch Script reads the `Stack:` line of the Project Repo's `AGENTS.md`: a `Stack:` line in `AGENTS.md` selects the Language Add-on (`csharp`, `node-javascript`, `node-typescript`, or one you add). Run `/agents-md` to write it, and `/addon-author` in a `Personal.Workflow` clone to add a stack.
 
-Optional per-machine short command `wf` (add to your PowerShell profile):
+Optional per-machine short command `pwf` (add to your PowerShell profile):
 
 ```powershell
-function wf { & "<home>\launch.cmd" @args }
+  function pwf { & "<home>\launch.cmd" @args }
 ```
 
-`wf version` prints the same output as `<home>\launch version`.
+`pwf version` prints the same output as `<home>\launch version`.
+
+#### Remote Control (Claude Code)
+
+To continue a local Claude Code session from `claude.ai/code` or the Claude mobile app with the Home Repo workflow loaded:
+
+- **Start with Remote Control enabled:** `<home>\launch claude --remote-control` (or `--rc`, optionally followed by a session name such as `"Incubate workflow"`). Because extra arguments pass through after `--add-dir` and `--plugin-dir`, Workflow Core, Language Add-ons, and the locked-tests guard load as usual.
+- **Turn it on mid-session:** run `/remote-control` (or `/rc`) inside a running Claude Code session.
+- **Auto-connect every interactive session:** run `/config` inside Claude Code and turn on **Enable Remote Control for all sessions**.
+- **Server mode (`claude remote-control`) is not supported via the Launch Script:** Claude Code rejects `--add-dir` and `--plugin-dir` with the `remote-control` subcommand; use interactive `--remote-control` or `/remote-control` instead.
 
 ### Direct Harness commands
 
