@@ -2,7 +2,7 @@
 
 Status: incubating
 Started: 2026-11-27
-Updated: 2026-11-27 (second session)
+Updated: 2026-11-28 (third session: Assumption Rule hand probe reviewed)
 
 ## Spark
 - `skill-review` was built to replace the hand-run reviews, and it is nearly blind ([skill-review-depth.md](skill-review-depth.md)). Instead of fixing the review again, look back at the `incubate` and `brain-storm` Conversations and the artifacts that designed it. How did we commit so many tokens to the wrong design, and what in the workflow let that happen?
@@ -110,6 +110,29 @@ Updated: 2026-11-27 (second session)
 - **Steelman vs. 80/20 (2026-11-27).** The steelman is one shared rule across all skills, with skill-review auditing labels. The 80/20 is incubate only. Reasoned through both cases (inferred; neither transcript was re-run against the rule). Incubate-only would catch incubate#1 ("never read beyond a flag" labelled not run, which forces either a replay of S1-S6 or a signoff) and miss `3a726106` (brain-storm). The Developer chose incubate first.
 - **Self-correction under the rule.** This session's agent first said it had "replayed" both cases through each version. That was reasoning, so it was relabelled as inferred. Even while discussing the rule, an agent over-claimed. That is why the rule is being hand-probed before any skill edit.
 
+### Hand probe of the Assumption Rule (observed, 2026-11-28)
+- **Session:** Claude Code `e92e2ca2` (`/incubate from skill-review-depth.md` plus the rule), 04:27Z to 06:32Z, read in full by this session as it ran. Its log moved mid-session to `~/.claude/projects/C--Projects-Personal-Workflow--claude-worktrees-incubate-skill-review-depth-triage/`. It parked the depth note at `df637ea` on `worktree-incubate-skill-review-depth-triage` (not merged).
+- **What the probe found about triage (the depth question):**
+  - Turn 1 was a paper replay, honestly labelled "inferred". Real probes followed: logs found (P1), fields present (P2), and counts checked against the hand counts (P3, which found 3 counting bugs: 0 typed turns, wrong main model, a whole-log window).
+  - A blind test ran 9 fresh pickers on shuffled tables, with the pass rule and column sets fixed in advance. **0 of 9 passed.** S1 and S2 beat every decoy, and S5 came 3rd (6th or 7th with the conversation or token columns dropped). A confusion-phrase scan, also fixed in advance, found 0 hits in S5.
+  - Developer's conclusion: counts catch loud failures (forms, volume, errors). A hallucination needs what was said to be read. The Developer proposed two top-3 lists (triage and tokens, with reviewed sessions removed), then a pick or a random draw.
+- **Confounds this session spotted (not in the depth note except the first):**
+  - **Skill version** (recorded at depth note line 63). `ask_user` was legal before `c6fcbb3`, so the form count measured which version ran.
+  - **The picker brief named "avoid multiple-choice forms (`ask_user`)" as an incubate rule** (observed, all 9 briefs). It was the only rule that lined up with a column, and every top-1 and top-2 reason cites it. The brief was written after the agent saw S5's row. The leak cut *against* S5, so the 0/9 result is partly caused by the brief. A neutral-brief re-run of the all-columns set was suggested but not run.
+  - The agent's post-hoc "top 3 = all three bad sessions, 1 in 120" treats 9 overlapping sets as if they were independent, and the brief handed it S1 and S2. It is weaker than stated.
+- **Against the three criteria:**
+
+| Criterion | Result | Evidence |
+| --- | --- | --- |
+| (a) Labels match tool output | **Held**, with one slip | Every observed claim checked against the log matched. The slip: piece 3 (the `8b3edef2` decoy) was grepped but never re-labelled, and the grep didn't settle it |
+| (b) Stops: how many, did they carry weight | **They carried weight, but came too wide.** About 6 stops. Each caught something real (20% luck odds, its own lost blindness, the multiple-comparison trap, rules broken after the fixer ran) | Several were bundled with reports or asked 2-3 decisions at once. The Developer's "Wow! I'm lost" (05:13) and "not understanding what I'm being ask" (05:39) both followed stops pitched at script internals |
+| (c) Signoffs carry a why and the risk in own words | **None given, and the rule held** | The Developer refused a signoff they couldn't explain ("I can't signoff on p4 if I don't understand", 05:01) and chose a probe every time. The agent never accepted a terse reply as a signoff |
+
+- **The Developer's skepticism did most of the steering (observed).** Refusing the signoff, "you have more than just S5", restating the test in their own words, the column-dropping idea, "were these the same skill?" (which surfaced the version confound), and "counts can't catch a hallucination". The rule gave that skepticism a place to land. It did not create it.
+- **The agent still changed one thing without asking (observed):** it added a second scoring ("2 clean decoys") after promising the decoy question as its own stop. That is small, but it is the same class of move as cause #2.
+- **Cost (observed from task notifications):** fixer 63.9K and 9 pickers about 41K each, so about 434K subagent tokens, plus the main session. That is cheap next to the ~64M build chain, and it answered the depth question with evidence rather than assertion.
+- **Verdict (current leaning):** criterion (a) holds, so per the earlier plan an incubate edit is justified. Criterion (b) says to tune the stop before shipping it: one decision per stop, stated in the Developer's terms (what it means for the result), never in script internals. The "I'm lost" feeling is the cost of getting this wrong, and the Developer named it as one that "sucks and irritates".
+
 ## What Fits vs. What Clashes
 
 | Workflow part | What it did here | What would have caught it (a hunch, not a design) |
@@ -155,45 +178,7 @@ Updated: 2026-11-27 (second session)
 - **"Probe" means two things.** Brain-storm's "Probe with examples" (`brain-storm/SKILL.md:60`) means asking questions, while the Developer means testing. `.workflow/language.md` has no "probe" entry (grep found no hits).
 
 ## Pick Up Here
-- **Run the hand probe of the Assumption Rule** (the Developer chose "run the probe first", rather than signing off on "agents will follow the rule honestly"). Start a **fresh** session, so its log can be checked on its own, and paste:
-
-```text
-/incubate from .workflow/incubations/skill-review-depth.md
-
-PROBE: For this session, apply the Assumption Rule below on top of the incubate skill.
-This session is itself a test of the rule; its log will be checked afterwards.
-
-Assumption Rule
-1. Split. Break each assumption into small pieces that can be proved one at a time.
-   Never try to prove everything at once.
-2. Label. Every claim that a decision rests on gets one status, shown up front:
-   - observed: what ran, where, and the actual output (say if output was truncated
-     or a page was only partly read)
-   - inferred: from what (file and line, doc section), and why it is likely
-   - not run: what it would take to check, and who can run it (you or me)
-   This covers your own claims about the design, not only external or environment facts.
-   "I reasoned through it" is inferred, never observed.
-3. Stop. Before any decision rests on a piece that is not observed, stop in its own
-   turn, with nothing else bundled in, and show:
-   piece | status and evidence | risk if wrong | cheapest probe
-   Then ask me to choose: run the probe, or sign off.
-4. Probe small. If I ask for the probe, run only the smallest check that settles that
-   one piece, then re-label it. If only I can run it, give me the exact command or step.
-5. Signoff. A signoff counts only if I give a why, restate the risk in my own words,
-   and approve. "yes", "A", "agree" or "sure" is not a signoff: ask again.
-   Record each signoff in the note under Accepted Risks, with my words.
-6. Exit gate. Do not graduate while any load-bearing piece is unobserved and not
-   signed off.
-7. Fast mode. If my replies get short and quick, keep the labels and stops exactly
-   as visible. Never shorten them to match my pace.
-
-First task: replay S1-S6 (docs/research/incubate-session-review.md) and P06
-(docs/research/pull-work-session-review-p06.md) through the proposed triage step and
-label which hand findings it would keep or drop, before any further design.
-```
-
-- **Then come back here** (`/incubate from .workflow/incubations/skill-review-design-miss.md`) and read that session's log against three criteria:
-  - (a) Did the labels match the real tool output?
-  - (b) How many stops fired, and did each one carry weight, or were there too many?
-  - (c) Did each signoff have a why and the risk in the Developer's own words?
-- Edit incubate only if (a) holds. Tune the stop's scope if (b) shows fatigue.
+- The hand probe ran (`e92e2ca2`, see "Hand probe of the Assumption Rule"). (a) held, (b) showed the stops are too wide and too technical, and (c) held with no signoffs.
+- Next, in this note: draft the Assumption Rule as incubate skill text, with one change from the probe version. **A stop asks one decision, in plain terms of what it changes in the result, with no script internals unless asked.** Show the draft to the Developer before any edit to `incubate/SKILL.md`.
+- Open check before relying on the depth result: a neutral-brief re-run of the all-columns picker (no rule list in the brief). It separates "counts can't see S5" from "the brief steered away from S5". It is cheap: one picker, about 41K tokens. That work belongs to `skill-review-depth.md`, not here.
+- Merge pending: `worktree-incubate-skill-review-depth-triage` (`df637ea`) has not been merged to `main`.
